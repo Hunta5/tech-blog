@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: node:20-alpine
+    container_name: nextjs-dev
+    working_dir: /app/frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules  # 防止本地 node_modules 覆盖容器内的
+    tty: true

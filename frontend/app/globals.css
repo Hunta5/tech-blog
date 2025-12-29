@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@layer base {
+    body {
+        @apply bg-gray-900 text-gray-100;
+    }
+    /* 滚动条样式 */
+    ::-webkit-scrollbar {
+        @apply w-2;
+    }
+
+    ::-webkit-scrollbar-track {
+        @apply bg-gray-900;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        @apply bg-gray-700 rounded-full;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-600;
+    }
+
+}
+
+@layer utilities {
+    /* 平滑滚动 */
+    .scroll-smooth {
+        scroll-behavior: smooth;
+    }
+}
