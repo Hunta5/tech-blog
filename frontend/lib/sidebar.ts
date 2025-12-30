@@ -30,6 +30,14 @@ export const sidebarConfig: SidebarItem[] = [
                 href: '/tools/timestamp',
             },
             {
+              title: 'HexDecimal',
+              href: '/tools/hex',
+            },
+            {
+              title: 'App Icon Creator',
+              href: '/tools/appIconCreator',
+            },
+            {
                 title: 'Atos Crash Transfer',
                 href: '/tools/atos',
             },
@@ -39,7 +47,7 @@ export const sidebarConfig: SidebarItem[] = [
         title: 'About',
         children: [
             {
-                title: "About US",
+                title: "About Me",
                 href: '/about',
             }
         ]
