@@ -38,8 +38,8 @@ export const sidebarConfig: SidebarItem[] = [
               href: '/tools/appIconCreator',
             },
             {
-                title: 'Atos Crash Transfer',
-                href: '/tools/atos',
+                title: 'Tool Info',
+                href: '/tools/crashtool',
             },
         ]
     },

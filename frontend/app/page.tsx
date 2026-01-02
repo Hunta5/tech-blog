@@ -16,16 +16,16 @@ export default function HomePage() {
                   className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
             </span>
-            持续更新中
+            지속적으로 업데이트 중
           </span>
                 </div>
 
                 <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                    欢迎来到我的技术博客
+                    제 기술 블로그에 오신 것을 환영합니다.
                 </h1>
 
                 <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                    记录学习与成长的点点滴滴，分享技术心得与开发经验
+                    학습 및 성장의 모든 단계를 기록하고 기술적 통찰력과 개발 경험을 공유하세요.
                 </p>
             </div>
 
@@ -34,17 +34,17 @@ export default function HomePage() {
                 <div
                     className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-xl p-6">
                     <div className="text-3xl font-bold text-blue-400 mb-2">{posts.length}</div>
-                    <div className="text-gray-400">技术文章</div>
+                    <div className="text-gray-400">기술 기사</div>
                 </div>
                 <div
                     className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20 rounded-xl p-6">
                     <div className="text-3xl font-bold text-purple-400 mb-2">5</div>
-                    <div className="text-gray-400">技术分类</div>
+                    <div className="text-gray-400">기술 분류</div>
                 </div>
                 <div
                     className="bg-gradient-to-br from-pink-500/10 to-pink-600/10 border border-pink-500/20 rounded-xl p-6">
                     <div className="text-3xl font-bold text-pink-400 mb-2">1k+</div>
-                    <div className="text-gray-400">总阅读量</div>
+                    <div className="text-gray-400">총 독서량</div>
                 </div>
             </div>
 
@@ -52,7 +52,7 @@ export default function HomePage() {
             <div>
                 <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-2">
                     <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></span>
-                    最新文章
+                    최신 기사
                 </h2>
 
                 <div className="space-y-6">
@@ -98,7 +98,7 @@ export default function HomePage() {
 
                                     <div
                                         className="flex items-center text-blue-400 group-hover:translate-x-2 transition-transform">
-                                        <span className="text-sm font-medium">阅读全文</span>
+                                        <span className="text-sm font-medium">더 읽어보세요</span>
                                         <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor"
                                              viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
