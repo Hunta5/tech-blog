@@ -1,8 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { marked } from 'marked';
 import Link from 'next/link';
+import MarkdownView from "@/components/MarkdownView";
+import { getShikiHighlighter } from '@/lib/shiki';
+const highlighter = await getShikiHighlighter();
 
 type Props = {
     params: Promise<{ slug: string }>;
@@ -39,7 +41,7 @@ export default async function PostPage({ params }: Props) {
 
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const { content, data } = matter(fileContents);
-    const html = marked(content);
+
 
     return (
         <div className="max-w-4xl mx-auto px-6 py-12">
@@ -99,31 +101,10 @@ export default async function PostPage({ params }: Props) {
             <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent mb-12"></div>
 
             {/* 文章内容 */}
-            <article
-                className="prose prose-lg prose-invert max-w-none
-          prose-headings:scroll-mt-20
-          prose-headings:font-bold
-          prose-h1:text-4xl prose-h1:mb-6 prose-h1:text-white
-          prose-h2:text-3xl prose-h2:mb-4 prose-h2:mt-12 prose-h2:text-white prose-h2:border-b prose-h2:border-gray-800 prose-h2:pb-2
-          prose-h3:text-2xl prose-h3:mb-3 prose-h3:mt-8 prose-h3:text-white
-          prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6
-          prose-a:text-blue-400 prose-a:no-underline prose-a:font-medium hover:prose-a:text-blue-300 hover:prose-a:underline
-          prose-strong:text-white prose-strong:font-semibold
-          prose-code:text-yellow-400 prose-code:bg-gray-800 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:text-sm
-          prose-code:before:content-[''] prose-code:after:content-['']
-          prose-pre:bg-gray-800 prose-pre:border prose-pre:border-gray-700 prose-pre:rounded-xl prose-pre:shadow-lg
-          prose-ul:text-gray-300 prose-ul:my-6
-          prose-ol:text-gray-300 prose-ol:my-6
-          prose-li:my-2 prose-li:leading-relaxed
-          prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-500/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r
-          prose-blockquote:text-gray-300 prose-blockquote:not-italic
-          prose-img:rounded-xl prose-img:shadow-xl prose-img:my-8
-          prose-hr:border-gray-800 prose-hr:my-12
-          prose-table:border-collapse prose-table:w-full
-          prose-th:bg-gray-800 prose-th:p-3 prose-th:text-left prose-th:font-semibold prose-th:text-white
-          prose-td:p-3 prose-td:border-t prose-td:border-gray-800 prose-td:text-gray-300"
-                dangerouslySetInnerHTML={{ __html: html }}
+            <MarkdownView
+                markdown={content}
             />
+
 
             {/* 文章底部 */}
             <div className="mt-16 pt-8 border-t border-gray-800">
