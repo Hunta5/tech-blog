@@ -12,10 +12,24 @@ services:
       - ./frontend:/app/frontend
       - frontend_node_modules:/app/frontend/node_modules
     environment:
-      - DATABASE_URL=postgres://postgres:postgres123@postgres:5432/app_db
+      - NEXT_PUBLIC_API_BASE_URL= ${NEXT_PUBLIC_API_BASE_URL}
+    depends_on:
+      - backend
+    tty: true
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../backend/Dockerfile
+    container_name: java-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     depends_on:
       - postgres
-    tty: true
 
   postgres:
     image: postgres:15
@@ -24,9 +38,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: hunta
-      POSTGRES_PASSWORD: Djslzja0080$
-      POSTGRES_DB: app_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

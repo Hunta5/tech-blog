@@ -7,7 +7,7 @@ WORKDIR /app
 RUN apk add --no-cache bash git
 
 # 复制 package.json（用于安装依赖）
-COPY frontend/package*.json ./frontend/
+COPY frontend/package*.json ./
 
 # 进入 frontend 目录安装依赖
 WORKDIR /app/frontend
