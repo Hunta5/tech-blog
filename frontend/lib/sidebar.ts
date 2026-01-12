@@ -11,6 +11,10 @@ export const sidebarConfig: SidebarItem[] = [
             {
                 title: ' All Articles',
                 href: '/',
+            },
+            {
+                title: 'BlogMaker',
+                href: '/blog',
             }
         ]
     },
