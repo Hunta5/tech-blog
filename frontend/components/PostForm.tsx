@@ -56,7 +56,7 @@ export default function PostForm() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto px-6 py-16">
+        <div className="max-w-6xl min-w-[1024px] mx-auto px-6 py-16">
             {/* 页面标题 */}
             <div className="mb-12 text-center">
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
