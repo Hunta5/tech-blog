@@ -10,8 +10,9 @@ public class PostMapper {
     public static  Post toEntity(PostCreateRequest dto) {
         Post post = new Post();
         post.setTitle(dto.getTitle());
+        post.setSlug(dto.getSlug());
         post.setContent(dto.getContent());
-        post.setCreatedAt(LocalDateTime.now());
+        post.setSummary(dto.getSummary());
         return  post;
     }
 

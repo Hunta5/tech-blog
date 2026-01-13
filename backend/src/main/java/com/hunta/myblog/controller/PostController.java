@@ -1,5 +1,6 @@
 package com.hunta.myblog.controller;
 
+import com.hunta.myblog.common.ApiResponse;
 import com.hunta.myblog.dto.PostCreateRequest;
 import com.hunta.myblog.dto.PostResponse;
 import com.hunta.myblog.service.PostService;
@@ -19,17 +20,17 @@ public class PostController {
     }
 
     @PostMapping
-    public PostResponse create(@Valid @RequestBody PostCreateRequest request){
-        return service.create(request);
+    public ApiResponse<PostResponse> create(@Valid @RequestBody PostCreateRequest request){
+        return ApiResponse.success(service.create(request));
     }
 
     @GetMapping
-    public List<PostResponse> list(){
-        return service.findAll();
+    public ApiResponse<List<PostResponse>> list() {
+        return ApiResponse.success(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public  PostResponse detail(@PathVariable Long id){
-        return service.findById(id);
+    public  ApiResponse<PostResponse> detail(@PathVariable Long id){
+        return ApiResponse.success(service.findById(id));
     }
 }

@@ -21,7 +21,8 @@ public class PostService {
 
     public PostResponse create(PostCreateRequest request) {
         Post post = PostMapper.toEntity(request);
-        return PostMapper.toResponse(repository.save(post));
+        Post saved = repository.save(post); // 🔥 这里自动触发
+        return PostMapper.toResponse(saved);
     }
 
     public List<PostResponse> findAll(){

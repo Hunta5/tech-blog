@@ -10,4 +10,9 @@ public class PostCreateRequest {
 
     @NotBlank(message = "content is required")
     private String content;
+
+    @NotBlank(message = "slug is required")
+    private String slug;
+
+    private String summary;
 }

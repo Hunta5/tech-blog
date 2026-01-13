@@ -34,7 +34,7 @@ export default function PostForm() {
         setError(null);
 
         try {
-            const res = await fetch('http://localhost:8080/posts', {
+            const res = await fetch('/api/posts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(form),
@@ -48,6 +48,7 @@ export default function PostForm() {
 
             alert('创建成功 🎉');
             setForm({ title: '', slug: '', content: '', summary: '' });
+
         } catch (e: any) {
             setError(e.message);
         } finally {
