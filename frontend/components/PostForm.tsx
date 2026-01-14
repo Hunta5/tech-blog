@@ -57,12 +57,14 @@ export default function PostForm() {
     };
 
     return (
+
         <div className="max-w-6xl min-w-[1024px] mx-auto px-6 py-16">
             {/* 页面标题 */}
+            <h1 className="text-center text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                新建博客文章
+            </h1>
+
             <div className="mb-12 text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                    新建博客文章
-                </h1>
                 <p className="text-gray-400">
                     记录你的技术思考与成长 ✍️
                 </p>
