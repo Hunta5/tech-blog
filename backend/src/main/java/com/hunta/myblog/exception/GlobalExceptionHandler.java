@@ -33,8 +33,9 @@ public class GlobalExceptionHandler {
     /* 兜底异常（防止 500 裸奔） */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+        e.printStackTrace();  // 打印堆栈跟踪用于调试
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(50000, "Internal server error"));
+                .body(ApiResponse.error(50000, e.getMessage()));
     }
 }

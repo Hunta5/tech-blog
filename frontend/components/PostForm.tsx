@@ -32,11 +32,12 @@ export default function PostForm() {
     const handleSubmit = async () => {
         setLoading(true);
         setError(null);
+        const token = localStorage.getItem('token');
 
         try {
             const res = await fetch('/api/posts', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}` },
                 body: JSON.stringify(form),
             });
 
@@ -49,8 +50,9 @@ export default function PostForm() {
             alert('创建成功 🎉');
             setForm({ title: '', slug: '', content: '', summary: '' });
 
-        } catch (e: any) {
-            setError(e.message);
+        } catch (e: unknown) {
+            const error = e as Error;
+            setError(error.message);
         } finally {
             setLoading(false);
         }
@@ -58,9 +60,9 @@ export default function PostForm() {
 
     return (
 
-        <div className="max-w-6xl min-w-[1024px] mx-auto px-6 py-16">
+        <div className="max-w-6xl min-w-5xl mx-auto px-6 py-16">
             {/* 页面标题 */}
-            <h1 className="text-center text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            <h1 className="text-center text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                 新建博客文章
             </h1>
 
@@ -139,7 +141,7 @@ export default function PostForm() {
                         onClick={handleSubmit}
                         disabled={loading}
                         className="
-              inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-white
+              inllinear items-center gap-2 px-6 py-3 rounded-xl font-medium text-white
               bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500
               hover:opacity-90 transition
               disabled:opacity-50 disabled:cursor-not-allowed

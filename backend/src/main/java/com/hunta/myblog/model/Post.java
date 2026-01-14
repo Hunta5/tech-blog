@@ -61,4 +61,9 @@ public class Post {
         if (createdAt == null) createdAt = now;
         if (updatedAt == null) updatedAt = now;
     }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
