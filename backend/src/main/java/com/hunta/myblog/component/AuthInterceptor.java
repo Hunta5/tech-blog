@@ -17,15 +17,25 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
-                             Object handler) {
+                             Object handler) throws Exception {
 
         String auth = request.getHeader("Authorization");
         if (auth == null || !auth.startsWith("Bearer ")) {
-            throw new RuntimeException("未登录");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"code\":40100,\"message\":\"未登录\",\"data\":null}");
+            return false;
         }
 
-        String token = auth.substring(7);
-        jwtUtil.parseUserId(token); // 校验合法性
+        try {
+            String token = auth.substring(7);
+            jwtUtil.parseUserId(token); // 校验合法性
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"code\":40100,\"message\":\"Token 无效或已过期\",\"data\":null}");
+            return false;
+        }
 
         return true;
     }

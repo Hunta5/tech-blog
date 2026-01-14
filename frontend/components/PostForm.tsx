@@ -34,6 +34,12 @@ export default function PostForm() {
         setError(null);
         const token = localStorage.getItem('token');
 
+        if (!token) {
+            setError('请先登录');
+            setLoading(false);
+            return;
+        }
+
         try {
             const res = await fetch('/api/posts', {
                 method: 'POST',
@@ -41,9 +47,22 @@ export default function PostForm() {
                 body: JSON.stringify(form),
             });
 
+            // 检查是否成功获取响应
+            if (!res.ok) {
+                const errorText = await res.text();
+                let errorMessage = '请求失败';
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.message || errorText || `HTTP ${res.status}`;
+                } catch {
+                    errorMessage = errorText || `HTTP ${res.status}`;
+                }
+                throw new Error(errorMessage);
+            }
+
             const json = await res.json();
 
-            if (!res.ok || json.code !== 0) {
+            if (json.code !== 0) {
                 throw new Error(json.message || '创建失败');
             }
 
@@ -52,7 +71,7 @@ export default function PostForm() {
 
         } catch (e: unknown) {
             const error = e as Error;
-            setError(error.message);
+            setError(error.message || '发生未知错误');
         } finally {
             setLoading(false);
         }
