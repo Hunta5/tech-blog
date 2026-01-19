@@ -23,6 +23,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "invitation_code", nullable = false)
+    private Integer invitationCode = 0;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }

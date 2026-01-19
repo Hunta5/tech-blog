@@ -39,9 +39,14 @@ public class UserService {
             throw new RuntimeException("用户名已存在");
         }
 
+        if (request.getInvitationCode() != 1005){
+            throw new RuntimeException("邀请码不正确");
+        }
+
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword())) // 🔐
+                .invitationCode(request.getInvitationCode())
                 .createdAt(LocalDateTime.now())
                 .build();
 

@@ -55,5 +55,14 @@ export const sidebarConfig: SidebarItem[] = [
                 href: '/about',
             }
         ]
+    },
+    {
+        title: 'Hobby',
+        children: [
+            {
+                title: "Lips Sync",
+                href: '/hobby/lipssync',
+            }
+        ]
     }
 ]

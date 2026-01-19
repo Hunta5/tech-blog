@@ -5,6 +5,7 @@ import { useState } from 'react';
 export default function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [invitationCode, setInvitationCode] = useState('');
 
     const handleLogin = async () => {
         const res = await fetch('/api/auth/login', {
@@ -28,7 +29,7 @@ export default function LoginPage() {
         const res = await fetch('/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ username, password, invitationCode }),
         });
 
         const json = await res.json();
@@ -65,6 +66,13 @@ export default function LoginPage() {
                    focus:outline-none focus:ring-2 focus:ring-purple-400"
                         placeholder="密码"
                         onChange={e => setPassword(e.target.value)}
+                    />
+
+                    <input
+                        className="w-full border border-gray-300 rounded-lg px-4 py-3
+                   focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        placeholder="推荐码"
+                        onChange={e => setInvitationCode(e.target.value)}
                     />
 
                     <button
