@@ -120,6 +120,7 @@ tuist clean
 
 ## 프로젝터 편집
 ``` bash
+
 # 打开生成的 Xcode 项目
 tuist edit
 ```
@@ -163,83 +164,87 @@ let project = Project(
 ```
 
 ```bash
+
 import ProjectDescription
 
 let project = Project(
-    name: "IMQACore",
-    organizationName: "ONYCOM",
+    name: "projectName",
+    organizationName: "company",
     targets: [
-        .target(name: "IMQACore",
+        .target(name: "TargetName",
                 destinations: .iOS,
                 product: .staticFramework,
-                bundleId: "com.onycom.IMQACore",
+                bundleId: "com.company.TargetName",
+#                iOS 支持的最低版本
                 deploymentTargets: .iOS("12.0"),
+#               文件路径                
                 sources: ["IMQASDK/IMQACore/**/*.swift"],
+#               资源路径 
                 resources: [
                     "IMQASDK/IMQACore/PrivacyInfo.xcprivacy"
                 ],
-                dependencies: [.target(name: "IMQACommon"),
-                               .target(name: "IMQADeviceInfo"),
-                               .target(name: "IMQAObjCUtilsInternal"),
-                               .target(name: "IMQACoreResources")],
+#               依赖target 
+                dependencies: [.target(name: "A"),
+                               .target(name: "ACoreResources")],
+#               buildSetting                               
                 settings: .settings(base: [
+#                衍生产物路径
                     "BUILD_DIR": "$(PROJECT_DIR)/Build",
+#                Swift target：必须开
+#                ObjC target： 开/不开都 功能等价， 通常不开
+#               作用时swift 版本有5.9， 如果版本上升变5.10， 容易炸
                     "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
+#               决定 产物会不会被导出 / archive
+#               App时 YES， Framework/SDK NO
                     "SKIP_INSTALL": "NO",
+#               SDK / Framework：一般保持默认（Release = YES，Debug = NO）
+#               除非你非常确定没有 runtime 反射 / hook / category / swizzle 为了保住+load 这种方法的
 //                    "DEAD_CODE_STRIPPING": "NO",
+#               自动链接libc++，libobjc，Foundation
+#               一般情况默认YES， 做C/runtime 特殊嵌入式环境时NO
                     "LINK_WITH_STANDARD_LIBRARIES" : "YES",
+#               是否把 Swift runtime 嵌入产物
+#               App yes， SDK/Framework NO，
+#               sdk打开了会怎样， 可能导致app 重复潜入Swift runtime，app store 审核警告， 体积变大
                     "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES" : "YES",
+#               告诉编译器：这个 target 是一个 module
+#               ObjC-only target：必须开   oc target必须开
+#               Swift target 默认就是module
                     "DEFINES_MODULE" : "YES"
+                    
+#                    对每一个 target，从上往下问：
+#Q1：这个 target 里有没有 Objective-C 代码？
+#	•	❌ 没有 → 不需要 -ObjC / -force_load
+#	•	✅ 有 → 继续
+
+#Q2：有没有 Category / +load / Swizzle / Hook / Runtime 注册？
+#	•	❌ 没有（只是普通类，被显式调用）→ 通常不需要
+#	•	✅ 有 → 继续
+
+#Q3：这个 target 是 静态库（.a） 还是 动态库（.framework）？
+#	•	🧱 静态库 → 必须考虑
+#	•	📦 动态 Framework → 通常不需要
                 ])),
         
-            .target(name: "IMQADeviceInfo",
+            .target(name: "A",
                     destinations: .iOS,
                     product: .staticFramework,
-                    bundleId: "com.onycom.IMQADeviceInfo",
+                    bundleId: "com.Company.A",
                     deploymentTargets: .iOS("12.0"),
                     sources: ["IMQASDK/IMQADeviceInfo/**"],
-                    headers: .headers(public: "IMQASDK/IMQADeviceInfo/**/*.h"),
+                    headers: .headers(public: "IMQASDK/A/**/*.h"),
                     dependencies: [],
                     settings: .settings(base: [
+#                   OBJECT-C 头文件搜索路径 
                         "HEADER_SEARCH_PATHS": ["$(SRCROOT)/IMQASDK/IMQADeviceInfo"],
+#                  	•	ObjC 内部工具模块
+#               	•	供 Swift SDK 使用
+#               	•	或多个 target 之间共享
+#               	•	module 名字 ≠ target 名字时，要非常小心
+#               	•	modulemap 路径错误 → 编译直接炸
+#               	•	如果同时设置了 DEFINES_MODULE = YES，要确保 不冲突
+
                         "MODULEMAP_FILE": "$(SRCROOT)/IMQASDK/IMQADeviceInfo/module.modulemap",
-                        "BUILD_DIR": "$(PROJECT_DIR)/Build",
-                        "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
-                        "SKIP_INSTALL": "NO",
-//                        "DEAD_CODE_STRIPPING": "NO",
-                        "LINK_WITH_STANDARD_LIBRARIES" : "YES",
-                        "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES" : "YES",
-                        "DEFINES_MODULE" : "YES"
-                    ])),
-        
-            .target(name: "IMQACommon",
-                    destinations: .iOS,
-                    product: .staticFramework,
-                    bundleId: "com.onycom.IMQACommon",
-                    deploymentTargets: .iOS("12.0"),
-                    sources: ["IMQASDK/IMQACommon/**"],
-                    dependencies: [],
-                    settings: .settings(base: [
-                        "BUILD_DIR": "$(PROJECT_DIR)/Build",
-                        "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
-                        "SKIP_INSTALL": "NO",
-//                        "DEAD_CODE_STRIPPING": "NO",
-                        "LINK_WITH_STANDARD_LIBRARIES" : "YES",
-                        "ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES" : "YES",
-                        "DEFINES_MODULE" : "YES"
-                    ])),
-        
-            .target(name: "IMQAObjCUtilsInternal",
-                    destinations: .iOS,
-                    product: .staticFramework,
-                    bundleId: "com.onycom.IMQAObjCUtilsInternal",
-                    deploymentTargets: .iOS("12.0"),
-                    sources: ["IMQASDK/IMQAObjCUtilsInternal/**"],
-                    headers: .headers(public: "IMQASDK/IMQAObjCUtilsInternal/**/*.h"),
-                    dependencies: [],
-                    settings: .settings(base: [
-                        "HEADER_SEARCH_PATHS": ["$(SRCROOT)/IMQASDK/IMQAObjCUtilsInternal"],
-                        "MODULEMAP_FILE": "$(SRCROOT)/IMQASDK/IMQAObjCUtilsInternal/module.modulemap",
                         "BUILD_DIR": "$(PROJECT_DIR)/Build",
                         "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
                         "SKIP_INSTALL": "NO",
@@ -272,13 +277,23 @@ let project = Project(
             "IMQASDK/IMQACore/PrivacyInfo.xcprivacy"
                 ],
                 settings: .settings(base: [
+#                bundle 一般这么设置 
+#                是否允许签名
+#               含义
+#
+#               不允许对这个 target 进行代码签名
+#
+#               Bundle 的现实情况
+#           	•	没有可执行 Mach-O
+#             	•	没有代码
+#           	•	签名毫无意义
                         "CODE_SIGNING_ALLOWED": "NO",
+#                Release / Archive，也不强制签名        
                         "CODE_SIGNING_REQUIRED": "NO",
+#                Archive / Install 阶段 不单独导出这个 target
                         "SKIP_INSTALL": "YES"
                     ])
-               )
-        
-        
+               )        
     ]
 )
 
