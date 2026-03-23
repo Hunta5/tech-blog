@@ -19,6 +19,7 @@ export const sidebarConfig: SidebarItem[] = [
             { titleKey: 'URL', href: '/tools/url' },
             { titleKey: 'Timestamp', href: '/tools/timestamp' },
             { titleKey: 'HexDecimal', href: '/tools/hex' },
+            { titleKey: 'JSON Escape', href: '/tools/json' },
             { titleKey: 'App Icon Creator', href: '/tools/appIconCreator' },
             { titleKey: 'Tool Info', href: '/tools/crashtool' },
         ]
