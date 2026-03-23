@@ -1,17 +1,19 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
-const languages = [
+const resumeLanguages = [
     { key: 'ko', label: '한국어', file: '/resume/resume_ko.html' },
     { key: 'zh', label: '中文', file: '/resume/resume_zh.html' },
 ] as const
 
 export default function ResumeViewer() {
+    const { t } = useLanguage()
     const [lang, setLang] = useState<string>('ko')
     const [iframeHeight, setIframeHeight] = useState(1200)
     const iframeRef = useRef<HTMLIFrameElement>(null)
-    const current = languages.find((l) => l.key === lang)!
+    const current = resumeLanguages.find((l) => l.key === lang)!
 
     const handleLoad = useCallback(() => {
         const iframe = iframeRef.current
@@ -31,7 +33,7 @@ export default function ResumeViewer() {
         <div>
             {/* 语言切换 */}
             <div className="flex items-center gap-3 mb-6">
-                {languages.map((l) => (
+                {resumeLanguages.map((l) => (
                     <button
                         key={l.key}
                         onClick={() => setLang(l.key)}
@@ -56,7 +58,7 @@ export default function ResumeViewer() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
-                    새 탭에서 열기
+                    {t('resume.openNewTab')}
                 </a>
             </div>
 

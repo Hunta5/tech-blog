@@ -1,0 +1,103 @@
+const ko: Record<string, string> = {
+    // Language
+    'lang.switch': '中文',
+
+    // Sidebar
+    'sidebar.blog': 'Blog',
+    'sidebar.allArticles': '모든 기사',
+    'sidebar.blogMaker': 'BlogMaker',
+    'sidebar.tool': 'Tool',
+    'sidebar.about': 'About',
+    'sidebar.aboutMe': 'About Me',
+
+    // Home
+    'home.updating': '지속적으로 업데이트 중',
+    'home.welcome': '제 기술 블로그에 오신 것을 환영합니다.',
+    'home.description': '학습 및 성장의 모든 단계를 기록하고 기술적 통찰력과 개발 경험을 공유하세요.',
+    'home.techArticles': '기술 기사',
+    'home.techCategories': '기술 분류',
+    'home.totalReads': '총 독서량',
+    'home.latestArticles': '최신 기사',
+    'home.readMore': '더 읽어보세요',
+    'home.minuteRead': '5 분 읽기',
+    'home.noArticles': '게시글 없음',
+    'home.noArticlesDesc': '첫 번째 글이 곧 발행됩니다!',
+
+    // Post detail
+    'post.backHome': '홈페이지로 돌아가기',
+    'post.techArticle': '기술 기사',
+    'post.minuteRead': '약 5 분',
+    'post.reads': '127 회 읽기',
+    'post.backToList': '목록으로 돌아가기',
+    'post.shareTo': '공유하기:',
+    'post.notFound': '게시글을 찾을 수 없습니다',
+    'post.notFoundDesc': '요청하신 게시글이 존재하지 않거나 삭제되었습니다',
+
+    // About
+    'about.backHome': '홈페이지로 돌아가기',
+    'about.role': 'Senior iOS Developer · 12+ Years Experience',
+    'about.location': '한국 · 서울',
+    'about.experience': '12년+ 경력',
+    'about.languages': '중국어 · 한국어 · 영어',
+    'about.yearsLabel': 'Years iOS 개발 경력',
+    'about.downloadsLabel': 'Downloads (玖富万卡, 轻图)',
+    'about.dauLabel': 'DAU (玖富万卡, 轻图)',
+    'about.coreSkills': 'Core Skills',
+    'about.careerTimeline': 'Career Timeline',
+    'about.resume': '이력서 / Resume',
+    'about.connectTitle': "Let's Connect!",
+    'about.connectDesc': '제 글에 관심이 있으시거나 기술적인 문제에 대해 논의하고 싶으시다면 아래 방법으로 언제든지 연락 주시기 바랍니다.',
+    'about.sendEmail': '이메일 보내기',
+    'about.followGithub': 'GitHub를 팔로우하세요',
+    'about.education': 'Education',
+    'about.educationDept': '소프트웨어 공학과',
+    'about.langSection': 'Languages',
+
+    // Blog Manager
+    'blog.title': 'Blog Manager',
+    'blog.newPost': '새 글 작성',
+    'blog.noPosts': '아직 게시글이 없습니다',
+    'blog.writeFirst': '첫 번째 글을 작성해 보세요',
+    'blog.view': '보기',
+    'blog.edit': '수정',
+    'blog.delete': '삭제',
+    'blog.backToList': '목록으로 돌아가기',
+    'blog.editPost': '게시글 수정',
+    'blog.createPost': '새 글 작성',
+    'blog.editingNote': '수정 중',
+    'blog.markdownNote': 'Markdown 형식으로 작성할 수 있습니다',
+    'blog.titleLabel': '제목',
+    'blog.titlePlaceholder': '게시글 제목을 입력하세요',
+    'blog.slugLabel': 'Slug',
+    'blog.summaryLabel': '요약 (선택)',
+    'blog.summaryPlaceholder': '간단한 요약을 입력하세요',
+    'blog.contentLabel': '내용 (Markdown)',
+    'blog.contentPlaceholder': '여기에 글을 작성하세요...',
+    'blog.cancel': '취소',
+    'blog.saving': '저장 중...',
+    'blog.publish': '발행하기',
+    'blog.update': '수정 완료',
+    'blog.required': '제목, Slug, 내용은 필수입니다',
+    'blog.editSuccess': '수정 완료!',
+    'blog.publishSuccess': '발행 완료!',
+    'blog.loadFailed': '게시글을 불러오지 못했습니다',
+    'blog.confirmDelete': '게시글을 삭제하시겠습니까?',
+    'blog.deleteFailed': '삭제 실패',
+    'blog.deleteError': '삭제 중 오류가 발생했습니다',
+
+    // Resume
+    'resume.openNewTab': '새 탭에서 열기',
+
+    // Login
+    'login.title': '로그인',
+    'login.username': '사용자 이름',
+    'login.password': '비밀번호',
+    'login.invitationCode': '추천 코드',
+    'login.loginBtn': '로그인',
+    'login.registerBtn': '회원가입',
+    'login.loginSuccess': '로그인 성공',
+    'login.registerSuccess': '회원가입 성공, 로그인해 주세요',
+    'login.registerFailed': '회원가입 실패',
+}
+
+export default ko

@@ -1,0 +1,103 @@
+const zh: Record<string, string> = {
+    // Language
+    'lang.switch': '한국어',
+
+    // Sidebar
+    'sidebar.blog': '博客',
+    'sidebar.allArticles': '所有文章',
+    'sidebar.blogMaker': '写文章',
+    'sidebar.tool': '工具',
+    'sidebar.about': '关于',
+    'sidebar.aboutMe': '关于我',
+
+    // Home
+    'home.updating': '持续更新中',
+    'home.welcome': '欢迎来到我的技术博客',
+    'home.description': '记录学习与成长的每一步，分享技术洞察与开发经验。',
+    'home.techArticles': '技术文章',
+    'home.techCategories': '技术分类',
+    'home.totalReads': '总阅读量',
+    'home.latestArticles': '最新文章',
+    'home.readMore': '阅读更多',
+    'home.minuteRead': '5 分钟阅读',
+    'home.noArticles': '暂无文章',
+    'home.noArticlesDesc': '第一篇文章即将发布，敬请期待！',
+
+    // Post detail
+    'post.backHome': '返回首页',
+    'post.techArticle': '技术文章',
+    'post.minuteRead': '约 5 分钟',
+    'post.reads': '127 次阅读',
+    'post.backToList': '返回列表',
+    'post.shareTo': '分享到：',
+    'post.notFound': '文章不存在',
+    'post.notFoundDesc': '您访问的文章不存在或已被删除',
+
+    // About
+    'about.backHome': '返回首页',
+    'about.role': '高级 iOS 开发工程师 · 12年以上经验',
+    'about.location': '韩国 · 首尔',
+    'about.experience': '12年+ 经验',
+    'about.languages': '中文 · 韩语 · 英语',
+    'about.yearsLabel': '年 iOS 开发经验',
+    'about.downloadsLabel': '下载量 (玖富万卡, 轻图)',
+    'about.dauLabel': '日活跃用户 (玖富万卡, 轻图)',
+    'about.coreSkills': '核心技能',
+    'about.careerTimeline': '职业经历',
+    'about.resume': '简历 / Resume',
+    'about.connectTitle': "联系我！",
+    'about.connectDesc': '如果您对我的文章感兴趣，或者想讨论技术问题，欢迎随时通过以下方式联系我。',
+    'about.sendEmail': '发送邮件',
+    'about.followGithub': '关注 GitHub',
+    'about.education': '教育背景',
+    'about.educationDept': '软件工程系',
+    'about.langSection': '语言能力',
+
+    // Blog Manager
+    'blog.title': '博客管理',
+    'blog.newPost': '写新文章',
+    'blog.noPosts': '还没有文章',
+    'blog.writeFirst': '写第一篇文章吧',
+    'blog.view': '查看',
+    'blog.edit': '编辑',
+    'blog.delete': '删除',
+    'blog.backToList': '返回列表',
+    'blog.editPost': '编辑文章',
+    'blog.createPost': '写新文章',
+    'blog.editingNote': '编辑中',
+    'blog.markdownNote': '支持 Markdown 格式',
+    'blog.titleLabel': '标题',
+    'blog.titlePlaceholder': '请输入文章标题',
+    'blog.slugLabel': 'Slug',
+    'blog.summaryLabel': '摘要（可选）',
+    'blog.summaryPlaceholder': '简要描述文章内容',
+    'blog.contentLabel': '正文（Markdown）',
+    'blog.contentPlaceholder': '在这里开始写你的文章...',
+    'blog.cancel': '取消',
+    'blog.saving': '保存中...',
+    'blog.publish': '发布文章',
+    'blog.update': '保存修改',
+    'blog.required': '标题、Slug、内容为必填项',
+    'blog.editSuccess': '修改成功！',
+    'blog.publishSuccess': '发布成功！',
+    'blog.loadFailed': '加载文章失败',
+    'blog.confirmDelete': '确定要删除这篇文章吗？',
+    'blog.deleteFailed': '删除失败',
+    'blog.deleteError': '删除时发生错误',
+
+    // Resume
+    'resume.openNewTab': '在新标签页打开',
+
+    // Login
+    'login.title': '登录',
+    'login.username': '用户名',
+    'login.password': '密码',
+    'login.invitationCode': '邀请码',
+    'login.loginBtn': '登录',
+    'login.registerBtn': '注册',
+    'login.loginSuccess': '登录成功',
+    'login.registerSuccess': '注册成功，请登录',
+    'login.registerFailed': '注册失败',
+}
+
+export default zh

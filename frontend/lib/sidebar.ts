@@ -1,59 +1,32 @@
 export type SidebarItem = {
-    title: string;
+    titleKey: string;
     href?: string;
     children?: SidebarItem[];
 }
 
 export const sidebarConfig: SidebarItem[] = [
     {
-        title: 'Blog',
+        titleKey: 'sidebar.blog',
         children: [
-            {
-                title: ' All Articles',
-                href: '/',
-            },
-            {
-                title: 'BlogMaker',
-                href: '/blog',
-            }
+            { titleKey: 'sidebar.allArticles', href: '/' },
+            { titleKey: 'sidebar.blogMaker', href: '/blog' },
         ]
     },
     {
-        title: 'Tool',
+        titleKey: 'sidebar.tool',
         children: [
-            {
-              title: 'Base64',
-              href: '/tools/base64',
-            },
-            {
-                title: 'URL',
-                href: '/tools/url',
-            },
-            {
-                title: 'Timestamp',
-                href: '/tools/timestamp',
-            },
-            {
-              title: 'HexDecimal',
-              href: '/tools/hex',
-            },
-            {
-              title: 'App Icon Creator',
-              href: '/tools/appIconCreator',
-            },
-            {
-                title: 'Tool Info',
-                href: '/tools/crashtool',
-            },
+            { titleKey: 'Base64', href: '/tools/base64' },
+            { titleKey: 'URL', href: '/tools/url' },
+            { titleKey: 'Timestamp', href: '/tools/timestamp' },
+            { titleKey: 'HexDecimal', href: '/tools/hex' },
+            { titleKey: 'App Icon Creator', href: '/tools/appIconCreator' },
+            { titleKey: 'Tool Info', href: '/tools/crashtool' },
         ]
     },
     {
-        title: 'About',
+        titleKey: 'sidebar.about',
         children: [
-            {
-                title: "About Me",
-                href: '/about',
-            }
+            { titleKey: 'sidebar.aboutMe', href: '/about' },
         ]
     },
 ]

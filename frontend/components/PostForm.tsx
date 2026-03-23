@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 type PostData = {
     slug: string
@@ -21,6 +22,7 @@ type FormData = {
 type ViewMode = 'list' | 'create' | 'edit'
 
 export default function PostForm() {
+    const { t } = useLanguage()
     const [mode, setMode] = useState<ViewMode>('list')
     const [posts, setPosts] = useState<PostData[]>([])
     const [form, setForm] = useState<FormData>({ title: '', slug: '', content: '', summary: '' })
@@ -72,22 +74,22 @@ export default function PostForm() {
                 setMode('edit')
             }
         } catch {
-            setError('게시글을 불러오지 못했습니다')
+            setError(t('blog.loadFailed'))
         }
     }
 
     const handleDelete = async (slug: string) => {
-        if (!confirm(`"${slug}" 게시글을 삭제하시겠습니까?`)) return
+        if (!confirm(`${t('blog.confirmDelete')}`)) return
         try {
             const res = await fetch(`/api/posts/${slug}`, { method: 'DELETE' })
             const json = await res.json()
             if (json.code === 0) {
                 fetchPosts()
             } else {
-                alert(json.message || '삭제 실패')
+                alert(json.message || t('blog.deleteFailed'))
             }
         } catch {
-            alert('삭제 중 오류가 발생했습니다')
+            alert(t('blog.deleteError'))
         }
     }
 
@@ -111,7 +113,7 @@ export default function PostForm() {
         setSuccess(null)
 
         if (!form.title || !form.slug || !form.content) {
-            setError('제목, Slug, 내용은 필수입니다')
+            setError(t('blog.required'))
             setLoading(false)
             return
         }
@@ -125,13 +127,13 @@ export default function PostForm() {
             const json = await res.json()
 
             if (json.code !== 0) {
-                throw new Error(json.message || '저장 실패')
+                throw new Error(json.message || t('blog.deleteFailed'))
             }
 
-            setSuccess(mode === 'edit' ? '수정 완료!' : '발행 완료!')
+            setSuccess(mode === 'edit' ? t('blog.editSuccess') : t('blog.publishSuccess'))
             setTimeout(() => goToList(), 1000)
         } catch (e: unknown) {
-            setError((e as Error).message || '오류가 발생했습니다')
+            setError((e as Error).message || t('blog.deleteError'))
         } finally {
             setLoading(false)
         }
@@ -143,7 +145,7 @@ export default function PostForm() {
             <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-16">
                 <div className="flex items-center justify-between mb-8">
                     <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                        Blog Manager
+                        {t('blog.title')}
                     </h1>
                     <button
                         onClick={goToCreate}
@@ -152,7 +154,7 @@ export default function PostForm() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        새 글 작성
+                        {t('blog.newPost')}
                     </button>
                 </div>
 
@@ -163,9 +165,9 @@ export default function PostForm() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </div>
-                        <p className="text-gray-400 mb-4">아직 게시글이 없습니다</p>
+                        <p className="text-gray-400 mb-4">{t('blog.noPosts')}</p>
                         <button onClick={goToCreate} className="text-blue-400 hover:text-blue-300 transition text-sm">
-                            첫 번째 글을 작성해 보세요 &rarr;
+                            {t('blog.writeFirst')} &rarr;
                         </button>
                     </div>
                 ) : (
@@ -190,19 +192,19 @@ export default function PostForm() {
                                         href={`/posts/${post.slug}`}
                                         className="px-3 py-1.5 text-xs rounded-lg bg-gray-700/50 text-gray-300 hover:bg-gray-700 transition"
                                     >
-                                        보기
+                                        {t('blog.view')}
                                     </Link>
                                     <button
                                         onClick={() => goToEdit(post.slug)}
                                         className="px-3 py-1.5 text-xs rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition"
                                     >
-                                        수정
+                                        {t('blog.edit')}
                                     </button>
                                     <button
                                         onClick={() => handleDelete(post.slug)}
                                         className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition"
                                     >
-                                        삭제
+                                        {t('blog.delete')}
                                     </button>
                                 </div>
                             </div>
@@ -224,27 +226,27 @@ export default function PostForm() {
                 <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                목록으로 돌아가기
+                {t('blog.backToList')}
             </button>
 
             <h1 className="text-center text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                {mode === 'edit' ? '게시글 수정' : '새 글 작성'}
+                {mode === 'edit' ? t('blog.editPost') : t('blog.createPost')}
             </h1>
             <div className="mb-10 text-center">
                 <p className="text-gray-400 text-sm">
-                    {mode === 'edit' ? `수정 중: ${editingSlug}` : 'Markdown 형식으로 작성할 수 있습니다'}
+                    {mode === 'edit' ? `${t('blog.editingNote')}: ${editingSlug}` : t('blog.markdownNote')}
                 </p>
             </div>
 
             <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 md:p-10 shadow-xl space-y-6">
                 {/* 标题 */}
                 <div>
-                    <label className="block text-sm text-gray-400 mb-2">제목</label>
+                    <label className="block text-sm text-gray-400 mb-2">{t('blog.titleLabel')}</label>
                     <input
                         name="title"
                         value={form.title}
                         onChange={handleTitleChange}
-                        placeholder="게시글 제목을 입력하세요"
+                        placeholder={t('blog.titlePlaceholder')}
                         className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
                     />
                 </div>
@@ -264,26 +266,26 @@ export default function PostForm() {
 
                 {/* 摘要 */}
                 <div>
-                    <label className="block text-sm text-gray-400 mb-2">요약 (선택)</label>
+                    <label className="block text-sm text-gray-400 mb-2">{t('blog.summaryLabel')}</label>
                     <textarea
                         name="summary"
                         value={form.summary}
                         onChange={handleChange}
                         rows={2}
-                        placeholder="간단한 요약을 입력하세요"
+                        placeholder={t('blog.summaryPlaceholder')}
                         className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500"
                     />
                 </div>
 
                 {/* 内容 */}
                 <div>
-                    <label className="block text-sm text-gray-400 mb-2">내용 (Markdown)</label>
+                    <label className="block text-sm text-gray-400 mb-2">{t('blog.contentLabel')}</label>
                     <textarea
                         name="content"
                         value={form.content}
                         onChange={handleChange}
                         rows={16}
-                        placeholder="여기에 글을 작성하세요..."
+                        placeholder={t('blog.contentPlaceholder')}
                         className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
                     />
                 </div>
@@ -306,7 +308,7 @@ export default function PostForm() {
                         onClick={goToList}
                         className="px-5 py-2.5 rounded-lg font-medium text-gray-400 bg-gray-700/50 hover:bg-gray-700 transition text-sm"
                     >
-                        취소
+                        {t('blog.cancel')}
                     </button>
                     <button
                         onClick={handleSubmit}
@@ -316,7 +318,7 @@ export default function PostForm() {
                         {loading && (
                             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         )}
-                        {loading ? '저장 중...' : mode === 'edit' ? '수정 완료' : '발행하기'}
+                        {loading ? t('blog.saving') : mode === 'edit' ? t('blog.update') : t('blog.publish')}
                     </button>
                 </div>
             </div>

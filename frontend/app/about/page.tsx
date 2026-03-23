@@ -1,7 +1,12 @@
+'use client'
+
 import Link from 'next/link'
 import ResumeViewer from '@/components/ResumeViewer'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function AboutPage() {
+    const { t } = useLanguage()
+
     const career = [
         { company: '어니컴 (ONYCOM)', role: 'Senior iOS SDK Engineer', period: '2024.10 ~ 재직중', product: 'IMQA APM SDK (iOS / Flutter / React Native)', color: 'blue' },
         { company: 'APUS', role: 'iOS App Developer', period: '2021.03 ~ 2024.05', product: 'Vieka — Music Video Editor', color: 'purple' },
@@ -32,7 +37,7 @@ export default function AboutPage() {
                         <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
-                        홈페이지로 돌아가기
+                        {t('about.backHome')}
                     </Link>
                 </nav>
 
@@ -57,7 +62,7 @@ export default function AboutPage() {
                                 박 용
                             </h1>
                             <p className="text-xl text-gray-400 mb-4">
-                                Senior iOS Developer · 12+ Years Experience
+                                {t('about.role')}
                             </p>
                             <div className="flex flex-wrap justify-center md:justify-start gap-3">
                                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm">
@@ -65,19 +70,19 @@ export default function AboutPage() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    한국 · 서울
+                                    {t('about.location')}
                                 </span>
                                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
-                                    12년+ 경력
+                                    {t('about.experience')}
                                 </span>
                                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm">
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                                     </svg>
-                                    중국어 · 한국어 · 영어
+                                    {t('about.languages')}
                                 </span>
                             </div>
                         </div>
@@ -112,15 +117,15 @@ export default function AboutPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-xl p-6">
                             <div className="text-3xl font-bold text-blue-400 mb-1">12+</div>
-                            <div className="text-sm text-gray-400">Years iOS 개발 경력</div>
+                            <div className="text-sm text-gray-400">{t('about.yearsLabel')}</div>
                         </div>
                         <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20 rounded-xl p-6">
                             <div className="text-3xl font-bold text-purple-400 mb-1">1,000만+</div>
-                            <div className="text-sm text-gray-400">Downloads (玖富万卡, 轻图)</div>
+                            <div className="text-sm text-gray-400">{t('about.downloadsLabel')}</div>
                         </div>
                         <div className="bg-gradient-to-br from-pink-500/10 to-pink-600/10 border border-pink-500/20 rounded-xl p-6">
                             <div className="text-3xl font-bold text-pink-400 mb-1">80만+</div>
-                            <div className="text-sm text-gray-400">DAU (玖富万卡, 轻图)</div>
+                            <div className="text-sm text-gray-400">{t('about.dauLabel')}</div>
                         </div>
                     </div>
                 </section>
@@ -129,7 +134,7 @@ export default function AboutPage() {
                 <section className="mb-16">
                     <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                         <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></span>
-                        Core Skills
+                        {t('about.coreSkills')}
                     </h2>
                     <div className="space-y-4">
                         {coreSkills.map((group) => (
@@ -151,7 +156,7 @@ export default function AboutPage() {
                 <section className="mb-16">
                     <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                         <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></span>
-                        Career Timeline
+                        {t('about.careerTimeline')}
                     </h2>
                     <div className="relative">
                         {/* 竖线 */}
@@ -182,16 +187,16 @@ export default function AboutPage() {
                 <section className="mb-16">
                     <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                         <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></span>
-                        이력서 / Resume
+                        {t('about.resume')}
                     </h2>
                     <ResumeViewer />
                 </section>
 
                 {/* 联系方式 */}
                 <section className="bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 border border-blue-500/20 rounded-xl p-8 text-center">
-                    <h2 className="text-2xl font-bold text-white mb-4">Let&apos;s Connect!</h2>
+                    <h2 className="text-2xl font-bold text-white mb-4">{t('about.connectTitle')}</h2>
                     <p className="text-gray-400 mb-6">
-                        제 글에 관심이 있으시거나 기술적인 문제에 대해 논의하고 싶으시다면 아래 방법으로 언제든지 연락 주시기 바랍니다.
+                        {t('about.connectDesc')}
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
                         <a
@@ -201,7 +206,7 @@ export default function AboutPage() {
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
-                            이메일 보내기
+                            {t('about.sendEmail')}
                         </a>
                         <a
                             href="https://github.com/Hunta5"
@@ -212,7 +217,7 @@ export default function AboutPage() {
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
                             </svg>
-                            GitHub를 팔로우하세요
+                            {t('about.followGithub')}
                         </a>
                     </div>
                 </section>

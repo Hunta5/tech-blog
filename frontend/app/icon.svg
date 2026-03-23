@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Dark background -->
+  <circle cx="256" cy="256" r="256" fill="#0f172a"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#3B82F6" stroke-width="3" opacity="0.2"/>
+
+  <!-- Bow arc — curves RIGHT (towards target) -->
+  <path d="M 230 80 Q 380 256 230 432" fill="none" stroke="#8B5CF6" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- Bowstring — pulled back LEFT by archer -->
+  <line x1="230" y1="80" x2="145" y2="256" stroke="#CBD5E1" stroke-width="3"/>
+  <line x1="145" y1="256" x2="230" y2="432" stroke="#CBD5E1" stroke-width="3"/>
+
+  <!-- Arrow shaft -->
+  <rect x="145" y="250" width="260" height="12" rx="2" fill="#E2E8F0"/>
+
+  <!-- Arrowhead -->
+  <polygon points="435,256 390,224 390,288" fill="#3B82F6"/>
+
+  <!-- Arrow feathers at tail (left end) -->
+  <polygon points="150,250 170,228 178,250" fill="#8B5CF6" opacity="0.8"/>
+  <polygon points="150,262 170,284 178,262" fill="#EC4899" opacity="0.8"/>
+
+  <!-- Leaves on arrow — "用多少取多少" -->
+  <ellipse cx="300" cy="240" rx="16" ry="8" transform="rotate(-30 300 240)" fill="#34D399" opacity="0.9"/>
+  <ellipse cx="312" cy="272" rx="16" ry="8" transform="rotate(30 312 272)" fill="#059669" opacity="0.9"/>
+
+  <!-- Nocking point -->
+  <circle cx="145" cy="256" r="8" fill="#F8FAFC"/>
+</svg>
