@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(cp /Users/huntapark/Desktop/jianli/resume_ko.html /Users/huntapark/Desktop/Study/my-tech-blog/frontend/public/resume/)",
+      "Bash(cp /Users/huntapark/Desktop/jianli/resume_zh.html /Users/huntapark/Desktop/Study/my-tech-blog/frontend/public/resume/)",
+      "Bash(find /Users/huntapark/Desktop/Study/my-tech-blog/frontend/app -type f -name *.ts -o -name *.tsx)",
+      "Bash(find /Users/huntapark/Desktop/Study/my-tech-blog -path */frontend/app/api -o -path */frontend/app/api/*)",
+      "Bash(find /Users/huntapark/Desktop/Study/my-tech-blog/backend -type f -name *.go)",
+      "Bash(find /Users/huntapark/Desktop/Study/my-tech-blog/backend/src -type f -name *.java)"
+    ]
+  }
+}

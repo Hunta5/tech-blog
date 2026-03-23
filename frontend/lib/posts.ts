@@ -11,9 +11,9 @@ export type Post = {
 };
 
 export function getAllPosts(): Post[] {
-    const fileNames = fs.readdirSync(postsDirectory);
+    const fileNames = fs.readdirSync(postsDirectory).filter((f) => f.endsWith('.md'));
 
-    return fileNames.map((fileName) => {
+    const posts = fileNames.map((fileName) => {
         const slug = fileName.replace(/\.md$/, '');
         const fullPath = path.join(postsDirectory, fileName);
         const fileContents = fs.readFileSync(fullPath, 'utf8');
@@ -26,4 +26,7 @@ export function getAllPosts(): Post[] {
                 : data.date,
         };
     });
+
+    posts.sort((a, b) => (b.date > a.date ? 1 : -1));
+    return posts;
 }

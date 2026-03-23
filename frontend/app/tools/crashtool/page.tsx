@@ -7,7 +7,7 @@ type Props = {
 export default async function CrashPage({ params }: Props) {
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800">
-            <div className="max-w-4xl mx-auto px-6 py-16">
+            <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-16">
                 <section className="mb-16">
                     <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                         <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></span>

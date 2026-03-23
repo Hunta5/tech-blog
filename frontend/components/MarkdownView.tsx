@@ -7,7 +7,7 @@ interface Props {
 
 export default function MarkdownView({ markdown }: Props) {
     return (
-        <div className="prose prose-lg max-w-none">
+        <div className="prose prose-lg max-w-none overflow-x-hidden [&_pre]:overflow-x-auto [&_code]:break-words [&_img]:max-w-full">
             <ReactMarkdown
                 components={{
                     h1: ({node, ...props}) => <h1 style={{fontSize: '2em', fontWeight: 'bold', marginBottom: '0.5em'}} {...props} />,

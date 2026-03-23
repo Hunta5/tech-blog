@@ -33,7 +33,7 @@ export default function RootLayout({
             <Sidebar/>
 
             {/* 右侧主内容（关键） */}
-            <main className="flex-1 overflow-auto bg-gray-900 text-white">
+            <main className="flex-1 overflow-auto bg-gray-900 text-white pt-14 md:pt-0">
                 {children}
             </main>
         </div>

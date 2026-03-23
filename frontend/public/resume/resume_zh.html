@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>朴勇 - iOS 高级开发工程师</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', -apple-system, sans-serif;
+            color: #2d2d2d;
+            background: #f5f5f5;
+            line-height: 1.7;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 0 30px rgba(0,0,0,0.08);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 50px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 6px;
+        }
+        .header .title {
+            font-size: 18px;
+            color: #7ec8e3;
+            font-weight: 400;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        .contact-row {
+            display: flex;
+            gap: 30px;
+            font-size: 14px;
+            color: #b8c9e0;
+            flex-wrap: wrap;
+        }
+        .contact-row span { display: flex; align-items: center; gap: 6px; }
+        .contact-row .icon { font-size: 14px; }
+
+        /* Main Content */
+        .main { padding: 40px 60px 50px; }
+
+        /* Section */
+        .section { margin-bottom: 36px; }
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #0f3460;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Summary */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 30px;
+        }
+        .summary-item {
+            font-size: 14px;
+            padding: 6px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+        .summary-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 13px;
+            width: 6px;
+            height: 6px;
+            background: #0f3460;
+            border-radius: 50%;
+        }
+
+        /* Highlight Stats */
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            margin: 16px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+            border-left: 3px solid #0f3460;
+            padding: 12px 18px;
+            border-radius: 0 6px 6px 0;
+            flex: 1;
+        }
+        .stat-card .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card .value { font-size: 20px; font-weight: 700; color: #0f3460; }
+        .stat-card .desc { font-size: 12px; color: #555; }
+
+        /* Skills */
+        .skill-category { margin-bottom: 16px; }
+        .skill-category-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag {
+            background: #f0f4ff;
+            color: #0f3460;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid #d8e2f3;
+        }
+        .tag.primary {
+            background: #0f3460;
+            color: #fff;
+            border-color: #0f3460;
+        }
+
+        /* Experience */
+        .exp-item {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 30px;
+            border-left: 2px solid #e0e0e0;
+        }
+        .exp-item::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            background: #0f3460;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #0f3460;
+        }
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+        .exp-company {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .exp-period {
+            font-size: 13px;
+            color: #888;
+            background: #f5f5f5;
+            padding: 2px 12px;
+            border-radius: 12px;
+        }
+        .exp-tech {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .exp-tech span {
+            color: #888;
+            font-weight: 600;
+        }
+
+        /* Project Detail */
+        .project-block {
+            background: #fafbfd;
+            border-radius: 8px;
+            padding: 16px 18px;
+            margin: 10px 0;
+            border: 1px solid #eef1f6;
+        }
+        .project-block .proj-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .project-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .project-block li {
+            font-size: 13px;
+            color: #444;
+            padding: 3px 0;
+            padding-left: 14px;
+            position: relative;
+        }
+        .project-block li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: #0f3460;
+            font-weight: 700;
+        }
+
+        /* Education & Language */
+        .edu-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        .edu-name { font-weight: 600; font-size: 15px; }
+        .edu-detail { font-size: 13px; color: #666; }
+        .edu-period { font-size: 13px; color: #888; }
+
+        .lang-row {
+            display: flex;
+            gap: 40px;
+            padding: 6px 0;
+        }
+        .lang-item { font-size: 14px; }
+        .lang-level {
+            display: inline-block;
+            background: #f0f4ff;
+            color: #0f3460;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+
+        /* Print */
+        @media print {
+            body { background: #fff; }
+            .container { box-shadow: none; }
+            .header { padding: 30px 40px; }
+            .main { padding: 20px 40px 30px; }
+        }
+        @page { margin: 0; size: A4; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <h1>朴 勇</h1>
+        <div class="title">iOS 高级开发工程师 &middot; 12年以上经验</div>
+        <div class="contact-row">
+            <span><span class="icon">&#9742;</span> 010-9927-1035</span>
+            <span><span class="icon">&#9993;</span> piaoyong.com@hotmail.com</span>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+        <!-- Summary -->
+        <div class="section">
+            <div class="section-title">个人简介</div>
+            <div class="summary-grid">
+                <div class="summary-item">精通 Swift、Objective-C、SwiftUI、Shell、C/C++ 的 iOS 原生应用开发专家（具备 Flutter、React Native 跨平台开发经验）</div>
+                <div class="summary-item">中文(母语)、韩语(商务级)、英语(CET-4) 三语开发者</div>
+                <div class="summary-item">具备 App 服务从设计、开发、发布到运营的全生命周期经验</div>
+                <div class="summary-item">丰富的 UI 实现经验，对用户交互有深刻理解</div>
+                <div class="summary-item">具备 APM SDK 设计与开发经验（基于 OpenTelemetry 的性能监控 SDK）</div>
+                <div class="summary-item">擅长与产品、设计、市场等跨职能团队高效沟通协作</div>
+                <div class="summary-item">多次在资源有限环境下从策划阶段参与并成功交付项目</div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="label">Career</div>
+                    <div class="value">12+ 年</div>
+                    <div class="desc">iOS 开发经验</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Downloads</div>
+                    <div class="value">1,000万+</div>
+                    <div class="desc">玖富万卡、轻图</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">DAU</div>
+                    <div class="value">80万+</div>
+                    <div class="desc">玖富万卡、轻图</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Skills -->
+        <div class="section">
+            <div class="section-title">专业技能</div>
+
+            <div class="skill-category">
+                <div class="skill-category-title">编程语言 & 框架</div>
+                <div class="tags">
+                    <span class="tag primary">Swift</span>
+                    <span class="tag primary">Objective-C</span>
+                    <span class="tag primary">SwiftUI</span>
+                    <span class="tag">C</span>
+                    <span class="tag">C++</span>
+                    <span class="tag">Shell</span>
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">HTML5 / CSS3</span>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <div class="skill-category-title">跨平台</div>
+                <div class="tags">
+                    <span class="tag primary">Flutter</span>
+                    <span class="tag primary">React Native</span>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <div class="skill-category-title">架构模式</div>
+                <div class="tags">
+                    <span class="tag primary">MVVM</span>
+                    <span class="tag primary">Clean Architecture (RIBs)</span>
+                    <span class="tag primary">TCA (The Composable Architecture)</span>
+                    <span class="tag">MVC</span>
+                    <span class="tag">MVP</span>
+                    <span class="tag">MVVM-C (Coordinator)</span>
+                    <span class="tag">VIPER</span>
+                    <span class="tag">Singleton</span>
+                    <span class="tag">Observer</span>
+                    <span class="tag">Delegate</span>
+                    <span class="tag">Factory</span>
+                    <span class="tag">Repository Pattern</span>
+                    <span class="tag">Dependency Injection</span>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <div class="skill-category-title">常用库 & SDK</div>
+                <div class="tags">
+                    <span class="tag">RxSwift</span>
+                    <span class="tag">RxCocoa</span>
+                    <span class="tag">Combine</span>
+                    <span class="tag">Alamofire</span>
+                    <span class="tag">AFNetworking</span>
+                    <span class="tag">Moya</span>
+                    <span class="tag">SnapKit</span>
+                    <span class="tag">Masonry</span>
+                    <span class="tag">AsyncDisplayKit (Texture)</span>
+                    <span class="tag">SDWebImage</span>
+                    <span class="tag">Kingfisher</span>
+                    <span class="tag">Lottie</span>
+                    <span class="tag">MJRefresh</span>
+                    <span class="tag">Firebase</span>
+                    <span class="tag">MMKV</span>
+                    <span class="tag">YYCache</span>
+                    <span class="tag">FMDB</span>
+                    <span class="tag">CoreData</span>
+                    <span class="tag">Realm</span>
+                    <span class="tag">SwiftyJSON</span>
+                    <span class="tag">HandyJSON</span>
+                    <span class="tag">MJExtension</span>
+                    <span class="tag">Codable</span>
+                    <span class="tag">MBProgressHUD</span>
+                    <span class="tag">SVProgressHUD</span>
+                    <span class="tag">IQKeyboardManager</span>
+                    <span class="tag">Hero</span>
+                    <span class="tag">KSCrash</span>
+                    <span class="tag">SwiftProtobuf</span>
+                    <span class="tag">OpenTelemetry</span>
+                    <span class="tag">Bugly</span>
+                    <span class="tag">WechatOpenSDK</span>
+                    <span class="tag">TikTokOpenSDK</span>
+                    <span class="tag">JPush (极光)</span>
+                </div>
+            </div>
+
+            <div class="skill-category">
+                <div class="skill-category-title">工具 & DevOps</div>
+                <div class="tags">
+                    <span class="tag">Xcode</span>
+                    <span class="tag">Android Studio</span>
+                    <span class="tag">VS Code</span>
+                    <span class="tag">IntelliJ IDEA</span>
+                    <span class="tag">Instruments</span>
+                    <span class="tag">Xcode Profiler</span>
+                    <span class="tag">Git / GitHub / GitLab</span>
+                    <span class="tag">SourceTree</span>
+                    <span class="tag">Jenkins</span>
+                    <span class="tag">Fastlane</span>
+                    <span class="tag">GitHub Actions</span>
+                    <span class="tag">CocoaPods</span>
+                    <span class="tag">Carthage</span>
+                    <span class="tag">SPM</span>
+                    <span class="tag">Tuist</span>
+                    <span class="tag">Gradle</span>
+                    <span class="tag">pub (Flutter)</span>
+                    <span class="tag">npm / yarn</span>
+                    <span class="tag">Homebrew</span>
+                    <span class="tag">Charles</span>
+                    <span class="tag">Postman</span>
+                    <span class="tag">Proxyman</span>
+                    <span class="tag">JIRA</span>
+                    <span class="tag">Confluence</span>
+                    <span class="tag">Slack</span>
+                    <span class="tag">Figma</span>
+                    <span class="tag">Zeplin</span>
+                    <span class="tag">Notion</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="section">
+            <div class="section-title">工作经历</div>
+
+            <!-- 어니컴 -->
+            <div class="exp-item">
+                <div class="exp-header">
+                    <span class="exp-company">ONYCOM Inc. (어니컴株式会社)</span>
+                    <span class="exp-period">2024.10 ~ 在职</span>
+                </div>
+                <div class="project-block" style="background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%); border-left: 3px solid #0f3460;">
+                    <div style="font-size: 13px; color: #0f3460; font-weight: 600; margin-bottom: 6px;">主要客户：NH农协银行 &middot; 三星生命 &middot; 金融结算院 &middot; 首尔保证保险(서금원) &middot; 江原乐园 &middot; 釜山银行</div>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">IMQA iOS SDK - APM (Application Performance Monitoring) SDK</div>
+                    <ul>
+                        <li>开发面向 iOS 应用的实时性能监控 SDK（iOS 12.0+, Swift 5.0）</li>
+                        <li>基于 KSCrash 实现崩溃采集，基于 URLSession Swizzling 实现网络请求自动采集</li>
+                        <li>UIViewController / SwiftUI View 生命周期自动追踪及用户触摸事件采集</li>
+                        <li>WKWebView 追踪 &mdash; 通过 JavaScript 注入实现 Native-Web 跨端会话共享</li>
+                        <li>自主实现 OpenTelemetry 核心组件（Tracer、Logger、SpanProcessor、Exporter）&mdash; 未使用官方 SDK，实现 SDK 轻量化</li>
+                        <li>基于 OTLP HTTP 协议构建 Trace/Log 数据采集及服务端传输管线</li>
+                        <li>利用 libtool 合并子模块 &mdash; 构建单一 XCFramework 产物（IMQACommon、IMQADeviceInfo、KSCrash、SwiftProtobuf 合并）</li>
+                        <li>搭建 Tuist + CocoaPods + Shell 脚本的 XCFramework 构建流水线（Makefile 自动化）</li>
+                        <li>支持 CocoaPods、SPM、XCFramework 手动集成等多种分发方式</li>
+                        <li>搭建 GitHub Actions Workflow 及 Self-hosted Runner 环境，实现 CI/CD 自动化</li>
+                        <li>搭建并运维 Jenkins 构建流水线</li>
+                        <li>实现 SDK 远程控制（采集开关、Drop Policy）及基于会话的采样机制</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Swift, Objective-C, C, OpenTelemetry, KSCrash, SwiftProtobuf, Tuist, CocoaPods, Method Swizzling, XCFramework</div>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">IMQA Flutter SDK - 跨平台 APM SDK (Flutter Plugin)</div>
+                    <ul>
+                        <li>基于 Flutter Plugin 架构设计并开发支持 iOS/Android 双平台的 APM SDK</li>
+                        <li>基于 OpenTelemetry 实现 Trace/Log 数据采集管线（Protobuf 序列化）</li>
+                        <li>通过 Dio Interceptor / http.Client Wrapper 实现网络请求(XHR)自动采集</li>
+                        <li>基于 Flutter Navigator Observer 实现页面切换自动追踪及 TabBar View 回调支持</li>
+                        <li>用户触摸事件采集（withIMQATracker Extension 方式）</li>
+                        <li>基于 flutter_inappwebview 注入 JavaScript 实现 Native-Web 跨端会话共享</li>
+                        <li>利用 runZonedGuarded 实现 Dart 层 Crash 采集及上报</li>
+                        <li>使用 Pigeon 实现 Flutter &harr; Native (iOS/Android) 类型安全通信</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Flutter, Dart, OpenTelemetry, Dio, Pigeon, Protobuf, shared_preferences, flutter_inappwebview</div>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">IMQA React Native SDK - 跨平台 APM SDK</div>
+                    <ul>
+                        <li>基于 React Native 设计并开发支持 iOS/Android 双平台的 APM SDK</li>
+                        <li>基于 OpenTelemetry JS SDK (@opentelemetry/sdk-trace-node) 实现 Trace 数据采集及 OTLP HTTP/Proto 传输</li>
+                        <li>通过 Fetch Interceptor / Axios Interceptor 实现网络请求(XHR)自动采集</li>
+                        <li>基于 React Navigation Observer 实现页面渲染自动追踪（initRenderPatchEarly 组件补丁）</li>
+                        <li>App Lifecycle (AppState) 监控及用户触摸事件采集</li>
+                        <li>通过 react-native-webview JavaScript 注入实现 Native-Web 跨端会话共享</li>
+                        <li>JS 层 Crash 采集及上报</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>React Native, TypeScript, OpenTelemetry JS, OTLP Proto/HTTP, Axios, react-native-webview</div>
+                </div>
+            </div>
+
+            <!-- APUS -->
+            <div class="exp-item">
+                <div class="exp-header">
+                    <span class="exp-company">APUS</span>
+                    <span class="exp-period">2021.03 ~ 2024.05 (3年3个月)</span>
+                </div>
+                <div class="project-block">
+                    <div class="proj-title">Vieka - Music Video Editor（照片/视频编辑 App, iOS 12.0+）</div>
+                    <ul>
+                        <li>开发数百种高品质滤镜（Film、Kira Starlight 等）、模板化 5 秒视频制作、音乐搜索及插入功能</li>
+                        <li>实现视频编辑核心功能（分割、倒放、旋转、变速、水印去除）</li>
+                        <li>App 性能优化 &mdash; 内存泄漏修复、冷启动时间缩短、UI 卡顿优化、App 瘦身</li>
+                        <li>广告 SDK 引入及迁移（AppLovin &rarr; Google AdMob）&mdash; 基于广告曝光率的决策</li>
+                        <li>基于 Firebase Dynamic Links 实现 Deep Linking / Deferred Deep Linking</li>
+                        <li>OpenGL &rarr; Metal 迁移及视频特效实现</li>
+                        <li>视频流媒体播放功能实现（SJBaseVideoPlayer + GCDWebServer + HLS Caching Reverse Proxy）</li>
+                        <li>应用内订阅付费系统（周/月/年）实现</li>
+                        <li>多语言支持（韩语、英语、中文、日语、俄语、阿拉伯语、土耳其语、德语）8 种语言</li>
+                        <li>其他项目：基于 Firefox 的广告拦截浏览器、Bitcoin 钱包 App 开发参与</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>RxSwift, Metal, OpenGL, SJBaseVideoPlayer, GCDWebServer, Google AdMob SDK, Firebase, StoreKit</div>
+                </div>
+            </div>
+
+            <!-- B612 -->
+            <div class="exp-item">
+                <div class="exp-header">
+                    <span class="exp-company">B612 (SNOW Corp.)</span>
+                    <span class="exp-period">2020.09 ~ 2021.02 (6个月)</span>
+                </div>
+                <div class="project-block">
+                    <div class="proj-title">轻图 - 全能照片/视频编辑器（评分 4.7, 评论 7.5万+, DAU 5万+, 下载量 200万+）</div>
+                    <ul>
+                        <li>担任中国分公司与韩国总部之间图片编辑引擎的技术沟通桥梁</li>
+                        <li>实现 AI 美颜、一键妆容、曲线/HSL/调色等专业编辑功能</li>
+                        <li>开发涂鸦笔、文字、画笔、Cutout、贴纸、美妆笔、自动去皱等核心功能</li>
+                        <li>实现视频编辑功能（视频涂鸦、轮播布局、图片无缝拼接）</li>
+                        <li>实现批量编辑功能（最多 15 张同时编辑）</li>
+                        <li>基于 VSH/FSH 着色器文件的图片特效处理（Objective-C 调用 C++）</li>
+                        <li>图片编辑引擎内存泄漏减少 15%</li>
+                        <li>实现应用内订阅系统（月/季/年）</li>
+                        <li>支持 12 种语言（韩语、中文、英语、日语、泰语、越南语、印尼语等）</li>
+                        <li>中国分公司代码整理及重构</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>RxSwift, RxCocoa, C++, Objective-C, OpenGL, StoreKit, CoreImage</div>
+                </div>
+            </div>
+
+            <!-- 玖富 -->
+            <div class="exp-item">
+                <div class="exp-header">
+                    <span class="exp-company">玖富数科科技集团有限责任公司 (2019 NASDAQ 上市)</span>
+                    <span class="exp-period">2018.04 ~ 2020.08 (2年5个月)</span>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">玖富万卡 - 个人信用借贷平台（DAU 80万+, 下载量 1,000万+）</div>
+                    <ul>
+                        <li>作为纳斯达克上市金融科技集团核心借贷 App 的 iOS 开发负责人，设计并实现实名认证 3 步开户全流程</li>
+                        <li>开发现金提取、分期消费、信用卡还款等核心金融服务全部前端功能</li>
+                        <li>实现贷款审核、还款计划管理、逾期提醒等复杂金融业务逻辑</li>
+                        <li>引入 OCR 身份证识别 / 活体检测人脸识别 SDK（阿里、商汤、微众）&mdash; 构建完整的远程 eKYC 身份核验流程</li>
+                        <li>实现 OAuth 社交登录（微信、QQ、Apple）及短信验证码、生物识别（Face ID / Touch ID）多因子认证</li>
+                        <li>设计 JavaScriptBridge 混合架构 &mdash; Native &harr; Web 双向通信，实现营销活动页面快速上线能力</li>
+                        <li>金融数据安全加固：Keychain 加密存储敏感数据、SSL Pinning、越狱检测等安全模块落地</li>
+                        <li>Objective-C &rarr; Swift 渐进式迁移，AFNetworking &rarr; Alamofire、Masonry &rarr; SnapKit 等遗留技术栈全面现代化</li>
+                        <li>App 瘦身（二进制优化、无用资源清理）及冷启动时间缩短 30% 以上</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Swift, Objective-C, Alamofire, SwiftyJSON, OCR, FaceVerify, JavaScriptBridge, Keychain, SSL Pinning</div>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">悟空理财 - 在线理财平台（纳斯达克上市集团战略级 App）</div>
+                    <ul>
+                        <li>开发月/季/年账户投资产品界面及资产概览展示逻辑</li>
+                        <li>使用 ReactiveObjC(RAC) 重构 MVVM 架构 &mdash; 数据绑定驱动 UI，代码可维护性大幅提升</li>
+                        <li>对接银行存款产品（振兴银行、众邦银行）、基金产品及实时资产概览仪表盘</li>
+                        <li>实现投资到期自动续投、提前赎回等复杂金融业务逻辑</li>
+                        <li>基于 APNs 推送实现投资到期提醒、收益到账通知等消息系统</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Objective-C, ReactiveObjC (RAC), MVVM, APNs</div>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">小鱼福卡 - 消费金融贷款 / 玖富商城 - B2C 电商平台</div>
+                    <ul>
+                        <li>小鱼福卡新项目架构设计 &mdash; 纯线上零材料审核、实时额度测算、即时放款全流程实现</li>
+                        <li>玖富商城电商平台核心业务开发（商品目录、分期购买、订单/物流追踪、优惠券/促销系统）</li>
+                        <li>基于 CocoaPods 设计并搭建团队内部公共模块库（Network、Cache、注册、WebViewController、通用 UI 组件）</li>
+                        <li>搭建 Jenkins + GitLab + Fastlane + fir.im CI/CD 流水线 &mdash; 构建、测试、分发自动化，显著缩短发版周期</li>
+                        <li>通过模块化架构实现 4 款 App（万卡、悟空、小鱼、商城）公共代码最大化复用</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Swift, Objective-C, CocoaPods, Jenkins, Fastlane, GitLab, Modular Architecture</div>
+                </div>
+            </div>
+
+            <!-- 新奥 -->
+            <div class="exp-item">
+                <div class="exp-header">
+                    <span class="exp-company">新奥集团 (ENN Group, 中国民营企业500强 Top 50, 员工 4万+)</span>
+                    <span class="exp-period">2016.03 ~ 2018.04 (2年2个月)</span>
+                </div>
+                <div class="project-block">
+                    <div class="proj-title">质采智购（现 恩牛网）- 集团内部 B2B 统一采购平台（企业内部发布）</div>
+                    <ul>
+                        <li>为 4万+ 员工、800+ 子公司使用的集团内部 B2B 采购平台设计并开发 iOS 应用</li>
+                        <li>实现供应商搜索、报价比较、下单、入库确认、结算等采购全流程前端功能</li>
+                        <li>自主设计并封装中信银行 Pay SDK &mdash; 对接企业间支付结算系统</li>
+                        <li>引入科大讯飞(iFLYTEK)语音转文字 SDK &mdash; 实现语音录入采购需求单功能</li>
+                        <li>引入 JSPatch 热更新 &mdash; 无需审核即可通过 JavaScript 调用 OC 紧急修复线上 Bug</li>
+                        <li>基于 AVFoundation 实现 QR Code 扫码物流入库/出库确认服务</li>
+                        <li>基于企业证书(Enterprise Certificate)进行应用分发及版本管理体系运营</li>
+                        <li>使用 Confluence 编写技术文档，绘制 UML 时序图及业务流程图</li>
+                        <li>从 App 上线到 Bug 修复、内存泄漏治理等全生命周期管理</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Objective-C, JSPatch, iFLYTEK, AVFoundation, Enterprise Certificate, Confluence, UML</div>
+                </div>
+                <div class="project-block">
+                    <div class="proj-title">新奥 B2B Web 管理平台</div>
+                    <ul>
+                        <li>采购管理员后台 Web 页面构建及前端开发</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>HTML, CSS, JavaScript, jQuery</div>
+                </div>
+            </div>
+
+            <!-- Oasis -->
+            <div class="exp-item">
+                <div class="exp-header">
+                    <span class="exp-company">Oasis Games (绿洲游戏)</span>
+                    <span class="exp-period">2014.03 ~ 2016.02 (2年)</span>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">芦花 - 匿名社交聊天 App（男版/女版独立运营）</div>
+                    <ul>
+                        <li>担任 iOS 团队 Lead &mdash; 团队任务分配、进度管理、Code Review 及代码质量把控</li>
+                        <li>环信(Easemob) IM SDK 二次封装 &mdash; 将实时消息、图片/语音传输、已读回执等聊天核心功能重新设计为开发者友好 API</li>
+                        <li>实现 OAuth 社交登录（微信、QQ）及短信验证码手机认证</li>
+                        <li>基于 AFNetworking + MJExtension 自主设计并实现团队通用网络模块<br>
+                            &nbsp;&nbsp;- 环境切换(Dev/Pre/Release)、日志开关、响应缓存、自动重试、统一错误处理、网络状态监控</li>
+                        <li>基于 AVFoundation 实现相机拍照/相册功能，GPUImage 实现实时滤镜及图片美化</li>
+                        <li>基于友盟(Umeng)统计进行崩溃分析、用户行为分析及 Bug 修复</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Objective-C, AFNetworking, MJExtension, GPUImage, AVFoundation, 环信(Easemob), 友盟</div>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">iTools - Enterprise IPA 重签名及设备文件管理工具</div>
+                    <ul>
+                        <li>基于 Apple Enterprise Certificate 开发 IPA 包重签名系统 UI 及功能</li>
+                        <li>实现 iPhone 音乐、文档、照片等文件免 PC 传输管理功能</li>
+                        <li>与合作公司沟通功能规格，定制重签名 Shell 脚本</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Objective-C, Masonry, Shell, Enterprise Certificate</div>
+                </div>
+
+                <div class="project-block">
+                    <div class="proj-title">Mizah Istasyonu - 全球幽默内容 App（土耳其 &middot; 阿塞拜疆 &middot; 伊朗 3国上线）</div>
+                    <ul>
+                        <li>作为项目初创成员，主导从设计到开发、发布、运营的全生命周期</li>
+                        <li>集成 OAuth 社交登录（Twitter、Facebook、Google）及社交分享功能</li>
+                        <li>基于 ASIHTTPRequest + YYModel 自主设计并实现网络模块（缓存、重试、错误处理）</li>
+                        <li>支持 3 种语言国际化，同步在 3 个国家 App Store 上线</li>
+                        <li>基于友盟(Umeng) SDK 实现推送通知、崩溃统计、社交分享功能</li>
+                        <li>独立完成 Apple 企业账号申请及 App Store 审核、上线、运营全流程</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>Objective-C, ASIHTTPRequest, YYModel, Masonry, 友盟, i18n</div>
+                </div>
+            </div>
+
+            <!-- CHARM -->
+            <div class="exp-item">
+                <div class="exp-header">
+                    <span class="exp-company">参 (CHARM) &mdash; BOE(京东方) 全球LCD面板市占率第一 合作商</span>
+                    <span class="exp-period">2013.07 ~ 2014.02 (8个月)</span>
+                </div>
+                <div class="project-block">
+                    <div class="proj-title">BOE 显示面板生产线工业软件开发</div>
+                    <ul>
+                        <li>为全球 LCD 面板市占率第一的 BOE(京东方) 生产线开发配套工业软件</li>
+                        <li>分析 BOE 硬件需求并编写软件需求规格说明书(SRS)</li>
+                        <li>基于 MFC(C++) 设计并开发生产线操作员工作界面 UI</li>
+                        <li>显示器维修设备控制程序驱动及业务逻辑修改</li>
+                        <li>根据德国激光设备操作手册开发设备驱动接口</li>
+                        <li>通过 Database(MySQL) 及设备日志分析进行生产设备故障追踪与诊断</li>
+                        <li>担任中韩双方工程师之间的技术翻译及沟通桥梁</li>
+                    </ul>
+                    <div class="exp-tech"><span>Tech: </span>MFC, C++, MySQL, 工业设备驱动, SRS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Education -->
+        <div class="section">
+            <div class="section-title">教育背景</div>
+            <div class="edu-row">
+                <div>
+                    <div class="edu-name">辽宁工程技术大学 (Liaoning Technical University)</div>
+                    <div class="edu-detail">软件工程系</div>
+                </div>
+                <div class="edu-period">2009.09 ~ 2013.07</div>
+            </div>
+        </div>
+
+        <!-- Languages -->
+        <div class="section">
+            <div class="section-title">语言能力</div>
+            <div class="lang-row">
+                <div class="lang-item">中文 <span class="lang-level">母语</span></div>
+                <div class="lang-item">韩语 <span class="lang-level">商务级</span></div>
+                <div class="lang-item">英语 <span class="lang-level">CET-4 (513分)</span></div>
+            </div>
+        </div>
+
+        <!-- Links -->
+        <div class="section">
+            <div class="section-title">作品链接</div>
+            <div style="font-size:13px; color:#444; line-height:2;">
+                <strong>Vika - 音乐视频编辑器：</strong> <span style="color:#0f3460;">apps.apple.com/kr/app/vieka-music-video-editor/id1559501669</span><br>
+                <strong>轻图（图片编辑器）：</strong> <span style="color:#0f3460;">apps.apple.com/cn/app/轻图/id1527559409</span><br>
+                <strong>玖富万卡：</strong> <span style="color:#0f3460;">apps.apple.com/kr/app/万卡/id1192163634</span><br>
+                <strong>质采智购（B2B）：</strong> <span style="color:#0f3460;">apps.apple.com/cn/app/质采智购/id1601780344</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

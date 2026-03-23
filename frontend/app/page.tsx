@@ -5,9 +5,9 @@ export default function HomePage() {
     const posts = getAllPosts();
 
     return (
-        <div className="max-w-5xl mx-auto px-6 py-16">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-16">
             {/* Hero Section */}
-            <div className="mb-20 text-center">
+            <div className="mb-12 md:mb-20 text-center">
                 <div className="inline-block mb-4">
           <span
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium">
@@ -20,7 +20,7 @@ export default function HomePage() {
           </span>
                 </div>
 
-                <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                     제 기술 블로그에 오신 것을 환영합니다.
                 </h1>
 
@@ -63,10 +63,10 @@ export default function HomePage() {
                             className="block group"
                         >
                             <article
-                                className="relative bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300">
+                                className="relative bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 pl-8 md:pl-6 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300">
                                 {/* 序号装饰 */}
                                 <div
-                                    className="absolute -left-3 top-6 w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                    className="absolute left-1 md:-left-3 top-6 w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                                     {index + 1}
                                 </div>
 

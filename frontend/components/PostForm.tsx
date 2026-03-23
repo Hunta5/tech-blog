@@ -1,178 +1,325 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 
-type PostFormData = {
-    title: string;
-    slug: string;
-    content: string;
-    summary?: string;
-};
+type PostData = {
+    slug: string
+    title: string
+    date: string
+    summary: string
+    content: string
+}
+
+type FormData = {
+    title: string
+    slug: string
+    content: string
+    summary: string
+}
+
+type ViewMode = 'list' | 'create' | 'edit'
 
 export default function PostForm() {
-    const [form, setForm] = useState<PostFormData>({
-        title: '',
-        slug: '',
-        content: '',
-        summary: '',
-    });
+    const [mode, setMode] = useState<ViewMode>('list')
+    const [posts, setPosts] = useState<PostData[]>([])
+    const [form, setForm] = useState<FormData>({ title: '', slug: '', content: '', summary: '' })
+    const [editingSlug, setEditingSlug] = useState<string | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const [success, setSuccess] = useState<string | null>(null)
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const fetchPosts = useCallback(async () => {
+        try {
+            const res = await fetch('/api/posts')
+            const json = await res.json()
+            if (json.code === 0) setPosts(json.data)
+        } catch {
+            // ignore
+        }
+    }, [])
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
-        });
-    };
+    useEffect(() => { fetchPosts() }, [fetchPosts])
+
+    const resetForm = () => {
+        setForm({ title: '', slug: '', content: '', summary: '' })
+        setEditingSlug(null)
+        setError(null)
+        setSuccess(null)
+    }
+
+    const goToList = () => {
+        resetForm()
+        setMode('list')
+        fetchPosts()
+    }
+
+    const goToCreate = () => {
+        resetForm()
+        setMode('create')
+    }
+
+    const goToEdit = async (slug: string) => {
+        setError(null)
+        setSuccess(null)
+        try {
+            const res = await fetch(`/api/posts/${slug}`)
+            const json = await res.json()
+            if (json.code === 0) {
+                const p = json.data
+                setForm({ title: p.title, slug: p.slug, content: p.content, summary: p.summary || '' })
+                setEditingSlug(p.slug)
+                setMode('edit')
+            }
+        } catch {
+            setError('게시글을 불러오지 못했습니다')
+        }
+    }
+
+    const handleDelete = async (slug: string) => {
+        if (!confirm(`"${slug}" 게시글을 삭제하시겠습니까?`)) return
+        try {
+            const res = await fetch(`/api/posts/${slug}`, { method: 'DELETE' })
+            const json = await res.json()
+            if (json.code === 0) {
+                fetchPosts()
+            } else {
+                alert(json.message || '삭제 실패')
+            }
+        } catch {
+            alert('삭제 중 오류가 발생했습니다')
+        }
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setForm({ ...form, [e.target.name]: e.target.value })
+    }
+
+    // auto-generate slug from title
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const title = e.target.value
+        setForm((prev) => ({
+            ...prev,
+            title,
+            ...(mode === 'create' ? { slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') } : {}),
+        }))
+    }
 
     const handleSubmit = async () => {
-        setLoading(true);
-        setError(null);
-        const token = localStorage.getItem('token');
+        setLoading(true)
+        setError(null)
+        setSuccess(null)
 
-        if (!token) {
-            setError('请先登录');
-            setLoading(false);
-            return;
+        if (!form.title || !form.slug || !form.content) {
+            setError('제목, Slug, 내용은 필수입니다')
+            setLoading(false)
+            return
         }
 
         try {
             const res = await fetch('/api/posts', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}` },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(form),
-            });
-
-            // 检查是否成功获取响应
-            if (!res.ok) {
-                const errorText = await res.text();
-                let errorMessage = '请求失败';
-                try {
-                    const errorJson = JSON.parse(errorText);
-                    errorMessage = errorJson.message || errorText || `HTTP ${res.status}`;
-                } catch {
-                    errorMessage = errorText || `HTTP ${res.status}`;
-                }
-                throw new Error(errorMessage);
-            }
-
-            const json = await res.json();
+            })
+            const json = await res.json()
 
             if (json.code !== 0) {
-                throw new Error(json.message || '创建失败');
+                throw new Error(json.message || '저장 실패')
             }
 
-            alert('创建成功 🎉');
-            setForm({ title: '', slug: '', content: '', summary: '' });
-
+            setSuccess(mode === 'edit' ? '수정 완료!' : '발행 완료!')
+            setTimeout(() => goToList(), 1000)
         } catch (e: unknown) {
-            const error = e as Error;
-            setError(error.message || '发生未知错误');
+            setError((e as Error).message || '오류가 발생했습니다')
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
+    // ───── List View ─────
+    if (mode === 'list') {
+        return (
+            <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-16">
+                <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        Blog Manager
+                    </h1>
+                    <button
+                        onClick={goToCreate}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 transition text-sm"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        새 글 작성
+                    </button>
+                </div>
+
+                {posts.length === 0 ? (
+                    <div className="text-center py-20">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-800 mb-4">
+                            <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <p className="text-gray-400 mb-4">아직 게시글이 없습니다</p>
+                        <button onClick={goToCreate} className="text-blue-400 hover:text-blue-300 transition text-sm">
+                            첫 번째 글을 작성해 보세요 &rarr;
+                        </button>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {posts.map((post) => (
+                            <div
+                                key={post.slug}
+                                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-800/50 border border-gray-700 rounded-xl px-5 py-4 hover:border-gray-600 transition"
+                            >
+                                <div className="flex-1 min-w-0">
+                                    <Link href={`/posts/${post.slug}`} className="text-white font-medium hover:text-blue-400 transition truncate block">
+                                        {post.title}
+                                    </Link>
+                                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                                        <span>{post.date}</span>
+                                        <span className="text-gray-700">·</span>
+                                        <span className="text-gray-600 font-mono">{post.slug}</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <Link
+                                        href={`/posts/${post.slug}`}
+                                        className="px-3 py-1.5 text-xs rounded-lg bg-gray-700/50 text-gray-300 hover:bg-gray-700 transition"
+                                    >
+                                        보기
+                                    </Link>
+                                    <button
+                                        onClick={() => goToEdit(post.slug)}
+                                        className="px-3 py-1.5 text-xs rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition"
+                                    >
+                                        수정
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(post.slug)}
+                                        className="px-3 py-1.5 text-xs rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition"
+                                    >
+                                        삭제
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        )
+    }
+
+    // ───── Create / Edit View ─────
     return (
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-16">
+            {/* 返回按钮 */}
+            <button
+                onClick={goToList}
+                className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
+            >
+                <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                목록으로 돌아가기
+            </button>
 
-        <div className="max-w-6xl min-w-5xl mx-auto px-6 py-16">
-            {/* 页面标题 */}
-            <h1 className="text-center text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                新建博客文章
+            <h1 className="text-center text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                {mode === 'edit' ? '게시글 수정' : '새 글 작성'}
             </h1>
-
-            <div className="mb-12 text-center">
-                <p className="text-gray-400">
-                    记录你的技术思考与成长 ✍️
+            <div className="mb-10 text-center">
+                <p className="text-gray-400 text-sm">
+                    {mode === 'edit' ? `수정 중: ${editingSlug}` : 'Markdown 형식으로 작성할 수 있습니다'}
                 </p>
             </div>
 
-            {/* 表单卡片 */}
-            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 md:p-10 shadow-xl space-y-6">
+            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 md:p-10 shadow-xl space-y-6">
                 {/* 标题 */}
                 <div>
-                    <label className="block text-sm text-gray-400 mb-2">标题</label>
+                    <label className="block text-sm text-gray-400 mb-2">제목</label>
                     <input
                         name="title"
                         value={form.title}
-                        onChange={handleChange}
-                        placeholder="请输入文章标题"
-                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
+                        onChange={handleTitleChange}
+                        placeholder="게시글 제목을 입력하세요"
+                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
                     />
                 </div>
 
-                {/* slug */}
+                {/* Slug */}
                 <div>
                     <label className="block text-sm text-gray-400 mb-2">Slug</label>
                     <input
                         name="slug"
                         value={form.slug}
                         onChange={handleChange}
-                        placeholder="spring-boot-postgres"
-                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+                        placeholder="url-friendly-slug"
+                        disabled={mode === 'edit'}
+                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                 </div>
 
                 {/* 摘要 */}
                 <div>
-                    <label className="block text-sm text-gray-400 mb-2">摘要</label>
+                    <label className="block text-sm text-gray-400 mb-2">요약 (선택)</label>
                     <textarea
                         name="summary"
                         value={form.summary}
                         onChange={handleChange}
-                        rows={3}
-                        placeholder="简要描述文章内容"
-                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500"
+                        rows={2}
+                        placeholder="간단한 요약을 입력하세요"
+                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500"
                     />
                 </div>
 
-                {/* 正文 */}
+                {/* 内容 */}
                 <div>
-                    <label className="block text-sm text-gray-400 mb-2">正文内容</label>
+                    <label className="block text-sm text-gray-400 mb-2">내용 (Markdown)</label>
                     <textarea
                         name="content"
                         value={form.content}
                         onChange={handleChange}
-                        rows={10}
-                        placeholder="在这里开始写你的文章..."
-                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
+                        rows={16}
+                        placeholder="여기에 글을 작성하세요..."
+                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
                     />
                 </div>
 
-                {/* 错误提示 */}
+                {/* 错误 / 成功 提示 */}
                 {error && (
                     <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2">
                         {error}
                     </div>
                 )}
+                {success && (
+                    <div className="text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-4 py-2">
+                        {success}
+                    </div>
+                )}
 
-                {/* 提交按钮 */}
-                <div className="pt-4 flex justify-end">
+                {/* 按钮 */}
+                <div className="pt-4 flex justify-end gap-3">
+                    <button
+                        onClick={goToList}
+                        className="px-5 py-2.5 rounded-lg font-medium text-gray-400 bg-gray-700/50 hover:bg-gray-700 transition text-sm"
+                    >
+                        취소
+                    </button>
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="
-              inllinear items-center gap-2 px-6 py-3 rounded-xl font-medium text-white
-              bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500
-              hover:opacity-90 transition
-              disabled:opacity-50 disabled:cursor-not-allowed
-            "
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:opacity-90 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading && (
                             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         )}
-                        {loading ? '提交中...' : '发布文章'}
+                        {loading ? '저장 중...' : mode === 'edit' ? '수정 완료' : '발행하기'}
                     </button>
                 </div>
             </div>
         </div>
-    );
+    )
 }
