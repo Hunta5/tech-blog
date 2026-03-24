@@ -1,99 +1,98 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function LoginPage() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [invitationCode, setInvitationCode] = useState('');
+    const { t } = useLanguage()
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const handleLogin = async () => {
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-        });
+        if (!username.trim() || !password.trim()) return
+        setLoading(true)
+        setError('')
 
-        const json = await res.json();
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            })
 
-        if (json.code !== 0) {
-            alert(json.message);
-            return;
+            const json = await res.json()
+
+            if (json.code !== 0) {
+                setError(json.message || t('login.failed'))
+                return
+            }
+
+            localStorage.setItem('token', json.data)
+            window.dispatchEvent(new Event('storage'))
+        } catch {
+            setError(t('login.failed'))
+        } finally {
+            setLoading(false)
         }
+    }
 
-        localStorage.setItem('token', json.data);
-        alert('登录成功');
-    };
-
-    const handleRegister = async () => {
-        const res = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, invitationCode }),
-        });
-
-        const json = await res.json();
-
-        if (!res.ok || json.code !== 0) {
-            alert(json.message || '注册失败');
-            return;
-        }
-
-        alert('注册成功，请登录');
-    };
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') handleLogin()
+    }
 
     return (
-        <div className="min-h-screen bg-black-50 flex items-center justify-center">
-            <div className="max-w-5xl w-full mx-auto px-6 py-16">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-16 md:py-24">
+            <div className="max-w-sm mx-auto">
+                <div className="text-center mb-10">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-2xl font-bold text-white mb-2">{t('login.title')}</h1>
+                    <p className="text-sm text-gray-500">{t('login.adminOnly')}</p>
+                </div>
 
-                <h1 className="text-4xl md:text-5xl font-bold mb-10
-      bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500
-      bg-clip-text text-transparent">
-                    登录
-                </h1>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5 font-semibold">{t('login.username')}</label>
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={e => setUsername(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="w-full px-4 py-2.5 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
+                            placeholder={t('login.username')}
+                        />
+                    </div>
 
-                <div className="max-w-md space-y-6">
-                    <input
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3
-                   focus:outline-none focus:ring-2 focus:ring-purple-400"
-                        placeholder="用户名"
-                        onChange={e => setUsername(e.target.value)}
-                    />
+                    <div>
+                        <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1.5 font-semibold">{t('login.password')}</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="w-full px-4 py-2.5 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
+                            placeholder={t('login.password')}
+                        />
+                    </div>
 
-                    <input
-                        type="password"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3
-                   focus:outline-none focus:ring-2 focus:ring-purple-400"
-                        placeholder="密码"
-                        onChange={e => setPassword(e.target.value)}
-                    />
-
-                    <input
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3
-                   focus:outline-none focus:ring-2 focus:ring-purple-400"
-                        placeholder="推荐码"
-                        onChange={e => setInvitationCode(e.target.value)}
-                    />
+                    {error && (
+                        <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2">{error}</div>
+                    )}
 
                     <button
                         onClick={handleLogin}
-                        className="w-full py-3 rounded-lg font-semibold text-white
-                   bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500
-                   hover:opacity-90 transition">
-                        登录
+                        disabled={loading || !username.trim() || !password.trim()}
+                        className="w-full py-2.5 rounded-lg font-medium text-sm text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 transition disabled:opacity-50"
+                    >
+                        {loading ? t('login.loggingIn') : t('login.loginBtn')}
                     </button>
-
-                    <button
-                        onClick={handleRegister}
-                        className="w-full py-3 rounded-lg font-semibold text-white
-                   bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500
-                   hover:opacity-90 transition">
-                        注册
-                    </button>
-
                 </div>
-
             </div>
         </div>
-    );
+    )
 }

@@ -42,9 +42,26 @@ export const sidebarConfig: SidebarItem[] = [
                     { titleKey: 'Timestamp', href: '/tools/timestamp' },
                     { titleKey: 'Color', href: '/tools/color' },
                     { titleKey: 'Image Compress', href: '/tools/imagecompress' },
+                    { titleKey: 'Translate', href: '/tools/translate' },
                 ],
             },
         ],
+    },
+    {
+        titleKey: 'sidebar.fortune',
+        children: [
+            { titleKey: 'sidebar.sajuAnalysis', href: '/saju' },
+            { titleKey: 'sidebar.horoscope', href: '/horoscope' },
+        ]
+    },
+    {
+        titleKey: 'sidebar.life',
+        children: [
+            { titleKey: 'sidebar.english', href: '/english' },
+            { titleKey: 'sidebar.foodFinder', href: '/food' },
+            { titleKey: 'sidebar.news', href: '/news' },
+            { titleKey: 'sidebar.baiduHot', href: '/news/hot' },
+        ]
     },
     {
         titleKey: 'sidebar.blog',

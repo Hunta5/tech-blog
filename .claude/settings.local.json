@@ -12,7 +12,16 @@
       "Bash(ipsw version:*)",
       "Bash(wc:*)",
       "Bash(npx next:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:saju-kid.com)",
+      "Bash(lsof:*)",
+      "Bash(ps -p 84606 -o pid,command)",
+      "Bash(kill:*)",
+      "Bash(curl:*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); cards=d.get\\(''''data'''',{}\\).get\\(''''cards'''',[]\\); items=cards[0].get\\(''''content'''',[]\\) if cards else []; [print\\(f{i+1}. {x.get\\(''''word'''',''''''''\\)} - {x.get\\(''''desc'''',''''''''\\)[:30]}\\) for i,x in enumerate\\(items[:5]\\)]\")",
+      "Bash(python3 -c \":*)",
+      "Bash(python3 -c ':*)",
+      "Bash(chmod:*)"
     ]
   }
 }

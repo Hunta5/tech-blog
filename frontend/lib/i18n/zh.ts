@@ -11,12 +11,20 @@ const zh: Record<string, string> = {
     'sidebar.tool.json': 'JSON',
     'sidebar.tool.ios': 'iOS',
     'sidebar.tool.dev': '开发工具',
+    'sidebar.fortune': '运势',
+    'sidebar.sajuAnalysis': '四柱八字',
+    'sidebar.horoscope': '星座运势',
+    'sidebar.life': '生活',
+    'sidebar.english': '每日英语',
+    'sidebar.foodFinder': '周边美食',
+    'sidebar.news': '全球新闻',
+    'sidebar.baiduHot': '百度热搜',
     'sidebar.about': '关于',
     'sidebar.aboutMe': '关于我',
 
     // Landing
     'landing.greeting': '你好',
-    'landing.name': '我是朴龙',
+    'landing.name': '我是朴勇',
     'landing.role': 'Senior iOS Developer · 12+ Years',
     'landing.subtitle': '记录学习与成长的每一步，分享技术洞察与开发经验。',
     'landing.tools': '开发工具',
@@ -76,6 +84,7 @@ const zh: Record<string, string> = {
 
     // Blog Manager
     'blog.title': '博客管理',
+    'blog.logout': '退出登录',
     'blog.newPost': '写新文章',
     'blog.noPosts': '还没有文章',
     'blog.writeFirst': '写第一篇文章吧',
@@ -105,6 +114,24 @@ const zh: Record<string, string> = {
     'blog.confirmDelete': '确定要删除这篇文章吗？',
     'blog.deleteFailed': '删除失败',
     'blog.deleteError': '删除时发生错误',
+
+    // Translate
+    'translate.title': '翻译工具',
+    'translate.desc': '中文、英文、韩语之间的文本翻译。支持 JSON 值批量翻译。',
+    'translate.textTab': '文本翻译',
+    'translate.jsonTab': 'JSON 翻译',
+    'translate.sourceLang': '源语言',
+    'translate.targetLang': '目标语言',
+    'translate.swap': '交换语言',
+    'translate.inputPlaceholder': '输入要翻译的文本...',
+    'translate.resultPlaceholder': '翻译结果...',
+    'translate.translating': '翻译中...',
+    'translate.translateJson': '翻译 JSON',
+    'translate.jsonHint': '自动翻译 JSON 中所有字符串值，键名保持不变。',
+    'translate.pasteJson': '请输入 JSON',
+    'translate.invalidJson': '无效的 JSON 格式',
+    'translate.openGoogle': '用 Google 翻译打开',
+    'translate.charLimit': '每日 5,000 字符限制',
 
     // Tools Common
     'tool.input': '输入',
@@ -397,15 +424,13 @@ const zh: Record<string, string> = {
     'resume.downloadPdf': '下载PDF',
 
     // Login
-    'login.title': '登录',
+    'login.title': '管理员登录',
+    'login.adminOnly': '仅管理员可访问此页面。',
     'login.username': '用户名',
     'login.password': '密码',
-    'login.invitationCode': '邀请码',
     'login.loginBtn': '登录',
-    'login.registerBtn': '注册',
-    'login.loginSuccess': '登录成功',
-    'login.registerSuccess': '注册成功，请登录',
-    'login.registerFailed': '注册失败',
+    'login.loggingIn': '登录中...',
+    'login.failed': '登录失败',
 }
 
 export default zh

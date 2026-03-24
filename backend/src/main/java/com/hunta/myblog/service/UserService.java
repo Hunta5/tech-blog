@@ -31,7 +31,7 @@ public class UserService {
             throw new RuntimeException("密码错误");
         }
 
-        return jwtUtil.generateToken(user.getId());
+        return jwtUtil.generateToken(user.getId(), user.getRole());
     }
 
     public void register(RegisterRequest request) {

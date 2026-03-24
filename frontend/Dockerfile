@@ -1,23 +1,52 @@
-FROM node:20-alpine
+# ============================================
+# Stage 1: Install dependencies
+# ============================================
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --ignore-scripts
 
-# 工作目录
+# ============================================
+# Stage 2: Build (混淆 + 压缩 + tree-shaking)
+# ============================================
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Build-time env vars (NEXT_PUBLIC_* must be available at build time)
+ARG NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_KAKAO_JS_KEY
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_KAKAO_JS_KEY=$NEXT_PUBLIC_KAKAO_JS_KEY
+
+# Next.js production build — automatically minifies & obfuscates JS
+RUN npm run build
+
+# ============================================
+# Stage 3: Production runner (minimal image)
+# ============================================
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-# 基础工具
-RUN apk add --no-cache bash git
+ENV NODE_ENV=production
 
-# 复制 package.json（用于安装依赖）
-COPY frontend/package*.json ./
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
-# 进入 frontend 目录安装依赖
-WORKDIR /app/frontend
-RUN npm install
+# Copy only what's needed to run
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-# 回到根目录
-WORKDIR /app
+# Copy posts markdown files if they exist
+COPY --from=builder /app/posts ./posts
 
-# 暴露端口
+USER nextjs
+
 EXPOSE 3000
 
-# 默认启动开发服务器
-CMD ["sh", "-c", "cd frontend && npm run dev"]
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]

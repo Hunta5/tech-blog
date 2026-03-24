@@ -36,4 +36,10 @@ public class PostService {
         Post post = repository.findById(id).orElseThrow(()-> new PostNotFoundException(id));
         return PostMapper.toResponse(post);
     }
+
+    public void deleteBySlug(String slug) {
+        Post post = repository.findBySlug(slug)
+                .orElseThrow(() -> new RuntimeException("文章不存在: " + slug));
+        repository.delete(post);
+    }
 }

@@ -26,6 +26,10 @@ public class User {
     @Column(name = "invitation_code", nullable = false)
     private Integer invitationCode = 0;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private String role = "user";  // "admin" or "user"
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }

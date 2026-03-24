@@ -41,7 +41,9 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable()) // ❌ 关闭 Basic Auth（弹窗来源）
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll() // 登录接口放行
-                        .requestMatchers("GET", "/posts").permitAll()  // GET /posts 放行（列表）
+                        .requestMatchers("GET", "/posts/**").permitAll()  // GET /posts 全部放行（列表+详情）
+                        .requestMatchers("/news/**").permitAll()       // 新闻接口放行
+                        .requestMatchers("/baidu-hot/**").permitAll() // 百度热搜放行
                         .anyRequest().authenticated()
                 );
 

@@ -1,7 +1,7 @@
-import PostForm from "@/components/PostForm";
+import AuthGate from "@/components/AuthGate";
 
 export default function BlogMaker() {
     return (
-        <PostForm />
+        <AuthGate />
     );
 }

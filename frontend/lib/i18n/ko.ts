@@ -11,6 +11,14 @@ const ko: Record<string, string> = {
     'sidebar.tool.json': 'JSON',
     'sidebar.tool.ios': 'iOS',
     'sidebar.tool.dev': '개발 유틸',
+    'sidebar.fortune': '운세',
+    'sidebar.sajuAnalysis': '사주팔자',
+    'sidebar.horoscope': '별자리 운세',
+    'sidebar.life': '생활',
+    'sidebar.english': '매일 영어',
+    'sidebar.foodFinder': '주변 맛집',
+    'sidebar.news': '글로벌 뉴스',
+    'sidebar.baiduHot': '바이두 인기',
     'sidebar.about': 'About',
     'sidebar.aboutMe': 'About Me',
 
@@ -76,6 +84,7 @@ const ko: Record<string, string> = {
 
     // Blog Manager
     'blog.title': 'Blog Manager',
+    'blog.logout': '로그아웃',
     'blog.newPost': '새 글 작성',
     'blog.noPosts': '아직 게시글이 없습니다',
     'blog.writeFirst': '첫 번째 글을 작성해 보세요',
@@ -105,6 +114,24 @@ const ko: Record<string, string> = {
     'blog.confirmDelete': '게시글을 삭제하시겠습니까?',
     'blog.deleteFailed': '삭제 실패',
     'blog.deleteError': '삭제 중 오류가 발생했습니다',
+
+    // Translate
+    'translate.title': '번역기',
+    'translate.desc': '중국어, 영어, 한국어 간 텍스트 번역. JSON 값 일괄 번역도 지원합니다.',
+    'translate.textTab': '텍스트 번역',
+    'translate.jsonTab': 'JSON 번역',
+    'translate.sourceLang': '원본 언어',
+    'translate.targetLang': '대상 언어',
+    'translate.swap': '언어 교체',
+    'translate.inputPlaceholder': '번역할 텍스트를 입력하세요...',
+    'translate.resultPlaceholder': '번역 결과...',
+    'translate.translating': '번역 중...',
+    'translate.translateJson': 'JSON 번역',
+    'translate.jsonHint': 'JSON의 모든 문자열 값을 자동으로 번역합니다. 키는 유지됩니다.',
+    'translate.pasteJson': 'JSON을 입력해 주세요',
+    'translate.invalidJson': '유효하지 않은 JSON 형식입니다',
+    'translate.openGoogle': 'Google 번역으로 열기',
+    'translate.charLimit': '일일 5,000자 제한',
 
     // Tools Common
     'tool.input': '입력',
@@ -397,15 +424,13 @@ const ko: Record<string, string> = {
     'resume.downloadPdf': 'PDF 다운로드',
 
     // Login
-    'login.title': '로그인',
+    'login.title': '관리자 로그인',
+    'login.adminOnly': '관리자 전용 페이지입니다.',
     'login.username': '사용자 이름',
     'login.password': '비밀번호',
-    'login.invitationCode': '추천 코드',
     'login.loginBtn': '로그인',
-    'login.registerBtn': '회원가입',
-    'login.loginSuccess': '로그인 성공',
-    'login.registerSuccess': '회원가입 성공, 로그인해 주세요',
-    'login.registerFailed': '회원가입 실패',
+    'login.loggingIn': '로그인 중...',
+    'login.failed': '로그인 실패',
 }
 
 export default ko

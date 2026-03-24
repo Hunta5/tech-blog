@@ -147,15 +147,27 @@ export default function PostForm() {
                     <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                         {t('blog.title')}
                     </h1>
-                    <button
-                        onClick={goToCreate}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 transition text-sm"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        {t('blog.newPost')}
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={goToCreate}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 transition text-sm"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            {t('blog.newPost')}
+                        </button>
+                        <button
+                            onClick={() => { localStorage.removeItem('token'); window.dispatchEvent(new Event('storage')) }}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-gray-400 bg-gray-800 border border-gray-700 hover:text-white transition"
+                            title={t('blog.logout')}
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            {t('blog.logout')}
+                        </button>
+                    </div>
                 </div>
 
                 {posts.length === 0 ? (

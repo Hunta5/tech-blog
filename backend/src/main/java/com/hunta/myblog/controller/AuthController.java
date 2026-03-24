@@ -25,13 +25,12 @@ public class AuthController {
         return ApiResponse.success(token);
     }
 
-    @PostMapping("/register")
-    public ApiResponse<Void> register(
-            @Valid @RequestBody RegisterRequest request
-    ) {
-        userService.register(request);
-        return ApiResponse.success();
-    }
+    // 注册功能已关闭 — 仅管理员使用，通过数据库直接创建账号
+    // @PostMapping("/register")
+    // public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
+    //     userService.register(request);
+    //     return ApiResponse.success();
+    // }
 
 
 }
