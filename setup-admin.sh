@@ -21,29 +21,29 @@ DB_NAME="${POSTGRES_DB:-app_db}"
 
 echo "🔐 Setting up admin account..."
 
-# Generate bcrypt hash directly inside postgres container using plpgsql + pgcrypto
-# First, try enabling pgcrypto extension, then use crypt() function
-HASH=$(docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -c "
-    CREATE EXTENSION IF NOT EXISTS pgcrypto;
-    SELECT crypt('$PASSWORD', gen_salt('bf', 10));
-" 2>/dev/null | tr -d ' \n')
+# Step 1: Enable pgcrypto extension
+docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c \
+    "CREATE EXTENSION IF NOT EXISTS pgcrypto;" > /dev/null 2>&1
+
+# Step 2: Generate bcrypt hash (separate query, clean output)
+HASH=$(docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -t -A -c \
+    "SELECT crypt('$PASSWORD', gen_salt('bf', 10));" 2>/dev/null)
 
 if [ -z "$HASH" ]; then
-    echo "❌ Failed. Make sure postgres container is running:"
-    echo "   docker-compose up -d postgres"
-    echo "   or: ./deploy.sh"
+    echo "❌ Failed to generate password hash."
+    echo "   Make sure postgres container is running: docker ps | grep postgres"
     exit 1
 fi
 
 echo "✅ Password hash generated"
 
-# Insert or update admin user
+# Step 3: Insert admin user
 docker exec postgres-db psql -U "$DB_USER" -d "$DB_NAME" -c "
     ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(255) NOT NULL DEFAULT 'user';
     DELETE FROM users WHERE username = '$USERNAME';
     INSERT INTO users (username, password, invitation_code, role, created_at)
     VALUES ('$USERNAME', '$HASH', 0, 'admin', NOW());
-" 2>/dev/null
+" > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then
     echo ""
