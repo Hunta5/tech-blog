@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 type Tab = 'regex' | 'predicate' | 'builder'
 
@@ -214,6 +215,7 @@ let _ruleId = 0
 // ---- component ----
 
 export default function RegexClient() {
+    const { t } = useLanguage()
     const [tab, setTab] = useState<Tab>('regex')
 
     // Regex state
@@ -363,26 +365,26 @@ export default function RegexClient() {
     }
 
     const tabs: { key: Tab; label: string }[] = [
-        { key: 'regex', label: 'Regex Tester' },
-        { key: 'builder', label: 'Predicate Builder' },
-        { key: 'predicate', label: 'Predicate Cheatsheet' },
+        { key: 'regex', label: t('regex.tester') },
+        { key: 'builder', label: t('regex.builder') },
+        { key: 'predicate', label: t('regex.cheatsheet') },
     ]
 
     return (
         <div className="space-y-6">
             {/* Tabs */}
             <div className="flex bg-gray-800/50 rounded-xl p-1 border border-gray-700">
-                {tabs.map((t) => (
+                {tabs.map((tb) => (
                     <button
-                        key={t.key}
-                        onClick={() => setTab(t.key)}
+                        key={tb.key}
+                        onClick={() => setTab(tb.key)}
                         className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                            tab === t.key
+                            tab === tb.key
                                 ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30'
                                 : 'text-gray-400 hover:text-white border border-transparent'
                         }`}
                     >
-                        {t.label}
+                        {tb.label}
                     </button>
                 ))}
             </div>
@@ -415,10 +417,10 @@ export default function RegexClient() {
                     {/* Flag Toggles */}
                     <div className="flex flex-wrap gap-2">
                         {[
-                            { flag: 'g', label: 'global' },
-                            { flag: 'i', label: 'case-insensitive' },
-                            { flag: 'm', label: 'multiline' },
-                            { flag: 's', label: 'dotAll' },
+                            { flag: 'g', label: t('regex.global') },
+                            { flag: 'i', label: t('regex.caseInsensitive') },
+                            { flag: 'm', label: t('regex.multiline') },
+                            { flag: 's', label: t('regex.dotAll') },
                         ].map(({ flag, label }) => (
                             <button
                                 key={flag}
@@ -436,11 +438,11 @@ export default function RegexClient() {
 
                     {/* Test String */}
                     <div>
-                        <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Test String</label>
+                        <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('regex.testString')}</label>
                         <textarea
                             value={testString}
                             onChange={(e) => setTestString(e.target.value)}
-                            placeholder="Enter text to test against the regex..."
+                            placeholder={t('regex.testPlaceholder')}
                             className="w-full h-28 p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/50 resize-none"
                         />
                     </div>
@@ -454,7 +456,7 @@ export default function RegexClient() {
                     {regexResult !== null && (
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Matches</span>
+                                <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('regex.matches')}</span>
                                 <span className={`px-2 py-0.5 rounded-md text-xs font-mono border ${
                                     regexResult.length > 0
                                         ? 'bg-green-500/10 border-green-500/20 text-green-400'
@@ -515,12 +517,12 @@ export default function RegexClient() {
                     {pattern && (
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Swift / NSPredicate Code</label>
+                                <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('regex.swiftCode')}</label>
                                 <button
                                     onClick={() => handleCopy('swift-regex', swiftRegex)}
                                     className="text-xs text-blue-400 hover:text-blue-300 transition"
                                 >
-                                    {copied === 'swift-regex' ? 'Copied!' : 'Copy'}
+                                    {copied === 'swift-regex' ? t('tool.copied') : t('tool.copy')}
                                 </button>
                             </div>
                             <pre className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-gray-300 font-mono text-xs overflow-x-auto whitespace-pre-wrap">{swiftRegex}</pre>
@@ -529,12 +531,12 @@ export default function RegexClient() {
 
                     {/* Common patterns */}
                     <details>
-                        <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">Common Regex Patterns</summary>
+                        <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">{t('regex.commonPatterns')}</summary>
                         <div className="mt-3 bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden">
                             <table className="w-full text-xs">
                                 <thead>
                                     <tr className="border-b border-gray-700">
-                                        <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">Pattern</th>
+                                        <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">{t('regex.pattern')}</th>
                                         <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">Regex</th>
                                     </tr>
                                 </thead>
@@ -566,11 +568,11 @@ export default function RegexClient() {
             {/* ==================== Predicate Builder ==================== */}
             {tab === 'builder' && (
                 <div className="space-y-5">
-                    <div className="text-xs text-gray-500">Build NSPredicate visually — select key paths, operators, and values.</div>
+                    <div className="text-xs text-gray-500">{t('regex.builderHint')}</div>
 
                     {/* Combiner */}
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Combine with</span>
+                        <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('regex.combineWith')}</span>
                         {(['AND', 'OR'] as Combiner[]).map(c => (
                             <button
                                 key={c}
@@ -645,7 +647,7 @@ export default function RegexClient() {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            Add Rule
+                            {t('tool.addRule')}
                         </button>
                     </div>
 
@@ -654,18 +656,18 @@ export default function RegexClient() {
                         <div className="space-y-3">
                             <div>
                                 <div className="flex items-center justify-between mb-2">
-                                    <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">NSPredicate Format</label>
+                                    <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('regex.predicateFormat')}</label>
                                     <button onClick={() => handleCopy('b-pred', builderOutput.predicate)} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                                        {copied === 'b-pred' ? 'Copied!' : 'Copy'}
+                                        {copied === 'b-pred' ? t('tool.copied') : t('tool.copy')}
                                     </button>
                                 </div>
                                 <pre className="p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-pink-400 font-mono text-sm overflow-x-auto">{builderOutput.predicate}</pre>
                             </div>
                             <div>
                                 <div className="flex items-center justify-between mb-2">
-                                    <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Swift Code</label>
+                                    <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('regex.swiftCode')}</label>
                                     <button onClick={() => handleCopy('b-swift', builderOutput.swift)} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                                        {copied === 'b-swift' ? 'Copied!' : 'Copy'}
+                                        {copied === 'b-swift' ? t('tool.copied') : t('tool.copy')}
                                     </button>
                                 </div>
                                 <pre className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-gray-300 font-mono text-xs overflow-x-auto whitespace-pre-wrap">{builderOutput.swift}</pre>
@@ -678,7 +680,7 @@ export default function RegexClient() {
             {/* ==================== Predicate Cheatsheet ==================== */}
             {tab === 'predicate' && (
                 <div className="space-y-3">
-                    <div className="text-xs text-gray-500">Click any example to copy the Swift code. Covers the most common NSPredicate patterns for CoreData and collection filtering.</div>
+                    <div className="text-xs text-gray-500">{t('regex.cheatsheetHint')}</div>
                     {PREDICATE_TEMPLATES.map((cat) => (
                         <div key={cat.category} className="border border-gray-700 rounded-xl overflow-hidden">
                             <button
@@ -686,7 +688,7 @@ export default function RegexClient() {
                                 className="w-full flex items-center justify-between px-4 py-3 bg-gray-800/50 hover:bg-gray-700/50 transition text-left"
                             >
                                 <span className="text-sm font-medium text-gray-300">{cat.category}</span>
-                                <span className="text-gray-500 text-xs">{cat.items.length} patterns</span>
+                                <span className="text-gray-500 text-xs">{cat.items.length} {t('regex.patterns')}</span>
                             </button>
                             {expandedCategory === cat.category && (
                                 <div className="divide-y divide-gray-800/50">
@@ -701,7 +703,7 @@ export default function RegexClient() {
                                                     onClick={() => handleCopy(item.label, item.swift)}
                                                     className="text-xs text-blue-400 hover:text-blue-300 transition whitespace-nowrap"
                                                 >
-                                                    {copied === item.label ? 'Copied!' : 'Copy Swift'}
+                                                    {copied === item.label ? t('tool.copied') : t('deeplink.copySwift')}
                                                 </button>
                                             </div>
                                             <div className="mb-1.5">

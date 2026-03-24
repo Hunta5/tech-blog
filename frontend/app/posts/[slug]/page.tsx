@@ -23,7 +23,7 @@ export default async function PostPage({ params }: Props) {
                     </div>
                     <h1 className="text-3xl font-bold text-white mb-4">Post Not Found</h1>
                     <p className="text-gray-400 mb-8">The post you are looking for does not exist.</p>
-                    <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                    <Link href="/articles" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                         Home
                     </Link>

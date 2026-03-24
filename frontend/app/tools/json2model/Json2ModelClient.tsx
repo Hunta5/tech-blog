@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 type Lang = 'swift-codable' | 'swift-objc' | 'typescript' | 'kotlin'
 
@@ -29,6 +30,7 @@ const LANGS: { key: Lang; label: string; sub?: string }[] = [
 ]
 
 export default function Json2ModelClient() {
+    const { t } = useLanguage()
     const [input, setInput] = useState('')
     const [output, setOutput] = useState('')
     const [lang, setLang] = useState<Lang>('swift-codable')
@@ -113,12 +115,12 @@ export default function Json2ModelClient() {
 
             {/* Options */}
             <div className="bg-gray-800/30 border border-gray-700/50 rounded-xl p-4 space-y-3">
-                <div className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">Options</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">{t('tool.options')}</div>
 
                 {/* Row 1: Root name + general */}
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <label className="text-xs text-gray-500">Root Name</label>
+                        <label className="text-xs text-gray-500">{t('j2m.rootName')}</label>
                         <input
                             type="text"
                             value={options.rootName}
@@ -127,14 +129,14 @@ export default function Json2ModelClient() {
                             placeholder="Root"
                         />
                     </div>
-                    <Checkbox label="All optional" checked={options.optionalAll} onChange={(v) => setOpt('optionalAll', v)} />
+                    <Checkbox label={t('j2m.allOptional')} checked={options.optionalAll} onChange={(v) => setOpt('optionalAll', v)} />
                 </div>
 
                 {/* Swift-specific options */}
                 {isSwift && (
                     <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-gray-700/50">
                         <div className="flex items-center gap-2">
-                            <label className="text-xs text-gray-500">Access</label>
+                            <label className="text-xs text-gray-500">{t('j2m.access')}</label>
                             <select value={options.accessLevel} onChange={(e) => setOpt('accessLevel', e.target.value as AccessLevel)}
                                 className="px-2 py-1.5 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 text-xs focus:outline-none">
                                 <option value="public">public</option>
@@ -143,11 +145,11 @@ export default function Json2ModelClient() {
                             </select>
                         </div>
                         <div className="flex items-center gap-2">
-                            <label className="text-xs text-gray-500">Properties</label>
+                            <label className="text-xs text-gray-500">{t('j2m.properties')}</label>
                             <select value={options.mutability} onChange={(e) => setOpt('mutability', e.target.value as SwiftMutability)}
                                 className="px-2 py-1.5 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 text-xs focus:outline-none">
-                                <option value="let">let (immutable)</option>
-                                <option value="var">var (mutable)</option>
+                                <option value="let">{t('j2m.immutable')}</option>
+                                <option value="var">{t('j2m.mutable')}</option>
                             </select>
                         </div>
                         <Checkbox label="class" checked={options.useClass} onChange={(v) => setOpt('useClass', v)} />
@@ -161,7 +163,7 @@ export default function Json2ModelClient() {
                 {isObjC && (
                     <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-gray-700/50">
                         <div className="flex items-center gap-2">
-                            <label className="text-xs text-gray-500">Class Prefix</label>
+                            <label className="text-xs text-gray-500">{t('j2m.classPrefix')}</label>
                             <input
                                 type="text"
                                 value={options.objcPrefix}
@@ -180,9 +182,9 @@ export default function Json2ModelClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">JSON Input</label>
+                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('j2m.jsonInput')}</label>
                         {input.trim() && (
-                            <button onClick={handleFormat} className="text-xs text-blue-400 hover:text-blue-300 transition">Format</button>
+                            <button onClick={handleFormat} className="text-xs text-blue-400 hover:text-blue-300 transition">{t('tool.format')}</button>
                         )}
                     </div>
                     <textarea
@@ -197,7 +199,7 @@ export default function Json2ModelClient() {
                         <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{langLabel} Output</label>
                         {output && (
                             <button onClick={handleCopy} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                                {copied ? 'Copied!' : 'Copy'}
+                                {copied ? t('tool.copied') : t('tool.copy')}
                             </button>
                         )}
                     </div>
@@ -221,26 +223,26 @@ export default function Json2ModelClient() {
                     onClick={handleConvert}
                     className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition"
                 >
-                    Generate →
+                    {t('tool.generate')}
                 </button>
                 <button
                     onClick={() => { setInput(''); setOutput(''); setError('') }}
                     className="px-6 py-2.5 bg-gray-800 border border-gray-700 text-gray-400 hover:text-white rounded-lg text-sm transition"
                 >
-                    Clear
+                    {t('tool.clear')}
                 </button>
             </div>
 
             {/* Key Mapping Reference */}
             <details className="mt-4">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">Key Mapping Reference</summary>
+                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">{t('j2m.keyMapping')}</summary>
                 <div className="mt-3 bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden">
                     <table className="w-full text-xs">
                         <thead>
                             <tr className="border-b border-gray-700">
-                                <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">JSON Key (snake_case)</th>
-                                <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">Property (camelCase)</th>
-                                <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">Auto CodingKey</th>
+                                <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">{t('j2m.jsonKey')}</th>
+                                <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">{t('j2m.property')}</th>
+                                <th className="px-4 py-2 text-left text-[10px] text-gray-500 uppercase">{t('j2m.autoCodingKey')}</th>
                             </tr>
                         </thead>
                         <tbody className="font-mono">

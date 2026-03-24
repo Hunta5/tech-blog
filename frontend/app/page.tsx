@@ -1,7 +1,7 @@
 import { getAllPosts } from '@/lib/posts'
-import HomeContent from '@/components/HomeContent'
+import LandingContent from '@/components/LandingContent'
 
-export default function HomePage() {
+export default function LandingPage() {
     const posts = getAllPosts()
-    return <HomeContent posts={posts} />
+    return <LandingContent posts={posts} />
 }

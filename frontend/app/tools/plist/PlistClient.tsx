@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useMemo } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 // ---- Plist value types ----
 
@@ -230,6 +231,7 @@ function plistToJson(pv: PlistValue): unknown {
 type ViewMode = 'tree' | 'grouped' | 'json'
 
 export default function PlistClient() {
+    const { t } = useLanguage()
     const [rawXml, setRawXml] = useState('')
     const [parsed, setParsed] = useState<PlistValue | null>(null)
     const [error, setError] = useState('')
@@ -350,16 +352,16 @@ export default function PlistClient() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
-                        Upload .plist / .entitlements
+                        {t('plist.uploadBtn')}
                     </button>
                     {fileName && (
                         <span className="text-xs font-mono text-gray-400 bg-gray-800/50 px-2 py-1 rounded">{fileName}</span>
                     )}
                     <div className="ml-auto flex gap-2">
                         <button onClick={() => handleSample('info')}
-                            className="text-xs text-orange-400/70 hover:text-orange-400 transition">Sample Info.plist</button>
+                            className="text-xs text-orange-400/70 hover:text-orange-400 transition">{t('plist.sampleInfo')}</button>
                         <button onClick={() => handleSample('entitlements')}
-                            className="text-xs text-orange-400/70 hover:text-orange-400 transition">Sample .entitlements</button>
+                            className="text-xs text-orange-400/70 hover:text-orange-400 transition">{t('plist.sampleEntitlements')}</button>
                     </div>
                 </div>
 
@@ -373,11 +375,11 @@ export default function PlistClient() {
                 <div className="flex gap-3">
                     <button onClick={handlePaste}
                         className="px-5 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition">
-                        Parse
+                        {t('plist.parse')}
                     </button>
                     <button onClick={() => { setRawXml(''); setParsed(null); setError(''); setFileName(''); setSearch('') }}
                         className="px-5 py-2 bg-gray-800 border border-gray-700 text-gray-400 hover:text-white rounded-lg text-sm transition">
-                        Clear
+                        {t('tool.clear')}
                     </button>
                 </div>
             </div>
@@ -394,16 +396,16 @@ export default function PlistClient() {
                     {stats && (
                         <div className="flex items-center gap-3 flex-wrap">
                             <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-500/10 border border-orange-500/20 text-orange-400">
-                                {stats.total} keys
+                                {stats.total} {t('plist.keys')}
                             </span>
                             {stats.privacyKeys > 0 && (
                                 <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-red-500/10 border border-red-500/20 text-red-400">
-                                    {stats.privacyKeys} privacy permissions
+                                    {stats.privacyKeys} {t('plist.privacyPermissions')}
                                 </span>
                             )}
                             {stats.entitlementKeys > 0 && (
                                 <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-500/10 border border-blue-500/20 text-blue-400">
-                                    {stats.entitlementKeys} entitlements
+                                    {stats.entitlementKeys} {t('plist.entitlements')}
                                 </span>
                             )}
                         </div>
@@ -419,21 +421,21 @@ export default function PlistClient() {
                                             ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                                             : 'text-gray-400 hover:text-white border border-transparent'
                                     }`}>
-                                    {m === 'grouped' ? 'Grouped' : m === 'tree' ? 'Tree' : 'JSON'}
+                                    {m === 'grouped' ? t('plist.grouped') : m === 'tree' ? t('plist.tree') : 'JSON'}
                                 </button>
                             ))}
                         </div>
                         {viewMode !== 'json' && (
                             <input
                                 type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Search keys..."
+                                placeholder={t('plist.searchPlaceholder')}
                                 className="flex-1 min-w-[150px] px-3 py-1.5 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/50"
                             />
                         )}
                         {viewMode === 'json' && (
                             <button onClick={() => handleCopy('json', jsonOutput)}
                                 className="ml-auto text-xs text-blue-400 hover:text-blue-300 transition">
-                                {copied === 'json' ? 'Copied!' : 'Copy JSON'}
+                                {copied === 'json' ? t('tool.copied') : t('plist.copyJson')}
                             </button>
                         )}
                     </div>
@@ -463,7 +465,7 @@ export default function PlistClient() {
                                                     </div>
                                                     <button onClick={() => handleCopy(key, valueToString(value))}
                                                         className="text-[11px] text-blue-400 hover:text-blue-300 transition whitespace-nowrap shrink-0">
-                                                        {copied === key ? '✓' : 'Copy'}
+                                                        {copied === key ? '✓' : t('tool.copy')}
                                                     </button>
                                                 </div>
                                                 <div className="mt-2">

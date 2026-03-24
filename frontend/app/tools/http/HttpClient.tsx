@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 type Header = { key: string; value: string; enabled: boolean }
@@ -19,6 +20,7 @@ const defaultHeaders: Header[] = [
 ]
 
 export default function HttpClient() {
+    const { t } = useLanguage()
     const [method, setMethod] = useState<Method>('GET')
     const [url, setUrl] = useState('')
     const [headers, setHeaders] = useState<Header[]>(defaultHeaders)
@@ -57,7 +59,7 @@ export default function HttpClient() {
         setError('')
         setResponse(null)
         if (!url.trim()) {
-            setError('Please enter a URL')
+            setError(t('http.enterUrl'))
             return
         }
 
@@ -144,8 +146,8 @@ export default function HttpClient() {
 
     const methods: Method[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
     const tabs: { key: Tab; label: string }[] = [
-        { key: 'headers', label: 'Headers' },
-        { key: 'body', label: 'Body' },
+        { key: 'headers', label: t('http.headers') },
+        { key: 'body', label: t('http.body') },
         { key: 'curl', label: 'cURL' },
     ]
 
@@ -193,9 +195,9 @@ export default function HttpClient() {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                             </svg>
-                            Sending
+                            {t('tool.sending')}
                         </span>
-                    ) : 'Send'}
+                    ) : t('tool.send')}
                 </button>
             </div>
 
@@ -236,20 +238,20 @@ export default function HttpClient() {
                                     type="text"
                                     value={h.key}
                                     onChange={(e) => updateHeader(i, 'key', e.target.value)}
-                                    placeholder="Header name"
+                                    placeholder={t('http.headerName')}
                                     className="flex-1 px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                                 />
                                 <input
                                     type="text"
                                     value={h.value}
                                     onChange={(e) => updateHeader(i, 'value', e.target.value)}
-                                    placeholder="Value"
+                                    placeholder={t('http.value')}
                                     className="flex-1 px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                                 />
                                 <button
                                     onClick={() => removeHeader(i)}
                                     className="p-2 text-gray-500 hover:text-red-400 transition"
-                                    title="Remove"
+                                    title={t('tool.remove')}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -264,7 +266,7 @@ export default function HttpClient() {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            Add Header
+                            {t('tool.addHeader')}
                         </button>
                     </div>
                 )}
@@ -274,7 +276,7 @@ export default function HttpClient() {
                     <div>
                         {method === 'GET' && (
                             <div className="text-sm text-gray-500 bg-gray-800/30 border border-gray-700/50 rounded-lg px-4 py-3 mb-3">
-                                GET requests typically don&apos;t include a body.
+                                {t('http.getNoBody')}
                             </div>
                         )}
                         <textarea
@@ -289,7 +291,7 @@ export default function HttpClient() {
                                     onClick={() => setBody(formatBody(body))}
                                     className="text-xs text-blue-400 hover:text-blue-300 transition"
                                 >
-                                    Format JSON
+                                    {t('http.formatJson')}
                                 </button>
                             </div>
                         )}
@@ -307,7 +309,7 @@ export default function HttpClient() {
                                 onClick={() => handleCopy(generateCurl())}
                                 className="absolute top-3 right-3 text-xs text-blue-400 hover:text-blue-300 transition bg-gray-800/80 px-2 py-1 rounded"
                             >
-                                {copied ? 'Copied!' : 'Copy'}
+                                {copied ? t('tool.copied') : t('tool.copy')}
                             </button>
                         </div>
                     </div>
@@ -323,7 +325,7 @@ export default function HttpClient() {
             {response && (
                 <div className="space-y-4">
                     <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Response</span>
+                        <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('http.response')}</span>
                         <span className={`px-2.5 py-0.5 rounded-md text-sm font-mono font-bold border ${statusColor(response.status)}`}>
                             {response.status} {response.statusText}
                         </span>
@@ -333,7 +335,7 @@ export default function HttpClient() {
                             onClick={() => handleCopy(response.body)}
                             className="ml-auto text-xs text-blue-400 hover:text-blue-300 transition"
                         >
-                            {copied ? 'Copied!' : 'Copy Body'}
+                            {copied ? t('tool.copied') : t('http.copyBody')}
                         </button>
                     </div>
 
@@ -341,7 +343,7 @@ export default function HttpClient() {
                     {Object.keys(response.headers).length > 0 && (
                         <details>
                             <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">
-                                Response Headers ({Object.keys(response.headers).length})
+                                {t('http.responseHeaders')} ({Object.keys(response.headers).length})
                             </summary>
                             <div className="mt-2 bg-gray-800/50 border border-gray-700 rounded-xl p-4 overflow-x-auto">
                                 <table className="w-full text-xs font-mono">

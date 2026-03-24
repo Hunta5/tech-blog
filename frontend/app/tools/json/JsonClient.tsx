@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 type Mode = 'escape' | 'unescape' | 'format' | 'minify'
 
 export default function JsonClient() {
+    const { t } = useLanguage()
     const [input, setInput] = useState('')
     const [output, setOutput] = useState('')
     const [mode, setMode] = useState<Mode>('escape')
@@ -13,7 +15,7 @@ export default function JsonClient() {
 
     const handleConvert = () => {
         setError('')
-        if (!input.trim()) { setError('Please enter some text'); return }
+        if (!input.trim()) { setError(t('json.enterText')); return }
 
         try {
             switch (mode) {
@@ -42,10 +44,10 @@ export default function JsonClient() {
     }
 
     const modes: { key: Mode; label: string; color: string }[] = [
-        { key: 'escape', label: 'Escape', color: 'blue' },
-        { key: 'unescape', label: 'Unescape', color: 'purple' },
-        { key: 'format', label: 'Format', color: 'green' },
-        { key: 'minify', label: 'Minify', color: 'pink' },
+        { key: 'escape', label: t('json.escape'), color: 'blue' },
+        { key: 'unescape', label: t('json.unescape'), color: 'purple' },
+        { key: 'format', label: t('json.formatBtn'), color: 'green' },
+        { key: 'minify', label: t('json.minify'), color: 'pink' },
     ]
 
     return (
@@ -69,31 +71,31 @@ export default function JsonClient() {
 
             {/* Hint */}
             <div className="text-xs text-gray-500">
-                {mode === 'escape' && 'Escapes special characters in a string for use inside JSON values (\\n, \\t, \\", etc.)'}
-                {mode === 'unescape' && 'Unescapes a JSON-escaped string back to its original form'}
-                {mode === 'format' && 'Parses and pretty-prints JSON with 2-space indentation'}
-                {mode === 'minify' && 'Removes all whitespace from JSON to minimize its size'}
+                {mode === 'escape' && t('json.escapeHint')}
+                {mode === 'unescape' && t('json.unescapeHint')}
+                {mode === 'format' && t('json.formatHint')}
+                {mode === 'minify' && t('json.minifyHint')}
             </div>
 
             {/* Input / Output */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Input</label>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('tool.input')}</label>
                     <textarea
                         className="w-full h-72 p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 resize-none"
                         placeholder={mode === 'escape' || mode === 'unescape'
-                            ? 'Enter text to escape/unescape...'
-                            : 'Paste JSON here...'}
+                            ? t('json.inputPlaceholder')
+                            : t('json.jsonPlaceholder')}
                         value={input}
                         onChange={e => setInput(e.target.value)}
                     />
                 </div>
                 <div>
                     <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Output</label>
+                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('tool.output')}</label>
                         {output && (
                             <button onClick={handleCopy} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                                {copied ? 'Copied!' : 'Copy'}
+                                {copied ? t('tool.copied') : t('tool.copy')}
                             </button>
                         )}
                     </div>
@@ -117,26 +119,26 @@ export default function JsonClient() {
                     onClick={handleConvert}
                     className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition"
                 >
-                    {mode === 'escape' ? 'Escape →' : mode === 'unescape' ? '← Unescape' : mode === 'format' ? 'Format →' : 'Minify →'}
+                    {mode === 'escape' ? t('json.escape') + ' →' : mode === 'unescape' ? '← ' + t('json.unescape') : mode === 'format' ? t('json.formatBtn') + ' →' : t('json.minify') + ' →'}
                 </button>
                 <button
                     onClick={() => { setInput(''); setOutput(''); setError('') }}
                     className="px-6 py-2.5 bg-gray-800 border border-gray-700 text-gray-400 hover:text-white rounded-lg text-sm transition"
                 >
-                    Clear
+                    {t('tool.clear')}
                 </button>
             </div>
 
             {/* Reference table */}
             <details className="mt-4">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">Escape Reference</summary>
+                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">{t('json.reference')}</summary>
                 <div className="mt-3 bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-700">
-                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Character</th>
-                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Escaped</th>
-                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Description</th>
+                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">{t('json.character')}</th>
+                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">{t('json.escaped')}</th>
+                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">{t('json.description')}</th>
                             </tr>
                         </thead>
                         <tbody className="font-mono text-xs">

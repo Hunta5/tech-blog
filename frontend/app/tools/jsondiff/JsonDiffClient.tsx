@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 // ---- diff types ----
 
@@ -119,6 +120,7 @@ function flattenRemoved(val: JsonValue, path: string, key: string, depth: number
 type ViewMode = 'all' | 'diff'
 
 export default function JsonDiffClient() {
+    const { t } = useLanguage()
     const [leftInput, setLeftInput] = useState('')
     const [rightInput, setRightInput] = useState('')
     const [error, setError] = useState('')
@@ -130,7 +132,7 @@ export default function JsonDiffClient() {
     const handleCompare = () => {
         setError(''); setDiffNodes([]); setHasCompared(false)
         if (!leftInput.trim() || !rightInput.trim()) {
-            setError('Please paste JSON on both sides')
+            setError(t('jdiff.pasteJson'))
             return
         }
         try {
@@ -199,9 +201,9 @@ export default function JsonDiffClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
                 <div>
                     <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Left (Original)</label>
+                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('jdiff.left')}</label>
                         {leftInput.trim() && (
-                            <button onClick={() => handleFormat('left')} className="text-xs text-blue-400 hover:text-blue-300 transition">Format</button>
+                            <button onClick={() => handleFormat('left')} className="text-xs text-blue-400 hover:text-blue-300 transition">{t('tool.format')}</button>
                         )}
                     </div>
                     <textarea
@@ -216,7 +218,7 @@ export default function JsonDiffClient() {
                 <button
                     onClick={handleSwap}
                     className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-9 h-9 items-center justify-center rounded-full bg-gray-700 border border-gray-600 text-gray-400 hover:text-white hover:bg-gray-600 transition"
-                    title="Swap"
+                    title={t('jdiff.swap')}
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -225,9 +227,9 @@ export default function JsonDiffClient() {
 
                 <div>
                     <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Right (Modified)</label>
+                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('jdiff.right')}</label>
                         {rightInput.trim() && (
-                            <button onClick={() => handleFormat('right')} className="text-xs text-blue-400 hover:text-blue-300 transition">Format</button>
+                            <button onClick={() => handleFormat('right')} className="text-xs text-blue-400 hover:text-blue-300 transition">{t('tool.format')}</button>
                         )}
                     </div>
                     <textarea
@@ -250,13 +252,13 @@ export default function JsonDiffClient() {
                     onClick={handleCompare}
                     className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition"
                 >
-                    Compare
+                    {t('jdiff.compare')}
                 </button>
                 <button
                     onClick={() => { setLeftInput(''); setRightInput(''); setDiffNodes([]); setError(''); setHasCompared(false) }}
                     className="px-6 py-2.5 bg-gray-800 border border-gray-700 text-gray-400 hover:text-white rounded-lg text-sm transition"
                 >
-                    Clear
+                    {t('tool.clear')}
                 </button>
             </div>
 
@@ -265,31 +267,31 @@ export default function JsonDiffClient() {
                 <div className="space-y-4">
                     {/* Stats */}
                     <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Result</span>
+                        <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('tool.result')}</span>
                         {isIdentical ? (
                             <span className="px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-500/10 border border-green-500/20 text-green-400">
-                                Identical
+                                {t('jdiff.identical')}
                             </span>
                         ) : (
                             <>
                                 {stats.added > 0 && (
                                     <span className="px-2 py-0.5 rounded-md text-xs font-mono bg-green-500/10 border border-green-500/20 text-green-400">
-                                        +{stats.added} added
+                                        +{stats.added} {t('jdiff.added')}
                                     </span>
                                 )}
                                 {stats.removed > 0 && (
                                     <span className="px-2 py-0.5 rounded-md text-xs font-mono bg-red-500/10 border border-red-500/20 text-red-400">
-                                        −{stats.removed} removed
+                                        −{stats.removed} {t('jdiff.removed')}
                                     </span>
                                 )}
                                 {stats.changed > 0 && (
                                     <span className="px-2 py-0.5 rounded-md text-xs font-mono bg-yellow-500/10 border border-yellow-500/20 text-yellow-400">
-                                        ~{stats.changed} changed
+                                        ~{stats.changed} {t('jdiff.changed')}
                                     </span>
                                 )}
                                 {stats.unchanged > 0 && (
                                     <span className="px-2 py-0.5 rounded-md text-xs font-mono bg-gray-500/10 border border-gray-500/20 text-gray-500">
-                                        {stats.unchanged} same
+                                        {stats.unchanged} {t('jdiff.same')}
                                     </span>
                                 )}
                             </>
@@ -301,7 +303,7 @@ export default function JsonDiffClient() {
                                     onClick={handleCopyDiff}
                                     className="text-xs text-blue-400 hover:text-blue-300 transition"
                                 >
-                                    {copied ? 'Copied!' : 'Copy Diff'}
+                                    {copied ? t('tool.copied') : t('jdiff.copyDiff')}
                                 </button>
                             )}
                         </div>
@@ -320,7 +322,7 @@ export default function JsonDiffClient() {
                                             : 'bg-gray-800/50 text-gray-400 border border-gray-700 hover:text-white hover:bg-gray-700/50'
                                     }`}
                                 >
-                                    {m === 'all' ? 'Show All' : 'Diff Only'}
+                                    {m === 'all' ? t('jdiff.showAll') : t('jdiff.diffOnly')}
                                 </button>
                             ))}
                         </div>
@@ -334,9 +336,9 @@ export default function JsonDiffClient() {
                                     <thead className="sticky top-0 bg-gray-800 z-10">
                                         <tr className="border-b border-gray-700">
                                             <th className="px-3 py-2 text-left text-[10px] text-gray-500 uppercase w-8"></th>
-                                            <th className="px-3 py-2 text-left text-[10px] text-gray-500 uppercase">Path</th>
-                                            <th className="px-3 py-2 text-left text-[10px] text-gray-500 uppercase">Left</th>
-                                            <th className="px-3 py-2 text-left text-[10px] text-gray-500 uppercase">Right</th>
+                                            <th className="px-3 py-2 text-left text-[10px] text-gray-500 uppercase">{t('jdiff.path')}</th>
+                                            <th className="px-3 py-2 text-left text-[10px] text-gray-500 uppercase">{t('jdiff.left')}</th>
+                                            <th className="px-3 py-2 text-left text-[10px] text-gray-500 uppercase">{t('jdiff.right')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

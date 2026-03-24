@@ -28,4 +28,27 @@
     .scroll-smooth {
         scroll-behavior: smooth;
     }
+
+    /* 透明背景棋盘格 */
+    .bg-checkered {
+        background-image:
+            linear-gradient(45deg, #1f2937 25%, transparent 25%),
+            linear-gradient(-45deg, #1f2937 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #1f2937 75%),
+            linear-gradient(-45deg, transparent 75%, #1f2937 75%);
+        background-size: 16px 16px;
+        background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+        background-color: #111827;
+    }
+
+    /* 进度条动画 */
+    .animate-progress {
+        animation: progress 1.5s ease-in-out infinite;
+    }
+}
+
+@keyframes progress {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
 }

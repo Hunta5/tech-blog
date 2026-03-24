@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import bcrypt from 'bcryptjs'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 type Mode = 'hash' | 'hmac' | 'bcrypt'
 
@@ -37,6 +38,7 @@ async function computeHmac(algo: HashAlgo, data: string, secret: string): Promis
 }
 
 export default function CryptoClient() {
+    const { t } = useLanguage()
     const [mode, setMode] = useState<Mode>('hash')
     const [input, setInput] = useState('')
     const [output, setOutput] = useState('')
@@ -65,7 +67,7 @@ export default function CryptoClient() {
 
     const handleHash = async () => {
         setError(''); setOutput('')
-        if (!input.trim()) { setError('Please enter text to hash'); return }
+        if (!input.trim()) { setError(t('crypto.enterText')); return }
         try {
             const result = await computeHash(hashAlgo, input)
             setOutput(result)
@@ -76,8 +78,8 @@ export default function CryptoClient() {
 
     const handleHmac = async () => {
         setError(''); setOutput('')
-        if (!input.trim()) { setError('Please enter text'); return }
-        if (!hmacSecret.trim()) { setError('Please enter a secret key'); return }
+        if (!input.trim()) { setError(t('crypto.enterText')); return }
+        if (!hmacSecret.trim()) { setError(t('crypto.enterSecret')); return }
         try {
             const result = await computeHmac(hmacAlgo, input, hmacSecret)
             setOutput(result)
@@ -88,7 +90,7 @@ export default function CryptoClient() {
 
     const handleBcrypt = async () => {
         setError(''); setOutput(''); setVerifyResult(null)
-        if (!input.trim()) { setError('Please enter a password'); return }
+        if (!input.trim()) { setError(t('crypto.enterPassword')); return }
         setLoading(true)
         try {
             if (bcryptMode === 'hash') {
@@ -96,7 +98,7 @@ export default function CryptoClient() {
                 const hash = await bcrypt.hash(input, salt)
                 setOutput(hash)
             } else {
-                if (!bcryptHash.trim()) { setError('Please enter a bcrypt hash to verify against'); setLoading(false); return }
+                if (!bcryptHash.trim()) { setError(t('crypto.enterHash')); setLoading(false); return }
                 const match = await bcrypt.compare(input, bcryptHash)
                 setVerifyResult(match)
             }
@@ -114,8 +116,8 @@ export default function CryptoClient() {
     }
 
     const modes: { key: Mode; label: string; color: string }[] = [
-        { key: 'hash', label: 'Hash', color: 'blue' },
-        { key: 'hmac', label: 'HMAC', color: 'purple' },
+        { key: 'hash', label: t('crypto.hash'), color: 'blue' },
+        { key: 'hmac', label: t('crypto.hmac'), color: 'purple' },
         { key: 'bcrypt', label: 'bcrypt', color: 'orange' },
     ]
 
@@ -144,15 +146,15 @@ export default function CryptoClient() {
 
             {/* Hint */}
             <div className="text-xs text-gray-500">
-                {mode === 'hash' && 'Generate a one-way hash digest of the input text using MD5 or SHA family algorithms.'}
-                {mode === 'hmac' && 'Generate a keyed-hash message authentication code (HMAC) using a secret key.'}
-                {mode === 'bcrypt' && 'Hash passwords with bcrypt or verify a password against an existing bcrypt hash.'}
+                {mode === 'hash' && t('crypto.hashHint')}
+                {mode === 'hmac' && t('crypto.hmacHint')}
+                {mode === 'bcrypt' && t('crypto.bcryptHint')}
             </div>
 
             {/* Algorithm Selector (Hash / HMAC) */}
             {(mode === 'hash' || mode === 'hmac') && (
                 <div>
-                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Algorithm</label>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('crypto.algorithm')}</label>
                     <div className="flex flex-wrap gap-2">
                         {HASH_ALGOS.filter(a => mode === 'hmac' ? a !== 'MD5' : true).map((algo) => {
                             const selected = mode === 'hash' ? hashAlgo === algo : hmacAlgo === algo
@@ -185,7 +187,7 @@ export default function CryptoClient() {
                                 : 'bg-gray-800/50 text-gray-400 border border-gray-700 hover:text-white hover:bg-gray-700/50'
                         }`}
                     >
-                        Hash
+                        {t('crypto.hash')}
                     </button>
                     <button
                         onClick={() => { setBcryptMode('verify'); setOutput(''); setVerifyResult(null); setError('') }}
@@ -195,7 +197,7 @@ export default function CryptoClient() {
                                 : 'bg-gray-800/50 text-gray-400 border border-gray-700 hover:text-white hover:bg-gray-700/50'
                         }`}
                     >
-                        Verify
+                        {t('crypto.verify')}
                     </button>
                 </div>
             )}
@@ -204,7 +206,7 @@ export default function CryptoClient() {
             {mode === 'bcrypt' && bcryptMode === 'hash' && (
                 <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">
-                        Salt Rounds: <span className="text-orange-400">{bcryptRounds}</span>
+                        {t('crypto.saltRounds')} <span className="text-orange-400">{bcryptRounds}</span>
                     </label>
                     <input
                         type="range"
@@ -215,8 +217,8 @@ export default function CryptoClient() {
                         className="w-full accent-orange-500"
                     />
                     <div className="flex justify-between text-xs text-gray-600 mt-1">
-                        <span>4 (fast)</span>
-                        <span>16 (slow, secure)</span>
+                        <span>{t('crypto.fast')}</span>
+                        <span>{t('crypto.slowSecure')}</span>
                     </div>
                 </div>
             )}
@@ -224,12 +226,12 @@ export default function CryptoClient() {
             {/* HMAC Secret */}
             {mode === 'hmac' && (
                 <div>
-                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Secret Key</label>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('crypto.secretKey')}</label>
                     <input
                         type="text"
                         value={hmacSecret}
                         onChange={(e) => setHmacSecret(e.target.value)}
-                        placeholder="Enter secret key..."
+                        placeholder={t('crypto.secretKeyPlaceholder')}
                         className="w-full px-4 py-2.5 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
                     />
                 </div>
@@ -239,7 +241,7 @@ export default function CryptoClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">
-                        {mode === 'bcrypt' ? 'Password' : 'Input'}
+                        {mode === 'bcrypt' ? t('crypto.password') : t('tool.input')}
                     </label>
                     <textarea
                         className="w-full h-40 p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 resize-none"
@@ -252,7 +254,7 @@ export default function CryptoClient() {
                     {mode === 'bcrypt' && bcryptMode === 'verify' ? (
                         <>
                             <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">
-                                Bcrypt Hash
+                                {t('crypto.bcryptHash')}
                             </label>
                             <textarea
                                 className="w-full h-40 p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 resize-none"
@@ -264,10 +266,10 @@ export default function CryptoClient() {
                     ) : (
                         <>
                             <div className="flex items-center justify-between mb-2">
-                                <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Output</label>
+                                <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('tool.output')}</label>
                                 {output && (
                                     <button onClick={() => handleCopy(output)} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                                        {copied ? 'Copied!' : 'Copy'}
+                                        {copied ? t('tool.copied') : t('tool.copy')}
                                     </button>
                                 )}
                             </div>
@@ -296,7 +298,7 @@ export default function CryptoClient() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         )}
                     </svg>
-                    {verifyResult ? 'Password matches the hash!' : 'Password does NOT match the hash.'}
+                    {verifyResult ? t('crypto.passwordMatch') : t('crypto.passwordNoMatch')}
                 </div>
             )}
 
@@ -318,32 +320,32 @@ export default function CryptoClient() {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                             </svg>
-                            Processing
+                            {t('tool.processing')}
                         </span>
                     ) : (
-                        mode === 'hash' ? 'Hash' :
-                        mode === 'hmac' ? 'Generate HMAC' :
-                        bcryptMode === 'hash' ? 'Hash Password' : 'Verify'
+                        mode === 'hash' ? t('crypto.hashBtn') :
+                        mode === 'hmac' ? t('crypto.generateHmac') :
+                        bcryptMode === 'hash' ? t('crypto.hashPassword') : t('crypto.verify')
                     )}
                 </button>
                 <button
                     onClick={() => { setInput(''); setOutput(''); setError(''); setVerifyResult(null); setBcryptHash(''); setHmacSecret('') }}
                     className="px-6 py-2.5 bg-gray-800 border border-gray-700 text-gray-400 hover:text-white rounded-lg text-sm transition"
                 >
-                    Clear
+                    {t('tool.clear')}
                 </button>
             </div>
 
             {/* Reference */}
             <details className="mt-4">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">Algorithm Reference</summary>
+                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">{t('crypto.reference')}</summary>
                 <div className="mt-3 bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-700">
-                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Algorithm</th>
-                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Output</th>
-                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">Note</th>
+                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">{t('crypto.algorithm')}</th>
+                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">{t('crypto.outputCol')}</th>
+                                <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase">{t('crypto.note')}</th>
                             </tr>
                         </thead>
                         <tbody className="text-xs">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { parseAuto, formatCrashReport } from '@/lib/crash/parser'
 import type { CrashReport, CrashThread } from '@/lib/crash/types'
 
@@ -13,6 +14,7 @@ interface SymbolInfo {
 }
 
 export default function CrashToolPage() {
+    const { t } = useLanguage()
     const [input, setInput] = useState('')
     const [report, setReport] = useState<CrashReport | null>(null)
     const [formatted, setFormatted] = useState('')
@@ -165,10 +167,10 @@ export default function CrashToolPage() {
     return (
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-16">
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                Crash Symbolication
+                {t('crash.title')}
             </h1>
             <p className="text-gray-400 mb-8">
-                Paste an Apple crash log or KSCrash JSON. Upload dSYM for your app, select system symbols for system libraries.
+                {t('crash.desc')}
             </p>
 
             {/* Toolbar */}

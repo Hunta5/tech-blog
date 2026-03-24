@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import { generateIOSAppIconZip } from "@/lib/icon-generator"
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function IconGeneratorPage() {
+    const { t } = useLanguage()
     const [loading, setLoading] = useState(false)
     const [fileName, setFileName] = useState('')
 
@@ -25,10 +27,10 @@ export default function IconGeneratorPage() {
     return (
         <div className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-16">
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                iOS App Icon Generator
+                {t('appicon.title')}
             </h1>
             <p className="text-gray-400 mb-10">
-                Upload a PNG/JPG image (min 1024x1024). Downloads a ZIP containing AppIcon.appiconset.
+                {t('appicon.desc')}
             </p>
 
             <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 md:p-10">
@@ -44,9 +46,9 @@ export default function IconGeneratorPage() {
                         )}
                         <div className="text-center">
                             <p className="text-sm text-gray-400">
-                                {fileName ? fileName : 'Click to select an image'}
+                                {fileName ? fileName : t('appicon.select')}
                             </p>
-                            <p className="text-xs text-gray-600 mt-1">PNG or JPG, 1024x1024 minimum</p>
+                            <p className="text-xs text-gray-600 mt-1">{t('appicon.requirement')}</p>
                         </div>
                     </div>
                     <input

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 // ---- conversion helpers ----
 
@@ -69,6 +70,7 @@ function contrastRatio(l1: number, l2: number) {
 // ---- component ----
 
 export default function ColorClient() {
+    const { t } = useLanguage()
     const [r, setR] = useState(59)
     const [g, setG] = useState(130)
     const [b, setB] = useState(246)
@@ -273,7 +275,7 @@ export default function ColorClient() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                         </svg>
-                        System Picker
+                        {t('color.systemPicker')}
                     </label>
                     {/* Contrast Info */}
                     <div className="text-xs text-gray-500 space-y-1 text-center">
@@ -286,7 +288,7 @@ export default function ColorClient() {
 
             {/* RGB Sliders */}
             <div className="space-y-3">
-                <label className="block text-xs text-gray-500 uppercase tracking-wider font-semibold">RGB Sliders</label>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('color.rgbSliders')}</label>
                 {[
                     { label: 'R', val: r, ch: 'r' as const, color: 'red' },
                     { label: 'G', val: g, ch: 'g' as const, color: 'green' },
@@ -347,7 +349,7 @@ export default function ColorClient() {
 
             {/* Copy Formats */}
             <div>
-                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-3 font-semibold">Copy As</label>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-3 font-semibold">{t('color.copyAs')}</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {formats.map(({ label, value }) => (
                         <button
@@ -360,7 +362,7 @@ export default function ColorClient() {
                                 <div className="text-xs font-mono text-gray-300 truncate">{value}</div>
                             </div>
                             <span className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition ml-3 whitespace-nowrap">
-                                {copied === label ? 'Copied!' : 'Copy'}
+                                {copied === label ? t('tool.copied') : t('tool.copy')}
                             </span>
                         </button>
                     ))}
@@ -369,13 +371,13 @@ export default function ColorClient() {
 
             {/* Color Harmony */}
             <div>
-                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-3 font-semibold">Color Harmony</label>
+                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-3 font-semibold">{t('color.harmony')}</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                        { label: 'Complementary', offset: [180] },
-                        { label: 'Triadic', offset: [120, 240] },
-                        { label: 'Analogous', offset: [30, 330] },
-                        { label: 'Split Comp.', offset: [150, 210] },
+                        { label: t('color.complementary'), offset: [180] },
+                        { label: t('color.triadic'), offset: [120, 240] },
+                        { label: t('color.analogous'), offset: [30, 330] },
+                        { label: t('color.splitComp'), offset: [150, 210] },
                     ].map(({ label, offset }) => (
                         <div key={label} className="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
                             <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">{label}</div>
@@ -410,12 +412,12 @@ export default function ColorClient() {
             {history.length > 0 && (
                 <div>
                     <div className="flex items-center justify-between mb-3">
-                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">History</label>
+                        <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('color.history')}</label>
                         <button
                             onClick={() => setHistory([])}
                             className="text-xs text-gray-600 hover:text-gray-400 transition"
                         >
-                            Clear
+                            {t('tool.clear')}
                         </button>
                     </div>
                     <div className="flex flex-wrap gap-2">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 // ---- types ----
 
@@ -98,22 +99,23 @@ function parseURL(raw: string): ParsedURL {
 
 // ---- component colors ----
 
-const PART_COLORS: Record<string, { bg: string; text: string; border: string; label: string }> = {
-    scheme:   { bg: 'bg-violet-500/15', text: 'text-violet-400', border: 'border-violet-500/30', label: 'Scheme' },
-    user:     { bg: 'bg-amber-500/15', text: 'text-amber-400', border: 'border-amber-500/30', label: 'User' },
-    host:     { bg: 'bg-blue-500/15', text: 'text-blue-400', border: 'border-blue-500/30', label: 'Host' },
-    port:     { bg: 'bg-cyan-500/15', text: 'text-cyan-400', border: 'border-cyan-500/30', label: 'Port' },
-    path:     { bg: 'bg-green-500/15', text: 'text-green-400', border: 'border-green-500/30', label: 'Path' },
-    query:    { bg: 'bg-yellow-500/15', text: 'text-yellow-400', border: 'border-yellow-500/30', label: 'Query' },
-    fragment: { bg: 'bg-pink-500/15', text: 'text-pink-400', border: 'border-pink-500/30', label: 'Fragment' },
+const PART_COLORS: Record<string, { bg: string; text: string; border: string; labelKey: string }> = {
+    scheme:   { bg: 'bg-violet-500/15', text: 'text-violet-400', border: 'border-violet-500/30', labelKey: 'deeplink.scheme' },
+    user:     { bg: 'bg-amber-500/15', text: 'text-amber-400', border: 'border-amber-500/30', labelKey: 'deeplink.user' },
+    host:     { bg: 'bg-blue-500/15', text: 'text-blue-400', border: 'border-blue-500/30', labelKey: 'deeplink.host' },
+    port:     { bg: 'bg-cyan-500/15', text: 'text-cyan-400', border: 'border-cyan-500/30', labelKey: 'deeplink.port' },
+    path:     { bg: 'bg-green-500/15', text: 'text-green-400', border: 'border-green-500/30', labelKey: 'deeplink.path' },
+    query:    { bg: 'bg-yellow-500/15', text: 'text-yellow-400', border: 'border-yellow-500/30', labelKey: 'deeplink.query' },
+    fragment: { bg: 'bg-pink-500/15', text: 'text-pink-400', border: 'border-pink-500/30', labelKey: 'deeplink.fragment' },
 }
 
 function ColorBadge({ part, value }: { part: string; value: string }) {
+    const { t } = useLanguage()
     if (!value) return null
     const c = PART_COLORS[part]
     return (
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono border ${c.bg} ${c.text} ${c.border}`}>
-            <span className="opacity-60 font-sans text-[10px]">{c.label}</span> {value}
+            <span className="opacity-60 font-sans text-[10px]">{t(c.labelKey)}</span> {value}
         </span>
     )
 }
@@ -121,6 +123,7 @@ function ColorBadge({ part, value }: { part: string; value: string }) {
 // ---- main component ----
 
 export default function DeepLinkClient() {
+    const { t } = useLanguage()
     const [tab, setTab] = useState<Tab>('parse')
     const [urlInput, setUrlInput] = useState('')
     const [copied, setCopied] = useState('')
@@ -328,8 +331,8 @@ export default function DeepLinkClient() {
     }, [parsed, tab, builtUrl])
 
     const tabs: { key: Tab; label: string }[] = [
-        { key: 'parse', label: 'Parse URL' },
-        { key: 'build', label: 'Build URL' },
+        { key: 'parse', label: t('deeplink.parseTab') },
+        { key: 'build', label: t('deeplink.buildTab') },
         { key: 'apple', label: 'apple-app-site-association' },
     ]
 
@@ -339,14 +342,14 @@ export default function DeepLinkClient() {
         <div className="space-y-6">
             {/* Tabs */}
             <div className="flex bg-gray-800/50 rounded-xl p-1 border border-gray-700">
-                {tabs.map(t => (
-                    <button key={t.key} onClick={() => setTab(t.key)}
+                {tabs.map(tb => (
+                    <button key={tb.key} onClick={() => setTab(tb.key)}
                         className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                            tab === t.key
+                            tab === tb.key
                                 ? 'bg-violet-500/20 text-violet-400 border border-violet-500/30'
                                 : 'text-gray-400 hover:text-white border border-transparent'
                         }`}>
-                        {t.label}
+                        {tb.label}
                     </button>
                 ))}
             </div>
@@ -356,7 +359,7 @@ export default function DeepLinkClient() {
                 <div className="space-y-5">
                     {/* URL Input */}
                     <div>
-                        <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">URL / Deep Link</label>
+                        <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('deeplink.urlInput')}</label>
                         <input
                             type="text"
                             value={urlInput}
@@ -368,7 +371,7 @@ export default function DeepLinkClient() {
 
                     {/* Quick examples */}
                     <div className="flex flex-wrap gap-2">
-                        <span className="text-xs text-gray-600">Try:</span>
+                        <span className="text-xs text-gray-600">{t('deeplink.try')}</span>
                         {[
                             'myapp://product/detail?id=123&from=home',
                             'https://example.com/app/product/123?ref=share&utm_source=twitter',
@@ -392,25 +395,25 @@ export default function DeepLinkClient() {
                 <div className="space-y-5">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
-                            <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">Scheme</label>
+                            <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">{t('deeplink.scheme')}</label>
                             <input type="text" value={bScheme} onChange={e => setBScheme(e.target.value)}
                                 className="w-full px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50"
                                 placeholder="myapp" />
                         </div>
                         <div>
-                            <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">Host</label>
+                            <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">{t('deeplink.host')}</label>
                             <input type="text" value={bHost} onChange={e => setBHost(e.target.value)}
                                 className="w-full px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                                 placeholder="product" />
                         </div>
                         <div>
-                            <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">Path</label>
+                            <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">{t('deeplink.path')}</label>
                             <input type="text" value={bPath} onChange={e => setBPath(e.target.value)}
                                 className="w-full px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50"
                                 placeholder="/detail" />
                         </div>
                         <div>
-                            <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">Fragment</label>
+                            <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">{t('deeplink.fragment')}</label>
                             <input type="text" value={bFragment} onChange={e => setBFragment(e.target.value)}
                                 className="w-full px-3 py-2 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/50"
                                 placeholder="section" />
@@ -419,7 +422,7 @@ export default function DeepLinkClient() {
 
                     {/* Query params */}
                     <div>
-                        <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-semibold">Query Parameters</label>
+                        <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('deeplink.queryParams')}</label>
                         <div className="space-y-2">
                             {bParams.map(([k, v], i) => (
                                 <div key={i} className="flex items-center gap-2">
@@ -443,7 +446,7 @@ export default function DeepLinkClient() {
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                 </svg>
-                                Add Param
+                                {t('tool.addParam')}
                             </button>
                         </div>
                     </div>
@@ -451,13 +454,13 @@ export default function DeepLinkClient() {
                     {/* Built URL */}
                     <div>
                         <div className="flex items-center justify-between mb-2">
-                            <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Generated URL</label>
+                            <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('deeplink.generatedUrl')}</label>
                             <div className="flex gap-3">
                                 <button onClick={() => { setUrlInput(builtUrl); setTab('parse') }}
-                                    className="text-xs text-violet-400 hover:text-violet-300 transition">→ Parse This</button>
+                                    className="text-xs text-violet-400 hover:text-violet-300 transition">{t('deeplink.parseThis')}</button>
                                 <button onClick={() => handleCopy('built', builtUrl)}
                                     className="text-xs text-blue-400 hover:text-blue-300 transition">
-                                    {copied === 'built' ? 'Copied!' : 'Copy'}
+                                    {copied === 'built' ? t('tool.copied') : t('tool.copy')}
                                 </button>
                             </div>
                         </div>
@@ -479,19 +482,19 @@ export default function DeepLinkClient() {
                 <div className="space-y-4">
                     <div>
                         <div className="flex items-center justify-between mb-2">
-                            <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Swift Code</label>
+                            <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('deeplink.swiftCode')}</label>
                             <button onClick={() => handleCopy('swift', swiftCode)} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                                {copied === 'swift' ? 'Copied!' : 'Copy'}
+                                {copied === 'swift' ? t('tool.copied') : t('tool.copy')}
                             </button>
                         </div>
                         <pre className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-gray-300 font-mono text-xs overflow-x-auto max-h-[400px] overflow-y-auto whitespace-pre-wrap">{swiftCode}</pre>
                     </div>
                     <details>
-                        <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">Objective-C Code</summary>
+                        <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">{t('deeplink.objcCode')}</summary>
                         <div className="mt-2">
                             <div className="flex justify-end mb-1">
                                 <button onClick={() => handleCopy('objc', objcCode)} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                                    {copied === 'objc' ? 'Copied!' : 'Copy'}
+                                    {copied === 'objc' ? t('tool.copied') : t('tool.copy')}
                                 </button>
                             </div>
                             <pre className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-gray-300 font-mono text-xs overflow-x-auto max-h-[300px] overflow-y-auto whitespace-pre-wrap">{objcCode}</pre>
@@ -549,8 +552,9 @@ function HighlightedURL({ p }: { p: ParsedURL }) {
 // ---- URL Visualization ----
 
 function URLVisualization({ p, copied, onCopy }: { p: ParsedURL; copied: string; onCopy: (key: string, text: string) => void }) {
+    const { t } = useLanguage()
     // Link type badge
-    const linkType = p.isDeepLink ? 'Deep Link (Custom Scheme)' : p.isUniversalLink ? 'Universal Link (HTTP/S)' : 'URL'
+    const linkType = p.isDeepLink ? t('deeplink.deepLink') : p.isUniversalLink ? t('deeplink.universalLink') : 'URL'
     const linkColor = p.isDeepLink
         ? 'bg-violet-500/10 border-violet-500/20 text-violet-400'
         : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
@@ -577,20 +581,20 @@ function URLVisualization({ p, copied, onCopy }: { p: ParsedURL; copied: string;
                 <table className="w-full text-sm">
                     <tbody>
                         {[
-                            { part: 'scheme', label: 'Scheme', value: p.scheme },
-                            ...(p.user ? [{ part: 'user', label: 'User', value: p.user }] : []),
-                            { part: 'host', label: 'Host', value: p.host },
-                            ...(p.port ? [{ part: 'port', label: 'Port', value: p.port }] : []),
-                            { part: 'path', label: 'Path', value: p.path },
-                        ].filter(r => r.value).map(({ part, label, value }) => {
+                            { part: 'scheme', value: p.scheme },
+                            ...(p.user ? [{ part: 'user', value: p.user }] : []),
+                            { part: 'host', value: p.host },
+                            ...(p.port ? [{ part: 'port', value: p.port }] : []),
+                            { part: 'path', value: p.path },
+                        ].filter(r => r.value).map(({ part, value }) => {
                             const c = PART_COLORS[part]
                             return (
                                 <tr key={part} className="border-b border-gray-800/50">
-                                    <td className={`px-4 py-2.5 w-28 ${c.text} text-xs font-semibold uppercase tracking-wider`}>{label}</td>
+                                    <td className={`px-4 py-2.5 w-28 ${c.text} text-xs font-semibold uppercase tracking-wider`}>{t(c.labelKey)}</td>
                                     <td className="px-4 py-2.5 font-mono text-gray-300 text-sm">{value}</td>
                                     <td className="px-4 py-2.5 w-16">
                                         <button onClick={() => onCopy(part, value)} className="text-[11px] text-blue-400 hover:text-blue-300 transition">
-                                            {copied === part ? '✓' : 'Copy'}
+                                            {copied === part ? '✓' : t('tool.copy')}
                                         </button>
                                     </td>
                                 </tr>
@@ -603,7 +607,7 @@ function URLVisualization({ p, copied, onCopy }: { p: ParsedURL; copied: string;
             {/* Path components */}
             {p.pathComponents.length > 0 && (
                 <div>
-                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Path Components</label>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('deeplink.pathComponents')}</label>
                     <div className="flex items-center gap-1 flex-wrap font-mono text-sm">
                         {p.pathComponents.map((pc, i) => (
                             <span key={i} className="flex items-center gap-1">
@@ -622,13 +626,13 @@ function URLVisualization({ p, copied, onCopy }: { p: ParsedURL; copied: string;
                 <div>
                     <div className="flex items-center justify-between mb-2">
                         <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">
-                            Query Parameters ({p.queryParams.length})
+                            {t('deeplink.queryParams')} ({p.queryParams.length})
                         </label>
                         <button onClick={() => {
                             const dict = Object.fromEntries(p.queryParams)
                             onCopy('params-json', JSON.stringify(dict, null, 2))
                         }} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                            {copied === 'params-json' ? 'Copied!' : 'Copy as JSON'}
+                            {copied === 'params-json' ? t('tool.copied') : t('deeplink.copyJson')}
                         </button>
                     </div>
                     <div className="bg-gray-800/30 border border-gray-700/50 rounded-xl overflow-hidden">
@@ -664,12 +668,12 @@ function URLVisualization({ p, copied, onCopy }: { p: ParsedURL; copied: string;
                     </div>
                     {/* Swift dictionary literal */}
                     <div className="mt-2 flex items-center justify-between">
-                        <label className="text-[10px] text-gray-600 uppercase tracking-wider">Swift Dictionary</label>
+                        <label className="text-[10px] text-gray-600 uppercase tracking-wider">{t('deeplink.swiftDict')}</label>
                         <button onClick={() => {
                             const lines = p.queryParams.map(([k, v]) => `    "${k}": "${v}"`)
                             onCopy('params-swift', `[\n${lines.join(',\n')}\n]`)
                         }} className="text-[11px] text-blue-400 hover:text-blue-300 transition">
-                            {copied === 'params-swift' ? 'Copied!' : 'Copy Swift'}
+                            {copied === 'params-swift' ? t('tool.copied') : t('deeplink.copySwift')}
                         </button>
                     </div>
                     <pre className="p-3 rounded-lg bg-gray-800/30 border border-gray-700/50 text-gray-400 font-mono text-xs mt-1">
@@ -693,6 +697,7 @@ function URLVisualization({ p, copied, onCopy }: { p: ParsedURL; copied: string;
 // ---- AASA Section ----
 
 function AASASection({ copied, onCopy }: { copied: string; onCopy: (k: string, v: string) => void }) {
+    const { t } = useLanguage()
     const [domain, setDomain] = useState('example.com')
     const [teamId, setTeamId] = useState('ABCDE12345')
     const [bundleId, setBundleId] = useState('com.company.app')
@@ -773,24 +778,23 @@ struct UniversalLinkRouter {
     return (
         <div className="space-y-5">
             <div className="text-xs text-gray-500">
-                Generate the <code className="text-violet-400">apple-app-site-association</code> file for Universal Links,
-                the entitlements plist, and a Swift router.
+                {t('deeplink.aasaDesc')}
             </div>
 
             {/* Config inputs */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
-                    <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">Domain</label>
+                    <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">{t('deeplink.domain')}</label>
                     <input type="text" value={domain} onChange={e => setDomain(e.target.value)}
                         className="w-full px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
                 </div>
                 <div>
-                    <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">Team ID</label>
+                    <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">{t('deeplink.teamId')}</label>
                     <input type="text" value={teamId} onChange={e => setTeamId(e.target.value)}
                         className="w-full px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
                 </div>
                 <div>
-                    <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">Bundle ID</label>
+                    <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-semibold">{t('deeplink.bundleId')}</label>
                     <input type="text" value={bundleId} onChange={e => setBundleId(e.target.value)}
                         className="w-full px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
                 </div>
@@ -799,7 +803,7 @@ struct UniversalLinkRouter {
             {/* Paths */}
             <div>
                 <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-semibold">
-                    Path Patterns <span className="text-gray-600">(prefix with &quot;NOT &quot; to exclude)</span>
+                    {t('deeplink.pathPatterns')} <span className="text-gray-600">({t('deeplink.pathPatternsHint')})</span>
                 </label>
                 <div className="space-y-2">
                     {paths.map((p, i) => (
@@ -824,7 +828,7 @@ struct UniversalLinkRouter {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        Add Path
+                        {t('tool.addPath')}
                     </button>
                 </div>
             </div>
@@ -837,7 +841,7 @@ struct UniversalLinkRouter {
                         <span className="text-gray-600 font-normal ml-2">→ https://{domain}/.well-known/apple-app-site-association</span>
                     </label>
                     <button onClick={() => onCopy('aasa', aasa)} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                        {copied === 'aasa' ? 'Copied!' : 'Copy'}
+                        {copied === 'aasa' ? t('tool.copied') : t('tool.copy')}
                     </button>
                 </div>
                 <pre className="p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-300 font-mono text-xs overflow-x-auto whitespace-pre-wrap">{aasa}</pre>
@@ -846,9 +850,9 @@ struct UniversalLinkRouter {
             {/* Entitlements */}
             <div>
                 <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Entitlements.plist</label>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('deeplink.entitlements')}</label>
                     <button onClick={() => onCopy('entitlements', entitlements)} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                        {copied === 'entitlements' ? 'Copied!' : 'Copy'}
+                        {copied === 'entitlements' ? t('tool.copied') : t('tool.copy')}
                     </button>
                 </div>
                 <pre className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-gray-300 font-mono text-xs overflow-x-auto whitespace-pre-wrap">{entitlements}</pre>
@@ -857,9 +861,9 @@ struct UniversalLinkRouter {
             {/* Swift Router */}
             <div>
                 <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Swift Router Example</label>
+                    <label className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{t('deeplink.swiftRouter')}</label>
                     <button onClick={() => onCopy('router', swiftRouterCode)} className="text-xs text-blue-400 hover:text-blue-300 transition">
-                        {copied === 'router' ? 'Copied!' : 'Copy'}
+                        {copied === 'router' ? t('tool.copied') : t('tool.copy')}
                     </button>
                 </div>
                 <pre className="p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 text-gray-300 font-mono text-xs overflow-x-auto max-h-[400px] overflow-y-auto whitespace-pre-wrap">{swiftRouterCode}</pre>
@@ -867,7 +871,7 @@ struct UniversalLinkRouter {
 
             {/* Checklist */}
             <details>
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">Universal Link Setup Checklist</summary>
+                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 transition">{t('deeplink.checklist')}</summary>
                 <div className="mt-3 space-y-2 text-xs text-gray-400">
                     {[
                         'Upload apple-app-site-association to /.well-known/ on your server (no .json extension)',

@@ -16,7 +16,7 @@ export default function PostContent({ title, date, content }: Props) {
     return (
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
             <nav className="mb-8">
-                <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                <Link href="/articles" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
                     <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                     {t('post.backHome')}
                 </Link>
@@ -51,7 +51,7 @@ export default function PostContent({ title, date, content }: Props) {
 
             <div className="mt-16 pt-8 border-t border-gray-800">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                    <Link href="/articles" className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                         {t('post.backToList')}
                     </Link>

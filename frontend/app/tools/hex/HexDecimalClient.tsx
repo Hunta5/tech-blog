@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function HexDecimalClient() {
+    const { t } = useLanguage()
     const [hex, setHex] = useState('')
     const [dec, setDec] = useState('')
     const [error, setError] = useState('')
@@ -33,7 +35,7 @@ export default function HexDecimalClient() {
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Hexadecimal</label>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('hex.hexLabel')}</label>
                     <input
                         className="w-full p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
                         placeholder="e.g. FF or 0xFF"
@@ -42,7 +44,7 @@ export default function HexDecimalClient() {
                     />
                 </div>
                 <div>
-                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Decimal</label>
+                    <label className="block text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">{t('hex.decLabel')}</label>
                     <input
                         className="w-full p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-200 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
                         placeholder="e.g. 255"
@@ -57,23 +59,19 @@ export default function HexDecimalClient() {
                     onClick={handleHexToDec}
                     className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium text-sm hover:opacity-90 transition flex items-center gap-2"
                 >
-                    Hex
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                    Dec
+                    {t('hex.toDecimal')}
                 </button>
                 <button
                     onClick={handleDecToHex}
                     className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-medium text-sm hover:opacity-90 transition flex items-center gap-2"
                 >
-                    Dec
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                    Hex
+                    {t('hex.toHex')}
                 </button>
                 <button
                     onClick={() => { setHex(''); setDec(''); setError('') }}
                     className="px-5 py-2.5 bg-gray-800 border border-gray-700 text-gray-400 hover:text-white rounded-lg text-sm transition"
                 >
-                    Clear
+                    {t('tool.clear')}
                 </button>
             </div>
 
