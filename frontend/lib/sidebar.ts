@@ -23,7 +23,13 @@ export const sidebarConfig: SidebarItem[] = [
             { titleKey: 'App Icon Creator', href: '/tools/appIconCreator' },
             { titleKey: 'HTTP Client', href: '/tools/http' },
             { titleKey: 'Crypto / Hash', href: '/tools/crypto' },
-            { titleKey: 'Tool Info', href: '/tools/crashtool' },
+            { titleKey: 'Color', href: '/tools/color' },
+            { titleKey: 'JSON → Model', href: '/tools/json2model' },
+            { titleKey: 'JSON Diff', href: '/tools/jsondiff' },
+            { titleKey: 'Regex & NSPredicate', href: '/tools/regex' },
+            { titleKey: 'URL & Deep Link', href: '/tools/deeplink' },
+            { titleKey: 'Plist Viewer', href: '/tools/plist' },
+            { titleKey: 'Crash Symbolicate', href: '/tools/crashtool' },
         ]
     },
     {
