@@ -21,6 +21,7 @@ export const sidebarConfig: SidebarItem[] = [
             { titleKey: 'HexDecimal', href: '/tools/hex' },
             { titleKey: 'JSON Escape', href: '/tools/json' },
             { titleKey: 'App Icon Creator', href: '/tools/appIconCreator' },
+            { titleKey: 'HTTP Client', href: '/tools/http' },
             { titleKey: 'Tool Info', href: '/tools/crashtool' },
         ]
     },

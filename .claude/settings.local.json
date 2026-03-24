@@ -10,7 +10,8 @@
       "Bash(find /Users/huntapark/Desktop/Study/my-tech-blog/backend/src -type f -name *.java)",
       "Bash(ls:*)",
       "Bash(ipsw version:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(npx next:*)"
     ]
   }
 }
