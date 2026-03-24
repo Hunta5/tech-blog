@@ -9,7 +9,8 @@
       "Bash(find /Users/huntapark/Desktop/Study/my-tech-blog/backend -type f -name *.go)",
       "Bash(find /Users/huntapark/Desktop/Study/my-tech-blog/backend/src -type f -name *.java)",
       "Bash(ls:*)",
-      "Bash(ipsw version:*)"
+      "Bash(ipsw version:*)",
+      "Bash(wc:*)"
     ]
   }
 }

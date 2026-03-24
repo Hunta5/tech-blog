@@ -87,6 +87,7 @@ const zh: Record<string, string> = {
 
     // Resume
     'resume.openNewTab': '在新标签页打开',
+    'resume.downloadPdf': '下载PDF',
 
     // Login
     'login.title': '登录',

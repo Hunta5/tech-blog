@@ -87,6 +87,7 @@ const ko: Record<string, string> = {
 
     // Resume
     'resume.openNewTab': '새 탭에서 열기',
+    'resume.downloadPdf': 'PDF 다운로드',
 
     // Login
     'login.title': '로그인',

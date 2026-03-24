@@ -29,6 +29,20 @@ export default function ResumeViewer() {
         }
     }, [])
 
+    const handleDownloadPdf = useCallback(() => {
+        const iframe = iframeRef.current
+        if (!iframe) return
+        try {
+            const iframeWindow = iframe.contentWindow
+            if (iframeWindow) {
+                iframeWindow.print()
+            }
+        } catch {
+            // fallback: open in new tab for manual print
+            window.open(current.file, '_blank')
+        }
+    }, [current.file])
+
     return (
         <div>
             {/* 语言切换 */}
@@ -49,17 +63,28 @@ export default function ResumeViewer() {
                     </button>
                 ))}
 
-                <a
-                    href={current.file}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-800/50 text-gray-400 border border-gray-700 hover:text-white hover:bg-gray-700/50 transition-all duration-200"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    {t('resume.openNewTab')}
-                </a>
+                <div className="ml-auto flex items-center gap-2">
+                    <button
+                        onClick={handleDownloadPdf}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 hover:text-blue-300 transition-all duration-200"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        {t('resume.downloadPdf')}
+                    </button>
+                    <a
+                        href={current.file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-800/50 text-gray-400 border border-gray-700 hover:text-white hover:bg-gray-700/50 transition-all duration-200"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        {t('resume.openNewTab')}
+                    </a>
+                </div>
             </div>
 
             {/* iframe 嵌入简历 */}
