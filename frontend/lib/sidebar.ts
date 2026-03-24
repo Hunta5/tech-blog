@@ -22,6 +22,7 @@ export const sidebarConfig: SidebarItem[] = [
             { titleKey: 'JSON Escape', href: '/tools/json' },
             { titleKey: 'App Icon Creator', href: '/tools/appIconCreator' },
             { titleKey: 'HTTP Client', href: '/tools/http' },
+            { titleKey: 'Crypto / Hash', href: '/tools/crypto' },
             { titleKey: 'Tool Info', href: '/tools/crashtool' },
         ]
     },
