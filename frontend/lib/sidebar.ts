@@ -43,6 +43,7 @@ export const sidebarConfig: SidebarItem[] = [
                     { titleKey: 'Color', href: '/tools/color' },
                     { titleKey: 'Image Compress', href: '/tools/imagecompress' },
                     { titleKey: 'Translate', href: '/tools/translate' },
+                    { titleKey: 'PDF Reader', href: '/tools/pdf' },
                 ],
             },
         ],

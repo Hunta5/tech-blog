@@ -103,6 +103,10 @@ const zh: Record<string, string> = {
     'blog.summaryPlaceholder': '简要描述文章内容',
     'blog.contentLabel': '正文（Markdown）',
     'blog.contentPlaceholder': '在这里开始写你的文章...',
+    'blog.editor': '编辑',
+    'blog.split': '分栏',
+    'blog.preview': '预览',
+    'blog.previewEmpty': '暂无预览内容。请输入 Markdown。',
     'blog.cancel': '取消',
     'blog.saving': '保存中...',
     'blog.publish': '发布文章',
@@ -114,6 +118,19 @@ const zh: Record<string, string> = {
     'blog.confirmDelete': '确定要删除这篇文章吗？',
     'blog.deleteFailed': '删除失败',
     'blog.deleteError': '删除时发生错误',
+
+    // PDF Reader
+    'pdf.title': 'PDF 阅读器',
+    'pdf.desc': '在浏览器中打开和阅读 PDF 文件。不会上传到服务器。',
+    'pdf.privacy': '所有处理均在浏览器本地完成。PDF 文件不会上传到任何服务器。',
+    'pdf.dropzone': '拖拽 PDF 到这里或点击选择',
+    'pdf.supported': '仅支持 PDF 文件',
+    'pdf.invalidFile': '只能上传 PDF 文件',
+    'pdf.loadError': 'PDF 加载失败',
+    'pdf.loading': '加载中...',
+    'pdf.thumbnails': '缩略图',
+    'pdf.changeFile': '更换文件',
+    'pdf.shortcuts': '← → 键翻页 · +/- 键缩放',
 
     // Translate
     'translate.title': '翻译工具',

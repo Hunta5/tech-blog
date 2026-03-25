@@ -103,6 +103,10 @@ const ko: Record<string, string> = {
     'blog.summaryPlaceholder': '간단한 요약을 입력하세요',
     'blog.contentLabel': '내용 (Markdown)',
     'blog.contentPlaceholder': '여기에 글을 작성하세요...',
+    'blog.editor': '편집',
+    'blog.split': '분할',
+    'blog.preview': '미리보기',
+    'blog.previewEmpty': '미리보기할 내용이 없습니다. 왼쪽에 Markdown을 입력하세요.',
     'blog.cancel': '취소',
     'blog.saving': '저장 중...',
     'blog.publish': '발행하기',
@@ -114,6 +118,19 @@ const ko: Record<string, string> = {
     'blog.confirmDelete': '게시글을 삭제하시겠습니까?',
     'blog.deleteFailed': '삭제 실패',
     'blog.deleteError': '삭제 중 오류가 발생했습니다',
+
+    // PDF Reader
+    'pdf.title': 'PDF 리더',
+    'pdf.desc': '브라우저에서 PDF 파일을 열고 읽을 수 있습니다. 서버에 업로드하지 않습니다.',
+    'pdf.privacy': '모든 처리는 브라우저에서 로컬로 이루어집니다. PDF 파일은 서버로 전송되지 않습니다.',
+    'pdf.dropzone': '여기에 PDF를 드래그하거나 클릭하여 선택하세요',
+    'pdf.supported': 'PDF 파일만 지원합니다',
+    'pdf.invalidFile': 'PDF 파일만 업로드할 수 있습니다',
+    'pdf.loadError': 'PDF 로드 실패',
+    'pdf.loading': '로딩 중...',
+    'pdf.thumbnails': '썸네일',
+    'pdf.changeFile': '파일 변경',
+    'pdf.shortcuts': '← → 키로 페이지 이동 · +/- 키로 확대/축소',
 
     // Translate
     'translate.title': '번역기',

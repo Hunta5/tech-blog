@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import MarkdownView from '@/components/MarkdownView'
 
 type PostData = {
     slug: string
@@ -20,10 +21,12 @@ type FormData = {
 }
 
 type ViewMode = 'list' | 'create' | 'edit'
+type EditorMode = 'edit' | 'split' | 'preview'
 
 export default function PostForm() {
     const { t } = useLanguage()
     const [mode, setMode] = useState<ViewMode>('list')
+    const [editorMode, setEditorMode] = useState<EditorMode>('split')
     const [posts, setPosts] = useState<PostData[]>([])
     const [form, setForm] = useState<FormData>({ title: '', slug: '', content: '', summary: '' })
     const [editingSlug, setEditingSlug] = useState<string | null>(null)
@@ -289,17 +292,71 @@ export default function PostForm() {
                     />
                 </div>
 
-                {/* 内容 */}
+                {/* 内容 - 编辑 + 预览 */}
                 <div>
-                    <label className="block text-sm text-gray-400 mb-2">{t('blog.contentLabel')}</label>
-                    <textarea
-                        name="content"
-                        value={form.content}
-                        onChange={handleChange}
-                        rows={16}
-                        placeholder={t('blog.contentPlaceholder')}
-                        className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
-                    />
+                    <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm text-gray-400">{t('blog.contentLabel')}</label>
+                        <div className="flex bg-gray-800/50 rounded-lg p-0.5 border border-gray-700">
+                            <button
+                                type="button"
+                                onClick={() => setEditorMode('edit')}
+                                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                                    editorMode === 'edit'
+                                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                        : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                                }`}
+                            >
+                                {t('blog.editor')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setEditorMode('split')}
+                                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                                    editorMode === 'split'
+                                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                        : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                                }`}
+                            >
+                                {t('blog.split')}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setEditorMode('preview')}
+                                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                                    editorMode === 'preview'
+                                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                        : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                                }`}
+                            >
+                                {t('blog.preview')}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className={`${editorMode === 'split' ? 'grid grid-cols-2 gap-4' : ''}`}>
+                        {/* Editor */}
+                        {editorMode !== 'preview' && (
+                            <textarea
+                                name="content"
+                                value={form.content}
+                                onChange={handleChange}
+                                rows={20}
+                                placeholder={t('blog.contentPlaceholder')}
+                                className="w-full rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 text-gray-200 font-mono text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 resize-y"
+                            />
+                        )}
+
+                        {/* Preview */}
+                        {editorMode !== 'edit' && (
+                            <div className="rounded-lg bg-gray-900 border border-gray-700 px-4 py-3 overflow-y-auto" style={{ minHeight: editorMode === 'preview' ? '480px' : '100%', maxHeight: '600px' }}>
+                                {form.content ? (
+                                    <MarkdownView markdown={form.content} />
+                                ) : (
+                                    <p className="text-gray-600 text-sm italic">{t('blog.previewEmpty')}</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* 错误 / 成功 提示 */}
