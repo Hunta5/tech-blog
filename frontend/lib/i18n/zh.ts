@@ -15,6 +15,7 @@ const zh: Record<string, string> = {
     'sidebar.sajuAnalysis': '四柱八字',
     'sidebar.horoscope': '星座运势',
     'sidebar.life': '生活',
+    'sidebar.learning': '学习目标',
     'sidebar.english': '每日英语',
     'sidebar.foodFinder': '周边美食',
     'sidebar.news': '全球新闻',

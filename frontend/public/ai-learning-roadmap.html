@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 工程师小白学习路线图</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #06080f;
+    color: #e0e6f0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 15% 30%, rgba(59,130,246,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 70%, rgba(16,185,129,0.07) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 48px 20px 80px; }
+
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 4px;
+  }
+  .sub { text-align: center; color: #475569; font-size: 0.85rem; letter-spacing: 3px; margin-bottom: 12px; }
+  .goal-bar {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 10px 20px;
+    background: rgba(52,211,153,0.06);
+    border: 1px solid rgba(52,211,153,0.15);
+    border-radius: 10px;
+    color: #34d399;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  /* ===== TIMELINE ===== */
+  .timeline { position: relative; padding-left: 56px; }
+
+  /* vertical line */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #3b82f6 0%, #8b5cf6 35%, #f59e0b 60%, #10b981 85%, #f43f5e 100%);
+    border-radius: 2px;
+  }
+
+  /* ===== PHASE ===== */
+  .phase { position: relative; margin-bottom: 52px; }
+
+  .phase-dot {
+    position: absolute;
+    left: -41px;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--c) 50%, transparent);
+    border: 3px solid #06080f;
+    z-index: 2;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .phase-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 10%, transparent);
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+
+  .phase-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+
+  .phase-time {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .phase-desc {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  /* ===== STEP CARDS ===== */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: all 0.25s;
+    cursor: default;
+  }
+  .step:hover {
+    border-color: color-mix(in srgb, var(--c) 50%, transparent);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--c) 10%, transparent);
+    transform: translateX(4px);
+  }
+
+  .step-order {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--c) 12%, transparent);
+    color: var(--c);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .step-body { flex: 1; }
+
+  .step-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: #e2e8f0;
+    margin-bottom: 3px;
+  }
+
+  .step-detail {
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.55;
+  }
+
+  .step-tags { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .stag {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-weight: 600;
+  }
+  .stag.tool  { background: rgba(96,165,250,0.12); color: #60a5fa; }
+  .stag.proj  { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .stag.time  { background: rgba(148,163,184,0.1); color: #94a3b8; }
+
+  /* ===== ARROW BETWEEN PHASES ===== */
+  .arrow-down {
+    text-align: center;
+    margin: -20px 0 -10px 16px;
+    color: #334155;
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+  }
+
+  /* ===== MILESTONE ===== */
+  .milestone {
+    position: relative;
+    margin-top: 16px;
+    margin-bottom: 52px;
+    background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(52,211,153,0.03));
+    border: 1.5px solid rgba(52,211,153,0.3);
+    border-radius: 14px;
+    padding: 18px 20px;
+    text-align: center;
+  }
+
+  .milestone-icon { font-size: 1.5rem; margin-bottom: 4px; }
+
+  .milestone-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #34d399;
+    margin-bottom: 4px;
+  }
+
+  .milestone-sub {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  /* ===== FOOTER TIP ===== */
+  .tip-box {
+    margin-top: 20px;
+    background: rgba(251,191,36,0.05);
+    border: 1px solid rgba(251,191,36,0.15);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .tip-box h3 { color: #fbbf24; font-size: 0.9rem; margin-bottom: 10px; }
+  .tip-box p { font-size: 0.82rem; color: #94a3b8; line-height: 1.7; }
+  .tip-box p + p { margin-top: 8px; }
+
+  @media (max-width: 600px) {
+    .page { padding: 32px 12px 60px; }
+    .timeline { padding-left: 44px; }
+    .phase-dot { left: -33px; }
+    .phase-header { flex-direction: column; gap: 4px; }
+    .phase-time { margin-left: 0; }
+    h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>小白 → AI 应用工程师</h1>
+  <p class="sub">ZERO TO JOB-READY LEARNING PATH</p>
+  <div class="goal-bar">🎯 目标：3~5 个月内具备 AI 应用开发岗位的上手能力</div>
+
+  <div class="timeline">
+
+    <!-- ======== PHASE 1 ======== -->
+    <div class="phase" style="--c: #3b82f6;">
+      <div class="phase-dot"></div>
+      <div class="phase-header">
+        <span class="phase-num">PHASE 01</span>
+        <span class="phase-title">Python 编程入门</span>
+        <span class="phase-time">⏱ 2~3 周</span>
+      </div>
+      <p class="phase-desc">不需要精通，能写出完整的小脚本、会读报错信息就够了。</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-order">1</div>
+          <div class="step-body">
+            <div class="step-name">基础语法</div>
+            <div class="step-detail">变量、数据类型、if/for/while、函数定义、列表/字典操作</div>
+            <div class="step-tags"><span class="stag time">3~5 天</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">2</div>
+          <div class="step-body">
+            <div class="step-name">文件与模块</div>
+            <div class="step-detail">读写文件（open/with）、导入模块（import）、pip 安装第三方包、虚拟环境基础</div>
+            <div class="step-tags"><span class="stag time">2~3 天</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">3</div>
+          <div class="step-body">
+            <div class="step-name">实用库速学</div>
+            <div class="step-detail">json（数据格式）、requests（HTTP 请求）、os/pathlib（路径操作）</div>
+            <div class="step-tags">
+              <span class="stag tool">requests</span>
+              <span class="stag tool">json</span>
+              <span class="stag time">3~4 天</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">4</div>
+          <div class="step-body">
+            <div class="step-name">调试能力</div>
+            <div class="step-detail">读懂 Traceback 报错信息、学会用 print 调试、会用 Google/GPT 搜索解决方案</div>
+            <div class="step-tags"><span class="stag time">贯穿始终</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">✦</div>
+          <div class="step-body">
+            <div class="step-name">🏋️ 练手项目</div>
+            <div class="step-detail">写一个脚本：读取本地 CSV → 筛选数据 → 输出结果到新文件</div>
+            <div class="step-tags"><span class="stag proj">动手项目</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== PHASE 2 ======== -->
+    <div class="phase" style="--c: #8b5cf6;">
+      <div class="phase-dot"></div>
+      <div class="phase-header">
+        <span class="phase-num">PHASE 02</span>
+        <span class="phase-title">数据处理能力</span>
+        <span class="phase-time">⏱ 2~3 周</span>
+      </div>
+      <p class="phase-desc">AI 工作中 80% 的时间在处理数据，这一步决定你的工作效率。</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-order">1</div>
+          <div class="step-body">
+            <div class="step-name">Pandas 核心操作</div>
+            <div class="step-detail">DataFrame 创建、读取 CSV/Excel、筛选过滤（loc/iloc）、分组聚合（groupby）、缺失值处理</div>
+            <div class="step-tags">
+              <span class="stag tool">Pandas</span>
+              <span class="stag time">7~10 天</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">2</div>
+          <div class="step-body">
+            <div class="step-name">SQL 基础查询</div>
+            <div class="step-detail">SELECT / WHERE / JOIN / GROUP BY，能对数据库做基本查询即可</div>
+            <div class="step-tags">
+              <span class="stag tool">SQL</span>
+              <span class="stag time">3~5 天</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">3</div>
+          <div class="step-body">
+            <div class="step-name">JSON 数据处理</div>
+            <div class="step-detail">解析嵌套 JSON、API 返回值提取、JSON ↔ DataFrame 互转（AI 接口全是 JSON）</div>
+            <div class="step-tags"><span class="stag time">2~3 天</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">✦</div>
+          <div class="step-body">
+            <div class="step-name">🏋️ 练手项目</div>
+            <div class="step-detail">用 Pandas 清洗一份真实数据集（如 Kaggle 数据），生成统计摘要</div>
+            <div class="step-tags"><span class="stag proj">动手项目</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== MILESTONE 1 ======== -->
+    <div class="milestone">
+      <div class="milestone-icon">🏁</div>
+      <div class="milestone-text">基础能力达标 — 可以开始接触 AI 实战了</div>
+      <div class="milestone-sub">到这里大约 1~1.5 个月，你已经能写脚本、处理数据</div>
+    </div>
+
+    <!-- ======== PHASE 3 ======== -->
+    <div class="phase" style="--c: #f59e0b;">
+      <div class="phase-dot"></div>
+      <div class="phase-header">
+        <span class="phase-num">PHASE 03</span>
+        <span class="phase-title">大模型 API 与 Prompt 工程</span>
+        <span class="phase-time">⏱ 2~3 周</span>
+      </div>
+      <p class="phase-desc">这是当前 AI 应用开发的核心入口，学完这一步就能产出实际价值。</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-order">1</div>
+          <div class="step-body">
+            <div class="step-name">调用大模型 API</div>
+            <div class="step-detail">注册 OpenAI / Claude / 国内大模型 API Key，用 Python 发送第一个请求，理解 token、temperature 等核心参数</div>
+            <div class="step-tags">
+              <span class="stag tool">OpenAI API</span>
+              <span class="stag tool">Claude API</span>
+              <span class="stag time">2~3 天</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">2</div>
+          <div class="step-body">
+            <div class="step-name">Prompt Engineering</div>
+            <div class="step-detail">System Prompt 设计、Few-shot 示例、思维链（CoT）、输出格式控制（JSON mode）</div>
+            <div class="step-tags"><span class="stag time">5~7 天</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">3</div>
+          <div class="step-body">
+            <div class="step-name">Function Calling / Tool Use</div>
+            <div class="step-detail">让大模型调用你定义的函数，实现"模型 + 工具"的组合能力</div>
+            <div class="step-tags"><span class="stag time">3~4 天</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">✦</div>
+          <div class="step-body">
+            <div class="step-name">🏋️ 练手项目</div>
+            <div class="step-detail">做一个 AI 客服机器人：接收用户问题 → 调用 API → 返回结构化回答</div>
+            <div class="step-tags"><span class="stag proj">动手项目</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== PHASE 4 ======== -->
+    <div class="phase" style="--c: #10b981;">
+      <div class="phase-dot"></div>
+      <div class="phase-header">
+        <span class="phase-num">PHASE 04</span>
+        <span class="phase-title">RAG 检索增强生成</span>
+        <span class="phase-time">⏱ 2~3 周</span>
+      </div>
+      <p class="phase-desc">企业最刚需的场景 —— 让大模型读懂你的私有数据。会 RAG 就能解决 70% 的企业需求。</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-order">1</div>
+          <div class="step-body">
+            <div class="step-name">Embedding 与向量化</div>
+            <div class="step-detail">理解文本向量化原理、调用 Embedding API 将文档转为向量</div>
+            <div class="step-tags"><span class="stag time">2~3 天</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">2</div>
+          <div class="step-body">
+            <div class="step-name">向量数据库</div>
+            <div class="step-detail">学一个即可：Chroma（最简单）或 Milvus / Pinecone，掌握存储、检索、相似度搜索</div>
+            <div class="step-tags">
+              <span class="stag tool">Chroma</span>
+              <span class="stag tool">Milvus</span>
+              <span class="stag time">3~4 天</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">3</div>
+          <div class="step-body">
+            <div class="step-name">文档处理管线</div>
+            <div class="step-detail">PDF/Word/网页的文本提取、文档切分（Chunking 策略）、元数据管理</div>
+            <div class="step-tags"><span class="stag time">3~4 天</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">4</div>
+          <div class="step-body">
+            <div class="step-name">RAG 全流程串联</div>
+            <div class="step-detail">用户提问 → 向量检索 → 拼装 Prompt → 大模型生成回答 → 引用溯源</div>
+            <div class="step-tags"><span class="stag time">3~5 天</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">✦</div>
+          <div class="step-body">
+            <div class="step-name">🏋️ 练手项目</div>
+            <div class="step-detail">搭建一个"企业知识库问答系统"：上传 PDF → 自动索引 → 智能问答</div>
+            <div class="step-tags"><span class="stag proj">动手项目</span><span class="stag proj">简历亮点</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== MILESTONE 2 ======== -->
+    <div class="milestone">
+      <div class="milestone-icon">🎉</div>
+      <div class="milestone-text">核心技能达标 — 已具备 AI 应用开发岗位能力</div>
+      <div class="milestone-sub">到这里大约 3 个月，可以开始投递简历了！</div>
+    </div>
+
+    <!-- ======== PHASE 5 ======== -->
+    <div class="phase" style="--c: #f43f5e;">
+      <div class="phase-dot"></div>
+      <div class="phase-header">
+        <span class="phase-num">PHASE 05</span>
+        <span class="phase-title">Agent 框架与工程化</span>
+        <span class="phase-time">⏱ 2~4 周（可边工作边学）</span>
+      </div>
+      <p class="phase-desc">进阶能力，让你从"能用"变成"好用"，大幅提升竞争力。</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-order">1</div>
+          <div class="step-body">
+            <div class="step-name">AI Agent 开发</div>
+            <div class="step-detail">理解 Agent 循环（Plan → Act → Observe）、多步推理、工具编排</div>
+            <div class="step-tags">
+              <span class="stag tool">LangChain</span>
+              <span class="stag tool">LlamaIndex</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">2</div>
+          <div class="step-body">
+            <div class="step-name">应用框架实战</div>
+            <div class="step-detail">用 Streamlit / Gradio 快速搭建 Web 界面，让你的 AI 应用可演示</div>
+            <div class="step-tags">
+              <span class="stag tool">Streamlit</span>
+              <span class="stag tool">Gradio</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">3</div>
+          <div class="step-body">
+            <div class="step-name">基本工程实践</div>
+            <div class="step-detail">Git 版本控制、Docker 基础、API 服务部署（FastAPI）、日志与错误处理</div>
+            <div class="step-tags">
+              <span class="stag tool">Git</span>
+              <span class="stag tool">Docker</span>
+              <span class="stag tool">FastAPI</span>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">4</div>
+          <div class="step-body">
+            <div class="step-name">Eval 与优化</div>
+            <div class="step-detail">评测 AI 输出质量、Prompt 迭代优化、成本控制（选模型、缓存策略）</div>
+            <div class="step-tags"><span class="stag time">持续精进</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-order">✦</div>
+          <div class="step-body">
+            <div class="step-name">🏋️ 毕业项目</div>
+            <div class="step-detail">做一个完整的 AI Agent：能上网搜索 + 读文档 + 调工具 + 生成报告，部署为 Web 服务</div>
+            <div class="step-tags"><span class="stag proj">作品集核心项目</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /timeline -->
+
+  <!-- ======== FINAL MILESTONE ======== -->
+  <div class="milestone" style="border-color: rgba(244,63,94,0.3); background: linear-gradient(135deg, rgba(244,63,94,0.08), rgba(168,85,247,0.03));">
+    <div class="milestone-icon">🚀</div>
+    <div class="milestone-text" style="color: #fb7185;">全流程打通 — 具备独立交付 AI 项目的能力</div>
+    <div class="milestone-sub">总计约 3~5 个月 · 可胜任 AI 应用开发工程师 / LLM 工程师岗位</div>
+  </div>
+
+  <!-- ======== TIPS ======== -->
+  <div class="tip-box">
+    <h3>💡 给小白的四条建议</h3>
+    <p><strong>① 项目驱动学习：</strong>每个阶段都有练手项目，千万别只看教程不动手。做出来的东西就是你的简历和作品集。</p>
+    <p><strong>② 不要纠结"学完再开始"：</strong>Python 学 70% 就去碰 Pandas，Pandas 学 70% 就去调 API。实战中遇到不会的再回头补，效率最高。</p>
+    <p><strong>③ 善用 AI 辅助学习：</strong>遇到报错直接丢给 ChatGPT / Claude 解释，这本身就是在练"和 AI 协作"的能力，也是未来工作日常。</p>
+    <p><strong>④ 先广后深：</strong>先把整条链路跑通（能调 API → 能做 RAG → 能搭界面），再回头深入某个环节。广度优先，T 型发展。</p>
+  </div>
+
+</div>
+</body>
+</html>

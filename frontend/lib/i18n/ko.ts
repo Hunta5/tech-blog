@@ -15,6 +15,7 @@ const ko: Record<string, string> = {
     'sidebar.sajuAnalysis': '사주팔자',
     'sidebar.horoscope': '별자리 운세',
     'sidebar.life': '생활',
+    'sidebar.learning': '학습 목표',
     'sidebar.english': '매일 영어',
     'sidebar.foodFinder': '주변 맛집',
     'sidebar.news': '글로벌 뉴스',

@@ -58,6 +58,7 @@ export const sidebarConfig: SidebarItem[] = [
     {
         titleKey: 'sidebar.life',
         children: [
+            { titleKey: 'sidebar.learning', href: '/learning' },
             { titleKey: 'sidebar.english', href: '/english' },
             { titleKey: 'sidebar.foodFinder', href: '/food' },
             { titleKey: 'sidebar.news', href: '/news' },
