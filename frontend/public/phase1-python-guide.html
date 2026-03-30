@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 · Python 编程入门 · 详细学习指南</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #06080f;
+    color: #c9d1d9;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 48px; }
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; color: #3b82f6; background: rgba(59,130,246,0.1); padding: 4px 14px; border-radius: 6px; margin-bottom: 12px; }
+  h1 { font-size: 2.2rem; font-weight: 900; color: #f1f5f9; margin-bottom: 6px; }
+  .header p { color: #64748b; font-size: 0.9rem; }
+  .meta-bar {
+    display: flex; justify-content: center; gap: 24px; margin-top: 16px; flex-wrap: wrap;
+  }
+  .meta-item {
+    font-size: 0.8rem; color: #94a3b8;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .meta-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Table of Contents */
+  .toc {
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+  .toc h2 { font-size: 0.85rem; color: #64748b; letter-spacing: 3px; margin-bottom: 14px; text-transform: uppercase; }
+  .toc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toc-list a {
+    color: #93c5fd; text-decoration: none; font-size: 0.88rem; padding: 6px 12px;
+    border-radius: 8px; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+  }
+  .toc-list a:hover { background: rgba(59,130,246,0.08); color: #60a5fa; }
+  .toc-num { color: #475569; font-size: 0.75rem; font-weight: 700; min-width: 24px; }
+
+  /* Day Section */
+  .day-section { margin-bottom: 56px; scroll-margin-top: 24px; }
+
+  .day-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #1e293b;
+  }
+  .day-badge {
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--dc), color-mix(in srgb, var(--dc) 60%, #000));
+    color: #fff; font-weight: 900;
+  }
+  .day-badge .d-label { font-size: 0.55rem; letter-spacing: 1px; opacity: 0.8; }
+  .day-badge .d-num { font-size: 1.3rem; line-height: 1; }
+  .day-title { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; }
+  .day-subtitle { font-size: 0.82rem; color: #64748b; margin-top: 2px; }
+
+  /* Topic Block */
+  .topic {
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .topic:hover { border-color: color-mix(in srgb, var(--dc) 40%, transparent); }
+
+  .topic-head {
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .topic-icon { font-size: 1.2rem; }
+  .topic-name { font-weight: 700; font-size: 0.95rem; color: #e2e8f0; flex: 1; }
+  .topic-tag {
+    font-size: 0.65rem; padding: 2px 8px; border-radius: 5px; font-weight: 600;
+  }
+  .tag-must { background: rgba(239,68,68,0.12); color: #f87171; }
+  .tag-imp  { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .tag-nice { background: rgba(148,163,184,0.1); color: #94a3b8; }
+
+  .topic-body { padding: 0 20px 20px; }
+
+  .explain {
+    font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px; line-height: 1.7;
+  }
+
+  /* Code Block */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .code-label {
+    padding: 6px 14px;
+    font-size: 0.7rem; font-weight: 600;
+    color: #7c8496; background: #161b22;
+    letter-spacing: 1px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-label .dot { width: 6px; height: 6px; border-radius: 50%; }
+  pre {
+    padding: 14px 18px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #c9d1d9;
+  }
+  .cm { color: #8b949e; }
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .st { color: #a5d6ff; }
+  .nu { color: #79c0ff; }
+  .bi { color: #ffa657; }
+  .op { color: #ff7b72; }
+  .var { color: #ffa657; }
+
+  /* Key Points */
+  .key-points {
+    background: rgba(59,130,246,0.05);
+    border-left: 3px solid rgba(59,130,246,0.3);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+  }
+  .key-points h4 { font-size: 0.78rem; color: #60a5fa; margin-bottom: 6px; letter-spacing: 1px; }
+  .key-points li {
+    font-size: 0.82rem; color: #94a3b8; margin-bottom: 4px; margin-left: 16px;
+  }
+
+  /* Practice Box */
+  .practice {
+    background: linear-gradient(135deg, rgba(52,211,153,0.06), rgba(16,185,129,0.02));
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 20px;
+  }
+  .practice h3 { color: #34d399; font-size: 0.9rem; margin-bottom: 10px; }
+  .practice-item {
+    font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;
+    padding-left: 20px; position: relative;
+  }
+  .practice-item::before {
+    content: '✦'; position: absolute; left: 0; color: #34d399; font-size: 0.7rem; top: 2px;
+  }
+
+  /* Resources */
+  .resources {
+    background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(139,92,246,0.02));
+    border: 1px solid rgba(168,85,247,0.2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 14px;
+  }
+  .resources h3 { color: #a78bfa; font-size: 0.88rem; margin-bottom: 10px; }
+  .res-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.83rem; color: #94a3b8; margin-bottom: 8px;
+  }
+  .res-type {
+    flex-shrink: 0; font-size: 0.65rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    background: rgba(168,85,247,0.1); color: #c4b5fd;
+  }
+
+  /* Checkpoint */
+  .checkpoint {
+    background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.03));
+    border: 1.5px solid rgba(251,191,36,0.25);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-top: 24px;
+    text-align: center;
+  }
+  .checkpoint h3 { color: #fbbf24; font-size: 1rem; margin-bottom: 8px; }
+  .checkpoint p { font-size: 0.85rem; color: #94a3b8; }
+  .check-list { list-style: none; text-align: left; margin-top: 14px; }
+  .check-list li {
+    font-size: 0.85rem; padding: 6px 0; color: #cbd5e1;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(251,191,36,0.08);
+  }
+  .check-list li:last-child { border: none; }
+  .chk { color: #fbbf24; font-size: 0.9rem; }
+
+  /* Warn / Tip */
+  .warn-box {
+    background: rgba(239,68,68,0.05);
+    border: 1px solid rgba(239,68,68,0.15);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+  }
+  .warn-box h4 { color: #f87171; font-size: 0.82rem; margin-bottom: 6px; }
+  .warn-box p { font-size: 0.8rem; color: #94a3b8; }
+
+  .tip-box {
+    background: rgba(59,130,246,0.05);
+    border: 1px solid rgba(59,130,246,0.15);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+  }
+  .tip-box h4 { color: #60a5fa; font-size: 0.82rem; margin-bottom: 6px; }
+  .tip-box p { font-size: 0.8rem; color: #94a3b8; }
+
+  /* Final */
+  .final-box {
+    margin-top: 56px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.05));
+    border: 1.5px solid rgba(59,130,246,0.25);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+  }
+  .final-box h2 { color: #93c5fd; font-size: 1.2rem; margin-bottom: 8px; }
+  .final-box p { color: #64748b; font-size: 0.88rem; }
+
+  @media (max-width: 600px) {
+    .toc-list { grid-template-columns: 1fr; }
+    h1 { font-size: 1.6rem; }
+    .page { padding: 32px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header">
+    <div class="badge">PHASE 01 · 详细版</div>
+    <h1>Python 编程入门</h1>
+    <p>从零开始，每天学什么、怎么学、练什么，全部给你安排好</p>
+    <div class="meta-bar">
+      <div class="meta-item"><div class="meta-dot" style="background:#3b82f6;"></div>总时长：2~3 周</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#f59e0b;"></div>每天投入：2~3 小时</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#10b981;"></div>前置要求：零基础</div>
+    </div>
+  </div>
+
+  <!-- ===== TOC ===== -->
+  <div class="toc">
+    <h2>📋 学习日程目录</h2>
+    <ul class="toc-list">
+      <li><a href="#d1"><span class="toc-num">Day 1-2</span>环境搭建 + 第一个程序</a></li>
+      <li><a href="#d3"><span class="toc-num">Day 3-4</span>变量与数据类型</a></li>
+      <li><a href="#d5"><span class="toc-num">Day 5-6</span>条件判断与循环</a></li>
+      <li><a href="#d7"><span class="toc-num">Day 7-8</span>列表与字典</a></li>
+      <li><a href="#d9"><span class="toc-num">Day 9-10</span>函数</a></li>
+      <li><a href="#d11"><span class="toc-num">Day 11-12</span>文件操作与模块</a></li>
+      <li><a href="#d13"><span class="toc-num">Day 13-14</span>实用第三方库</a></li>
+      <li><a href="#d15"><span class="toc-num">Day 15-17</span>调试 + 综合项目</a></li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 1-2 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d1" style="--dc: #3b82f6;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">1-2</span></div>
+      <div>
+        <div class="day-title">环境搭建 + 第一个程序</div>
+        <div class="day-subtitle">磨刀不误砍柴工，把工具准备好</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">⬇️</span>
+        <span class="topic-name">安装 Python</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">去 <strong>python.org</strong> 下载最新的 Python 3.12+，安装时务必勾选 <strong>"Add Python to PATH"</strong>（Windows），Mac 用户推荐用 Homebrew：<code>brew install python</code>。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> TERMINAL — 验证安装</div>
+<pre><span class="cm"># 打开终端 / 命令行，输入：</span>
+python --version     <span class="cm"># 应显示 Python 3.12.x</span>
+pip --version        <span class="cm"># 应显示 pip 24.x.x</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📝</span>
+        <span class="topic-name">选择编辑器</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">推荐 <strong>VS Code</strong>（免费、插件丰富），安装后装一个 <strong>Python 扩展</strong>（Microsoft 出品），就能获得代码高亮、自动补全和一键运行。</p>
+        <div class="tip-box">
+          <h4>💡 小白提示</h4>
+          <p>不要纠结编辑器选择。VS Code 是目前业界最主流的选择，先用起来就好。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">👋</span>
+        <span class="topic-name">你的第一个 Python 程序</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">创建一个文件叫 <code>hello.py</code>，写下面的代码，然后在终端运行 <code>python hello.py</code></p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> hello.py</div>
+<pre><span class="cm"># 我的第一个 Python 程序</span>
+<span class="fn">print</span>(<span class="st">"Hello, World!"</span>)
+<span class="fn">print</span>(<span class="st">"你好，世界！"</span>)
+
+<span class="cm"># 试试简单计算</span>
+<span class="fn">print</span>(<span class="nu">1</span> + <span class="nu">1</span>)          <span class="cm"># 输出: 2</span>
+<span class="fn">print</span>(<span class="nu">10</span> * <span class="nu">3</span>)         <span class="cm"># 输出: 30</span>
+<span class="fn">print</span>(<span class="st">"AI"</span> * <span class="nu">3</span>)      <span class="cm"># 输出: AIAIAI</span>
+
+<span class="cm"># 接收用户输入</span>
+name = <span class="fn">input</span>(<span class="st">"你叫什么名字？"</span>)
+<span class="fn">print</span>(<span class="st">f"你好，</span><span class="var">{name}</span><span class="st">！欢迎学习 Python"</span>)</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 要记住的</h4>
+          <ul>
+            <li><code>print()</code> — 输出内容到屏幕</li>
+            <li><code>input()</code> — 接收用户的键盘输入</li>
+            <li><code>f"...{变量}..."</code> — f-string 格式化，把变量嵌入字符串</li>
+            <li><code># 注释</code> — 以 # 开头的是注释，不会被执行</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 1-2 练习</h3>
+      <div class="practice-item">写一个程序：问用户的名字和年龄，然后输出 "XX 你好，你明年就 XX 岁了！"</div>
+      <div class="practice-item">写一个简单计算器：输入两个数字，输出它们的加减乘除结果</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 3-4 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d3" style="--dc: #6366f1;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">3-4</span></div>
+      <div>
+        <div class="day-title">变量与数据类型</div>
+        <div class="day-subtitle">Python 里的"积木块"——所有数据的基本形态</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📦</span>
+        <span class="topic-name">变量：给数据取名字</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">变量就是一个名字，指向一段数据。Python 不需要声明类型，直接赋值即可。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> variables.py</div>
+<pre><span class="cm"># ---- 基本赋值 ----</span>
+age = <span class="nu">25</span>                   <span class="cm"># 整数 int</span>
+price = <span class="nu">9.99</span>               <span class="cm"># 浮点数 float</span>
+name = <span class="st">"小明"</span>              <span class="cm"># 字符串 str</span>
+is_student = <span class="kw">True</span>          <span class="cm"># 布尔值 bool</span>
+
+<span class="cm"># ---- 查看类型 ----</span>
+<span class="fn">print</span>(<span class="fn">type</span>(age))           <span class="cm"># &lt;class 'int'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(name))          <span class="cm"># &lt;class 'str'&gt;</span>
+
+<span class="cm"># ---- 类型转换 ----</span>
+age_str = <span class="st">"25"</span>             <span class="cm"># 这是字符串 "25"</span>
+age_num = <span class="fn">int</span>(age_str)     <span class="cm"># 转成数字 25</span>
+price_str = <span class="fn">str</span>(price)     <span class="cm"># 数字转字符串 "9.99"</span>
+
+<span class="cm"># ---- 命名规范 ----</span>
+user_name = <span class="st">"好"</span>           <span class="cm"># ✅ 用下划线连接（推荐）</span>
+userName = <span class="st">"不推荐"</span>         <span class="cm"># ❌ 驼峰命名（Python 不常用）</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔤</span>
+        <span class="topic-name">字符串操作（重点！）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">在 AI 开发中，你大量时间都在处理文本，所以字符串操作是最常用的技能之一。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> strings.py</div>
+<pre>text = <span class="st">"Hello, Python World!"</span>
+
+<span class="cm"># ---- 基本操作 ----</span>
+<span class="fn">print</span>(<span class="fn">len</span>(text))             <span class="cm"># 长度: 21</span>
+<span class="fn">print</span>(text.lower())          <span class="cm"># 全小写: hello, python world!</span>
+<span class="fn">print</span>(text.upper())          <span class="cm"># 全大写: HELLO, PYTHON WORLD!</span>
+<span class="fn">print</span>(text.replace(<span class="st">"World"</span>, <span class="st">"AI"</span>))  <span class="cm"># 替换: Hello, Python AI!</span>
+
+<span class="cm"># ---- 切片（超级常用）----</span>
+<span class="fn">print</span>(text[<span class="nu">0</span>])               <span class="cm"># 第一个字符: H</span>
+<span class="fn">print</span>(text[<span class="nu">7</span>:<span class="nu">13</span>])            <span class="cm"># 截取: Python</span>
+<span class="fn">print</span>(text[<span class="op">-</span><span class="nu">6</span>:])             <span class="cm"># 倒数6个: orld!</span>
+
+<span class="cm"># ---- 分割与拼接 ----</span>
+words = text.split(<span class="st">","</span>)      <span class="cm"># 按逗号分割: ['Hello', ' Python World!']</span>
+joined = <span class="st">" | "</span>.join([<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>])  <span class="cm"># 拼接: a | b | c</span>
+
+<span class="cm"># ---- 查找与判断 ----</span>
+<span class="fn">print</span>(<span class="st">"Python"</span> <span class="kw">in</span> text)     <span class="cm"># True（是否包含）</span>
+<span class="fn">print</span>(text.startswith(<span class="st">"Hello"</span>))  <span class="cm"># True</span>
+<span class="fn">print</span>(text.find(<span class="st">"Python"</span>))   <span class="cm"># 7（返回位置）</span>
+
+<span class="cm"># ---- f-string 格式化（最推荐）----</span>
+name = <span class="st">"小明"</span>
+score = <span class="nu">95.6</span>
+<span class="fn">print</span>(<span class="st">f"</span><span class="var">{name}</span><span class="st"> 的成绩是 </span><span class="var">{score:.1f}</span><span class="st"> 分"</span>)  <span class="cm"># 小明 的成绩是 95.6 分</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 AI 开发中最常用的字符串操作</h4>
+          <ul>
+            <li><code>.strip()</code> — 去掉首尾空格/换行（清洗数据必备）</li>
+            <li><code>.split()</code> — 按分隔符拆分字符串</li>
+            <li><code>"".join()</code> — 把列表拼回字符串</li>
+            <li><code>f"..."</code> — 格式化输出（拼接 prompt 时天天用）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔢</span>
+        <span class="topic-name">数字与运算</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> numbers.py</div>
+<pre><span class="cm"># ---- 基本运算 ----</span>
+<span class="fn">print</span>(<span class="nu">10</span> + <span class="nu">3</span>)     <span class="cm"># 加: 13</span>
+<span class="fn">print</span>(<span class="nu">10</span> - <span class="nu">3</span>)     <span class="cm"># 减: 7</span>
+<span class="fn">print</span>(<span class="nu">10</span> * <span class="nu">3</span>)     <span class="cm"># 乘: 30</span>
+<span class="fn">print</span>(<span class="nu">10</span> / <span class="nu">3</span>)     <span class="cm"># 除: 3.3333（结果是浮点数）</span>
+<span class="fn">print</span>(<span class="nu">10</span> // <span class="nu">3</span>)    <span class="cm"># 整除: 3</span>
+<span class="fn">print</span>(<span class="nu">10</span> % <span class="nu">3</span>)     <span class="cm"># 取余: 1</span>
+<span class="fn">print</span>(<span class="nu">2</span> ** <span class="nu">10</span>)    <span class="cm"># 幂运算: 1024</span>
+
+<span class="cm"># ---- 常用内置函数 ----</span>
+<span class="fn">print</span>(<span class="fn">abs</span>(<span class="op">-</span><span class="nu">5</span>))     <span class="cm"># 绝对值: 5</span>
+<span class="fn">print</span>(<span class="fn">round</span>(<span class="nu">3.7</span>))  <span class="cm"># 四舍五入: 4</span>
+<span class="fn">print</span>(<span class="fn">max</span>(<span class="nu">1</span>,<span class="nu">5</span>,<span class="nu">3</span>))  <span class="cm"># 最大值: 5</span>
+<span class="fn">print</span>(<span class="fn">min</span>(<span class="nu">1</span>,<span class="nu">5</span>,<span class="nu">3</span>))  <span class="cm"># 最小值: 1</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 3-4 练习</h3>
+      <div class="practice-item">写一个程序：输入一段英文句子，输出有多少个单词、多少个字符</div>
+      <div class="practice-item">写一个温度转换器：输入摄氏度，输出华氏度（公式：F = C × 9/5 + 32）</div>
+      <div class="practice-item">用 f-string 写一段自我介绍，包含姓名、年龄、职业</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 5-6 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d5" style="--dc: #f59e0b;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">5-6</span></div>
+      <div>
+        <div class="day-title">条件判断与循环</div>
+        <div class="day-subtitle">让程序有"逻辑"——会判断、会重复</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔀</span>
+        <span class="topic-name">if / elif / else 条件判断</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> conditions.py</div>
+<pre>score = <span class="nu">85</span>
+
+<span class="cm"># ---- 基本判断 ----</span>
+<span class="kw">if</span> score >= <span class="nu">90</span>:
+    <span class="fn">print</span>(<span class="st">"优秀"</span>)
+<span class="kw">elif</span> score >= <span class="nu">60</span>:
+    <span class="fn">print</span>(<span class="st">"及格"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"不及格"</span>)
+
+<span class="cm"># ---- 比较运算符 ----</span>
+<span class="cm"># ==  等于     !=  不等于</span>
+<span class="cm"># >   大于     <   小于</span>
+<span class="cm"># >=  大于等于  <=  小于等于</span>
+
+<span class="cm"># ---- 逻辑运算符 ----</span>
+age = <span class="nu">20</span>
+has_id = <span class="kw">True</span>
+
+<span class="kw">if</span> age >= <span class="nu">18</span> <span class="kw">and</span> has_id:
+    <span class="fn">print</span>(<span class="st">"可以进入"</span>)
+
+<span class="kw">if</span> age < <span class="nu">12</span> <span class="kw">or</span> age > <span class="nu">65</span>:
+    <span class="fn">print</span>(<span class="st">"享受优惠"</span>)
+
+<span class="kw">if</span> <span class="kw">not</span> has_id:
+    <span class="fn">print</span>(<span class="st">"请出示证件"</span>)
+
+<span class="cm"># ---- 判断字符串内容（AI 开发常用）----</span>
+user_input = <span class="st">"你好"</span>
+<span class="kw">if</span> <span class="st">"你好"</span> <span class="kw">in</span> user_input:
+    <span class="fn">print</span>(<span class="st">"检测到问候语"</span>)</pre>
+        </div>
+        <div class="warn-box">
+          <h4>⚠️ 常见错误</h4>
+          <p>Python 用<strong>缩进</strong>（4个空格）来表示代码块，不是大括号 {}。缩进不对会报 <code>IndentationError</code>，这是新手最常遇到的错误。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔁</span>
+        <span class="topic-name">for 循环</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> for_loop.py</div>
+<pre><span class="cm"># ---- 遍历列表 ----</span>
+fruits = [<span class="st">"苹果"</span>, <span class="st">"香蕉"</span>, <span class="st">"橘子"</span>]
+<span class="kw">for</span> fruit <span class="kw">in</span> fruits:
+    <span class="fn">print</span>(<span class="st">f"我喜欢吃</span><span class="var">{fruit}</span><span class="st">"</span>)
+
+<span class="cm"># ---- range() 生成数字序列 ----</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):           <span class="cm"># 0, 1, 2, 3, 4</span>
+    <span class="fn">print</span>(i)
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">11</span>):      <span class="cm"># 1 到 10</span>
+    <span class="fn">print</span>(i)
+
+<span class="cm"># ---- 带索引遍历（enumerate）----</span>
+<span class="kw">for</span> index, fruit <span class="kw">in</span> <span class="fn">enumerate</span>(fruits):
+    <span class="fn">print</span>(<span class="st">f"</span><span class="var">{index}</span><span class="st">: </span><span class="var">{fruit}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 遍历字符串 ----</span>
+<span class="kw">for</span> char <span class="kw">in</span> <span class="st">"Python"</span>:
+    <span class="fn">print</span>(char, end=<span class="st">" "</span>)     <span class="cm"># P y t h o n</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔄</span>
+        <span class="topic-name">while 循环 + break / continue</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> while_loop.py</div>
+<pre><span class="cm"># ---- 基本 while ----</span>
+count = <span class="nu">0</span>
+<span class="kw">while</span> count < <span class="nu">5</span>:
+    <span class="fn">print</span>(<span class="st">f"第 </span><span class="var">{count + 1}</span><span class="st"> 次"</span>)
+    count += <span class="nu">1</span>
+
+<span class="cm"># ---- break: 立即跳出循环 ----</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    cmd = <span class="fn">input</span>(<span class="st">"输入命令（quit 退出）: "</span>)
+    <span class="kw">if</span> cmd == <span class="st">"quit"</span>:
+        <span class="kw">break</span>
+    <span class="fn">print</span>(<span class="st">f"你输入了: </span><span class="var">{cmd}</span><span class="st">"</span>)
+
+<span class="cm"># ---- continue: 跳过本次循环 ----</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">10</span>):
+    <span class="kw">if</span> i % <span class="nu">2</span> == <span class="nu">0</span>:       <span class="cm"># 跳过偶数</span>
+        <span class="kw">continue</span>
+    <span class="fn">print</span>(i)              <span class="cm"># 只输出: 1, 3, 5, 7, 9</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 5-6 练习</h3>
+      <div class="practice-item">猜数字游戏：程序随机生成 1-100 的数字，用户循环猜测，给出"大了/小了"提示，直到猜对</div>
+      <div class="practice-item">九九乘法表：用两层 for 循环打印</div>
+      <div class="practice-item">FizzBuzz：1 到 50，3 的倍数打印 Fizz，5 的倍数打印 Buzz，同时是 3 和 5 的倍数打印 FizzBuzz</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 7-8 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d7" style="--dc: #10b981;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">7-8</span></div>
+      <div>
+        <div class="day-title">列表与字典</div>
+        <div class="day-subtitle">最最最重要的两种数据结构，AI 开发中每行代码都在用</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📋</span>
+        <span class="topic-name">列表 (List)</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">列表是有序的数据集合，用 <code>[]</code> 表示，可以放任何类型的数据。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> lists.py</div>
+<pre><span class="cm"># ---- 创建列表 ----</span>
+nums = [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>]
+names = [<span class="st">"小明"</span>, <span class="st">"小红"</span>, <span class="st">"小刚"</span>]
+mixed = [<span class="nu">1</span>, <span class="st">"hello"</span>, <span class="kw">True</span>, <span class="nu">3.14</span>]   <span class="cm"># 可以混合类型</span>
+
+<span class="cm"># ---- 增删改查 ----</span>
+names.append(<span class="st">"小李"</span>)          <span class="cm"># 末尾添加</span>
+names.insert(<span class="nu">0</span>, <span class="st">"小王"</span>)       <span class="cm"># 指定位置插入</span>
+names.remove(<span class="st">"小红"</span>)          <span class="cm"># 删除指定元素</span>
+last = names.pop()            <span class="cm"># 删除并返回最后一个</span>
+names[<span class="nu">0</span>] = <span class="st">"大王"</span>            <span class="cm"># 修改元素</span>
+
+<span class="cm"># ---- 切片（和字符串一样）----</span>
+<span class="fn">print</span>(nums[<span class="nu">1</span>:<span class="nu">3</span>])              <span class="cm"># [2, 3]</span>
+<span class="fn">print</span>(nums[<span class="op">-</span><span class="nu">2</span>:])              <span class="cm"># [4, 5]</span>
+
+<span class="cm"># ---- 常用操作 ----</span>
+<span class="fn">print</span>(<span class="fn">len</span>(nums))              <span class="cm"># 长度: 5</span>
+<span class="fn">print</span>(<span class="fn">sorted</span>(nums, reverse=<span class="kw">True</span>))  <span class="cm"># 降序排列</span>
+<span class="fn">print</span>(<span class="nu">3</span> <span class="kw">in</span> nums)              <span class="cm"># True（是否包含）</span>
+
+<span class="cm"># ---- 列表推导式（超级常用！）----</span>
+squares = [x**<span class="nu">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">10</span>)]
+<span class="cm"># [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span>
+
+even = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">20</span>) <span class="kw">if</span> x % <span class="nu">2</span> == <span class="nu">0</span>]
+<span class="cm"># [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🗂️</span>
+        <span class="topic-name">字典 (Dict) — AI 开发的核心数据结构</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">字典是键值对集合，用 <code>{}</code> 表示。API 返回的 JSON 数据本质就是字典，必须熟练掌握！</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> dicts.py</div>
+<pre><span class="cm"># ---- 创建字典 ----</span>
+person = {
+    <span class="st">"name"</span>: <span class="st">"小明"</span>,
+    <span class="st">"age"</span>: <span class="nu">25</span>,
+    <span class="st">"skills"</span>: [<span class="st">"Python"</span>, <span class="st">"SQL"</span>],
+    <span class="st">"is_student"</span>: <span class="kw">False</span>
+}
+
+<span class="cm"># ---- 访问与修改 ----</span>
+<span class="fn">print</span>(person[<span class="st">"name"</span>])           <span class="cm"># 小明</span>
+<span class="fn">print</span>(person.get(<span class="st">"age"</span>))       <span class="cm"># 25（推荐，不存在时返回 None）</span>
+<span class="fn">print</span>(person.get(<span class="st">"email"</span>, <span class="st">"无"</span>)) <span class="cm"># "无"（不存在时返回默认值）</span>
+
+person[<span class="st">"age"</span>] = <span class="nu">26</span>            <span class="cm"># 修改</span>
+person[<span class="st">"email"</span>] = <span class="st">"a@b.com"</span>  <span class="cm"># 新增</span>
+<span class="kw">del</span> person[<span class="st">"is_student"</span>]       <span class="cm"># 删除</span>
+
+<span class="cm"># ---- 遍历字典 ----</span>
+<span class="kw">for</span> key, value <span class="kw">in</span> person.items():
+    <span class="fn">print</span>(<span class="st">f"</span><span class="var">{key}</span><span class="st">: </span><span class="var">{value}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 嵌套字典（模拟 API 返回值）----</span>
+api_response = {
+    <span class="st">"status"</span>: <span class="st">"success"</span>,
+    <span class="st">"data"</span>: {
+        <span class="st">"message"</span>: <span class="st">"你好，世界"</span>,
+        <span class="st">"tokens"</span>: <span class="nu">15</span>
+    }
+}
+<span class="cm"># 取出嵌套的值</span>
+msg = api_response[<span class="st">"data"</span>][<span class="st">"message"</span>]
+<span class="fn">print</span>(msg)  <span class="cm"># 你好，世界</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 为什么字典这么重要？</h4>
+          <ul>
+            <li>大模型 API 的请求和返回值全是 JSON 格式 = Python 字典</li>
+            <li>配置文件、Prompt 模板管理都用字典</li>
+            <li>后续学的 Pandas 的每一行数据本质也是键值对</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 7-8 练习</h3>
+      <div class="practice-item">创建一个通讯录字典，支持"增加联系人、查找联系人、删除联系人、显示所有人"功能</div>
+      <div class="practice-item">统计一段文本中每个单词出现的次数，存入字典并按频率排序</div>
+      <div class="practice-item">模拟 API 返回值：创建一个嵌套字典，练习多层访问取值</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 9-10 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d9" style="--dc: #ec4899;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">9-10</span></div>
+      <div>
+        <div class="day-title">函数</div>
+        <div class="day-subtitle">把重复的代码打包成"工具"——写可维护代码的关键</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔧</span>
+        <span class="topic-name">定义与调用函数</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> functions.py</div>
+<pre><span class="cm"># ---- 基本函数 ----</span>
+<span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="st">"""向某人打招呼"""</span>
+    <span class="kw">return</span> <span class="st">f"你好，</span><span class="var">{name}</span><span class="st">！"</span>
+
+result = greet(<span class="st">"小明"</span>)
+<span class="fn">print</span>(result)   <span class="cm"># 你好，小明！</span>
+
+<span class="cm"># ---- 默认参数 ----</span>
+<span class="kw">def</span> <span class="fn">call_api</span>(prompt, model=<span class="st">"gpt-4"</span>, temperature=<span class="nu">0.7</span>):
+    <span class="fn">print</span>(<span class="st">f"模型: </span><span class="var">{model}</span><span class="st">, 温度: </span><span class="var">{temperature}</span><span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"提示词: </span><span class="var">{prompt}</span><span class="st">"</span>)
+
+call_api(<span class="st">"你好"</span>)                          <span class="cm"># 用默认参数</span>
+call_api(<span class="st">"你好"</span>, model=<span class="st">"claude"</span>)           <span class="cm"># 只改模型</span>
+call_api(<span class="st">"你好"</span>, temperature=<span class="nu">0.2</span>)          <span class="cm"># 只改温度</span>
+
+<span class="cm"># ---- 返回多个值 ----</span>
+<span class="kw">def</span> <span class="fn">analyze_text</span>(text):
+    word_count = <span class="fn">len</span>(text.split())
+    char_count = <span class="fn">len</span>(text)
+    <span class="kw">return</span> word_count, char_count
+
+words, chars = analyze_text(<span class="st">"Hello World Python"</span>)
+<span class="fn">print</span>(<span class="st">f"单词数: </span><span class="var">{words}</span><span class="st">, 字符数: </span><span class="var">{chars}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 返回字典（AI 开发中常见模式）----</span>
+<span class="kw">def</span> <span class="fn">process_response</span>(raw_text):
+    <span class="kw">return</span> {
+        <span class="st">"content"</span>: raw_text.strip(),
+        <span class="st">"length"</span>: <span class="fn">len</span>(raw_text),
+        <span class="st">"is_empty"</span>: <span class="fn">len</span>(raw_text.strip()) == <span class="nu">0</span>
+    }</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">⚡</span>
+        <span class="topic-name">Lambda 与常用内置函数</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> lambda_builtins.py</div>
+<pre><span class="cm"># ---- lambda：一行搞定的小函数 ----</span>
+double = <span class="kw">lambda</span> x: x * <span class="nu">2</span>
+<span class="fn">print</span>(double(<span class="nu">5</span>))     <span class="cm"># 10</span>
+
+<span class="cm"># ---- 排序时指定规则（超级常用）----</span>
+students = [
+    {<span class="st">"name"</span>: <span class="st">"小明"</span>, <span class="st">"score"</span>: <span class="nu">85</span>},
+    {<span class="st">"name"</span>: <span class="st">"小红"</span>, <span class="st">"score"</span>: <span class="nu">92</span>},
+    {<span class="st">"name"</span>: <span class="st">"小刚"</span>, <span class="st">"score"</span>: <span class="nu">78</span>},
+]
+<span class="cm"># 按分数从高到低排</span>
+ranked = <span class="fn">sorted</span>(students, key=<span class="kw">lambda</span> s: s[<span class="st">"score"</span>], reverse=<span class="kw">True</span>)
+
+<span class="cm"># ---- map / filter ----</span>
+nums = [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>]
+doubled = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x * <span class="nu">2</span>, nums))    <span class="cm"># [2, 4, 6, 8, 10]</span>
+evens = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x % <span class="nu">2</span> == <span class="nu">0</span>, nums)) <span class="cm"># [2, 4]</span>
+
+<span class="cm"># 但更推荐用列表推导式（更 Pythonic）</span>
+doubled = [x * <span class="nu">2</span> <span class="kw">for</span> x <span class="kw">in</span> nums]
+evens = [x <span class="kw">for</span> x <span class="kw">in</span> nums <span class="kw">if</span> x % <span class="nu">2</span> == <span class="nu">0</span>]</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 9-10 练习</h3>
+      <div class="practice-item">写一个函数 <code>build_prompt(role, question)</code>，拼出完整的 AI 提示词模板</div>
+      <div class="practice-item">写一个函数，接收一个学生列表（字典列表），返回平均分、最高分的学生姓名</div>
+      <div class="practice-item">写一个"简易密码强度检测器"函数：检查长度、是否有大小写、是否有数字</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 11-12 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d11" style="--dc: #8b5cf6;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">11-12</span></div>
+      <div>
+        <div class="day-title">文件操作与模块</div>
+        <div class="day-subtitle">读写文件 + 组织代码——从"写脚本"到"写项目"</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📄</span>
+        <span class="topic-name">文件读写</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> file_io.py</div>
+<pre><span class="cm"># ---- 写入文件 ----</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.txt"</span>, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    f.write(<span class="st">"第一行内容\n"</span>)
+    f.write(<span class="st">"第二行内容\n"</span>)
+
+<span class="cm"># ---- 读取文件 ----</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.txt"</span>, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    content = f.read()          <span class="cm"># 读全部内容</span>
+    <span class="fn">print</span>(content)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.txt"</span>, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    lines = f.readlines()       <span class="cm"># 按行读取，返回列表</span>
+    <span class="kw">for</span> line <span class="kw">in</span> lines:
+        <span class="fn">print</span>(line.strip())     <span class="cm"># strip() 去掉换行符</span>
+
+<span class="cm"># ---- 追加内容 ----</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.txt"</span>, <span class="st">"a"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    f.write(<span class="st">"追加的第三行\n"</span>)</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 with 语句的意义</h4>
+          <ul>
+            <li><code>with open()</code> 会在代码块结束后自动关闭文件，不用手动 close()</li>
+            <li>始终加 <code>encoding="utf-8"</code>，避免中文乱码</li>
+            <li><code>"w"</code> = 写（覆盖），<code>"r"</code> = 读，<code>"a"</code> = 追加</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📦</span>
+        <span class="topic-name">模块、包与 pip</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> modules.py</div>
+<pre><span class="cm"># ---- 导入标准库 ----</span>
+<span class="kw">import</span> os
+<span class="kw">import</span> random
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="cm"># os 模块：文件路径操作</span>
+<span class="fn">print</span>(os.getcwd())              <span class="cm"># 当前工作目录</span>
+<span class="fn">print</span>(os.path.exists(<span class="st">"output.txt"</span>))  <span class="cm"># 文件是否存在</span>
+
+<span class="cm"># pathlib（更现代的路径处理方式）</span>
+p = Path(<span class="st">"data"</span>) / <span class="st">"output.txt"</span>  <span class="cm"># 自动处理路径分隔符</span>
+
+<span class="cm"># random 模块</span>
+<span class="fn">print</span>(random.randint(<span class="nu">1</span>, <span class="nu">100</span>))  <span class="cm"># 随机整数</span>
+<span class="fn">print</span>(random.choice([<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>]))  <span class="cm"># 随机选一个</span>
+
+<span class="cm"># datetime 模块</span>
+now = datetime.now()
+<span class="fn">print</span>(now.strftime(<span class="st">"%Y-%m-%d %H:%M"</span>))  <span class="cm"># 2026-03-30 14:30</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> TERMINAL — pip 安装第三方包</div>
+<pre><span class="cm"># 安装第三方包</span>
+pip install requests         <span class="cm"># HTTP 请求库</span>
+pip install pandas           <span class="cm"># 数据处理库</span>
+pip install python-dotenv    <span class="cm"># 环境变量管理</span>
+
+<span class="cm"># 查看已安装的包</span>
+pip list
+
+<span class="cm"># 创建虚拟环境（推荐每个项目一个）</span>
+python -m venv myenv         <span class="cm"># 创建</span>
+source myenv/bin/activate    <span class="cm"># 激活（Mac/Linux）</span>
+myenv\Scripts\activate       <span class="cm"># 激活（Windows）</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 11-12 练习</h3>
+      <div class="practice-item">写一个日记程序：每次运行追加当天日期和内容到 diary.txt</div>
+      <div class="practice-item">批量处理文件：读取一个文件夹里所有 .txt 文件，统计每个文件的行数</div>
+      <div class="practice-item">在新虚拟环境里安装 requests 库，确认能正常 import</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 13-14 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d13" style="--dc: #f97316;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">13-14</span></div>
+      <div>
+        <div class="day-title">实用第三方库</div>
+        <div class="day-subtitle">学会这三个库，你就能调 API + 处理数据了</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🌐</span>
+        <span class="topic-name">requests — HTTP 请求（调 API 必备）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> use_requests.py</div>
+<pre><span class="kw">import</span> requests
+
+<span class="cm"># ---- GET 请求（获取数据）----</span>
+response = requests.get(<span class="st">"https://api.github.com/users/octocat"</span>)
+<span class="fn">print</span>(response.status_code)    <span class="cm"># 200 = 成功</span>
+
+data = response.json()          <span class="cm"># JSON → Python 字典</span>
+<span class="fn">print</span>(data[<span class="st">"name"</span>])             <span class="cm"># The Octocat</span>
+<span class="fn">print</span>(data[<span class="st">"public_repos"</span>])    <span class="cm"># 8</span>
+
+<span class="cm"># ---- POST 请求（发送数据，调 AI API 用这个）----</span>
+url = <span class="st">"https://api.example.com/chat"</span>
+headers = {
+    <span class="st">"Authorization"</span>: <span class="st">"Bearer YOUR_API_KEY"</span>,
+    <span class="st">"Content-Type"</span>: <span class="st">"application/json"</span>
+}
+payload = {
+    <span class="st">"model"</span>: <span class="st">"gpt-4"</span>,
+    <span class="st">"messages"</span>: [
+        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"你好"</span>}
+    ]
+}
+response = requests.post(url, headers=headers, json=payload)
+result = response.json()
+
+<span class="cm"># ---- 错误处理 ----</span>
+<span class="kw">if</span> response.status_code == <span class="nu">200</span>:
+    <span class="fn">print</span>(<span class="st">"成功！"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">f"出错了: </span><span class="var">{response.status_code}</span><span class="st">"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📊</span>
+        <span class="topic-name">json — 数据交换格式</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> use_json.py</div>
+<pre><span class="kw">import</span> json
+
+<span class="cm"># ---- 字典 → JSON 字符串 ----</span>
+data = {<span class="st">"name"</span>: <span class="st">"小明"</span>, <span class="st">"scores"</span>: [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>]}
+json_str = json.dumps(data, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>)
+<span class="fn">print</span>(json_str)
+
+<span class="cm"># ---- JSON 字符串 → 字典 ----</span>
+parsed = json.loads(json_str)
+<span class="fn">print</span>(parsed[<span class="st">"name"</span>])         <span class="cm"># 小明</span>
+
+<span class="cm"># ---- 读写 JSON 文件 ----</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"config.json"</span>, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    json.dump(data, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"config.json"</span>, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    loaded = json.load(f)
+    <span class="fn">print</span>(loaded)</pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 json 和 dict 的关系</h4>
+          <p>JSON 是一种文本格式，Python 字典是内存中的数据结构。<code>json.dumps()</code> 把字典变成文本，<code>json.loads()</code> 把文本变回字典。API 通信全靠它们。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔑</span>
+        <span class="topic-name">dotenv — 管理 API Key（安全第一）</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> .env 文件（不要上传到 GitHub！）</div>
+<pre>OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
+MODEL_NAME=gpt-4</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> use_dotenv.py</div>
+<pre><span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()  <span class="cm"># 加载 .env 文件</span>
+
+api_key = os.getenv(<span class="st">"OPENAI_API_KEY"</span>)
+model = os.getenv(<span class="st">"MODEL_NAME"</span>, <span class="st">"gpt-3.5-turbo"</span>)  <span class="cm"># 可设默认值</span>
+<span class="fn">print</span>(<span class="st">f"使用模型: </span><span class="var">{model}</span><span class="st">"</span>)</pre>
+        </div>
+        <div class="warn-box">
+          <h4>⚠️ 安全警告</h4>
+          <p>永远不要把 API Key 写死在代码里！用 .env 文件管理，并在 .gitignore 中排除 .env。这是工作中的铁律。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 13-14 练习</h3>
+      <div class="practice-item">用 requests 调用一个公开 API（如天气 API、GitHub API），把结果存成 JSON 文件</div>
+      <div class="practice-item">写一个配置管理工具：读取 JSON 配置文件，支持修改和保存</div>
+      <div class="practice-item">创建 .env 文件存 API Key，用 dotenv 读取并在请求中使用</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 15-17 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d15" style="--dc: #06b6d4;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">15-17</span></div>
+      <div>
+        <div class="day-title">调试能力 + 综合项目</div>
+        <div class="day-subtitle">从"能写代码"进化到"能解决问题"</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🐛</span>
+        <span class="topic-name">读懂报错信息</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">不会调试 = 永远依赖别人。学会读报错信息是独立开发的分水岭。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> 常见报错类型</div>
+<pre><span class="cm"># ❌ SyntaxError — 语法写错了</span>
+<span class="cm"># 看报错指向的行号，通常是漏了冒号、括号、引号</span>
+<span class="kw">if</span> x == <span class="nu">1</span>     <span class="cm"># 少了冒号 :</span>
+
+<span class="cm"># ❌ NameError — 变量名不存在</span>
+<span class="fn">print</span>(username)  <span class="cm"># 没有定义过 username</span>
+
+<span class="cm"># ❌ TypeError — 类型不对</span>
+<span class="st">"age: "</span> + <span class="nu">25</span>    <span class="cm"># 字符串不能和数字直接拼，要 str(25)</span>
+
+<span class="cm"># ❌ KeyError — 字典里找不到这个 key</span>
+data = {<span class="st">"name"</span>: <span class="st">"小明"</span>}
+data[<span class="st">"age"</span>]     <span class="cm"># 用 data.get("age") 更安全</span>
+
+<span class="cm"># ❌ IndexError — 列表下标越界</span>
+lst = [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>]
+lst[<span class="nu">5</span>]           <span class="cm"># 只有 0, 1, 2 三个下标</span>
+
+<span class="cm"># ❌ FileNotFoundError — 找不到文件</span>
+<span class="fn">open</span>(<span class="st">"不存在.txt"</span>)  <span class="cm"># 检查路径和文件名</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 调试三步法</h4>
+          <ul>
+            <li><strong>第一步：</strong>看报错的最后一行——告诉你错误类型和原因</li>
+            <li><strong>第二步：</strong>看报错中的行号——定位出错的位置</li>
+            <li><strong>第三步：</strong>把报错信息复制给 ChatGPT / Claude——AI 解释比自己查快 10 倍</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🛡️</span>
+        <span class="topic-name">try / except 异常处理</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> error_handling.py</div>
+<pre><span class="cm"># ---- 基本异常处理 ----</span>
+<span class="kw">try</span>:
+    num = <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"输入一个数字: "</span>))
+    result = <span class="nu">100</span> / num
+    <span class="fn">print</span>(<span class="st">f"结果: </span><span class="var">{result}</span><span class="st">"</span>)
+<span class="kw">except</span> ValueError:
+    <span class="fn">print</span>(<span class="st">"请输入有效数字！"</span>)
+<span class="kw">except</span> ZeroDivisionError:
+    <span class="fn">print</span>(<span class="st">"不能除以零！"</span>)
+<span class="kw">except</span> Exception <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="st">f"发生未知错误: </span><span class="var">{e}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 实际应用：安全调用 API ----</span>
+<span class="kw">import</span> requests
+
+<span class="kw">def</span> <span class="fn">safe_api_call</span>(url):
+    <span class="kw">try</span>:
+        response = requests.get(url, timeout=<span class="nu">10</span>)
+        response.raise_for_status()  <span class="cm"># 非 200 抛异常</span>
+        <span class="kw">return</span> response.json()
+    <span class="kw">except</span> requests.Timeout:
+        <span class="fn">print</span>(<span class="st">"请求超时"</span>)
+    <span class="kw">except</span> requests.RequestException <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="st">f"请求失败: </span><span class="var">{e}</span><span class="st">"</span>)
+    <span class="kw">return</span> <span class="kw">None</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🏆</span>
+        <span class="topic-name">Phase 1 综合项目：CSV 数据处理器</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">把前面学的所有知识串起来，做一个完整的小工具。这就是你 Phase 1 的"毕业作品"。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> project.py — CSV 数据处理器</div>
+<pre><span class="kw">import</span> json
+<span class="kw">import</span> os
+
+<span class="kw">def</span> <span class="fn">read_csv</span>(filepath):
+    <span class="st">"""读取 CSV 文件，返回字典列表"""</span>
+    <span class="kw">try</span>:
+        <span class="kw">with</span> <span class="fn">open</span>(filepath, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+            lines = f.readlines()
+        headers = lines[<span class="nu">0</span>].strip().split(<span class="st">","</span>)
+        data = []
+        <span class="kw">for</span> line <span class="kw">in</span> lines[<span class="nu">1</span>:]:
+            values = line.strip().split(<span class="st">","</span>)
+            row = <span class="fn">dict</span>(<span class="fn">zip</span>(headers, values))
+            data.append(row)
+        <span class="kw">return</span> data
+    <span class="kw">except</span> FileNotFoundError:
+        <span class="fn">print</span>(<span class="st">f"文件不存在: </span><span class="var">{filepath}</span><span class="st">"</span>)
+        <span class="kw">return</span> []
+
+<span class="kw">def</span> <span class="fn">filter_data</span>(data, column, value):
+    <span class="st">"""按条件筛选数据"""</span>
+    <span class="kw">return</span> [row <span class="kw">for</span> row <span class="kw">in</span> data <span class="kw">if</span> row.get(column) == value]
+
+<span class="kw">def</span> <span class="fn">summarize</span>(data, column):
+    <span class="st">"""对数值列求和、平均值"""</span>
+    values = [<span class="fn">float</span>(row[column]) <span class="kw">for</span> row <span class="kw">in</span> data <span class="kw">if</span> column <span class="kw">in</span> row]
+    <span class="kw">return</span> {
+        <span class="st">"count"</span>: <span class="fn">len</span>(values),
+        <span class="st">"sum"</span>: <span class="fn">sum</span>(values),
+        <span class="st">"average"</span>: <span class="fn">sum</span>(values) / <span class="fn">len</span>(values) <span class="kw">if</span> values <span class="kw">else</span> <span class="nu">0</span>
+    }
+
+<span class="kw">def</span> <span class="fn">save_result</span>(data, filepath):
+    <span class="st">"""保存结果为 JSON"""</span>
+    <span class="kw">with</span> <span class="fn">open</span>(filepath, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+        json.dump(data, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>)
+    <span class="fn">print</span>(<span class="st">f"结果已保存到 </span><span class="var">{filepath}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 主流程 ----</span>
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    data = read_csv(<span class="st">"students.csv"</span>)
+    <span class="fn">print</span>(<span class="st">f"共读取 </span><span class="var">{<span class="fn">len</span>(data)}</span><span class="st"> 条数据"</span>)
+
+    <span class="cm"># 筛选</span>
+    class_a = filter_data(data, <span class="st">"class"</span>, <span class="st">"A"</span>)
+    <span class="fn">print</span>(<span class="st">f"A班学生: </span><span class="var">{<span class="fn">len</span>(class_a)}</span><span class="st"> 人"</span>)
+
+    <span class="cm"># 统计</span>
+    stats = summarize(data, <span class="st">"score"</span>)
+    <span class="fn">print</span>(<span class="st">f"平均分: </span><span class="var">{stats['average']:.1f}</span><span class="st">"</span>)
+
+    <span class="cm"># 保存</span>
+    save_result(stats, <span class="st">"result.json"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ 综合项目扩展挑战</h3>
+      <div class="practice-item">为 CSV 处理器添加"排序"功能：按某列升序/降序排列</div>
+      <div class="practice-item">添加命令行交互：让用户选择要执行的操作（筛选/统计/保存）</div>
+      <div class="practice-item">增加错误处理：空文件、数据缺失、类型错误等边界情况</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CHECKPOINT -->
+  <!-- ======================================================================== -->
+  <div class="checkpoint">
+    <h3>🏁 Phase 1 通关自测清单</h3>
+    <p>如果你能完成以下所有项目，说明你已经具备了进入 Phase 2 的能力：</p>
+    <ul class="check-list">
+      <li><span class="chk">□</span> 能独立创建 .py 文件，用终端运行，看到输出</li>
+      <li><span class="chk">□</span> 能用变量、字符串、数字完成基本计算和文本处理</li>
+      <li><span class="chk">□</span> 能写 if/for/while 实现猜数字或 FizzBuzz</li>
+      <li><span class="chk">□</span> 能熟练操作列表（增删改查、切片、列表推导式）</li>
+      <li><span class="chk">□</span> 能熟练操作字典（嵌套访问、遍历、.get() 安全访问）</li>
+      <li><span class="chk">□</span> 能定义函数，使用参数、默认值和返回值</li>
+      <li><span class="chk">□</span> 能读写文件（txt/json），理解 with open() 用法</li>
+      <li><span class="chk">□</span> 能用 pip 安装包，能用 requests 发 GET/POST 请求</li>
+      <li><span class="chk">□</span> 遇到报错不慌——能看懂 Traceback，知道去哪找答案</li>
+      <li><span class="chk">□</span> 完成综合项目：CSV 数据处理器</li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- RESOURCES -->
+  <!-- ======================================================================== -->
+  <div class="resources" style="margin-top: 32px;">
+    <h3>📚 推荐学习资源</h3>
+    <div class="res-item"><span class="res-type">免费教程</span>菜鸟教程 Python 3 — runoob.com（中文，零基础友好）</div>
+    <div class="res-item"><span class="res-type">免费教程</span>廖雪峰 Python 教程 — liaoxuefeng.com（中文，讲得清楚）</div>
+    <div class="res-item"><span class="res-type">视频</span>Python for Beginners — YouTube (Mosh) / B站搜"Python零基础"</div>
+    <div class="res-item"><span class="res-type">练习</span>LeetCode 简单题（每天1题，练习逻辑思维）</div>
+    <div class="res-item"><span class="res-type">AI 辅助</span>遇到问题直接问 ChatGPT / Claude，把报错信息贴过去让它解释</div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- FINAL -->
+  <!-- ======================================================================== -->
+  <div class="final-box">
+    <h2>完成 Phase 1 后 → 进入 Phase 2：Pandas 数据处理</h2>
+    <p>恭喜你掌握了 Python 基础！接下来学 Pandas，你会发现前面学的列表、字典、文件操作全都用上了。</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 · 数据处理能力 · Pandas + SQL + JSON 详细学习指南</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #06080f;
+    color: #c9d1d9;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(139,92,246,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(16,185,129,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 48px; }
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; color: #8b5cf6; background: rgba(139,92,246,0.1); padding: 4px 14px; border-radius: 6px; margin-bottom: 12px; }
+  h1 { font-size: 2.2rem; font-weight: 900; color: #f1f5f9; margin-bottom: 6px; }
+  .header p { color: #64748b; font-size: 0.9rem; }
+  .meta-bar { display: flex; justify-content: center; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+  .meta-item { font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+  .meta-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Why box */
+  .why-box {
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid rgba(139,92,246,0.2);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+  .why-box h2 { font-size: 1rem; color: #a78bfa; margin-bottom: 10px; }
+  .why-box p { font-size: 0.88rem; color: #94a3b8; line-height: 1.8; }
+  .why-box p + p { margin-top: 8px; }
+
+  /* TOC */
+  .toc {
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+  .toc h2 { font-size: 0.85rem; color: #64748b; letter-spacing: 3px; margin-bottom: 14px; text-transform: uppercase; }
+  .toc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toc-list a { color: #93c5fd; text-decoration: none; font-size: 0.88rem; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+  .toc-list a:hover { background: rgba(59,130,246,0.08); color: #60a5fa; }
+  .toc-num { color: #475569; font-size: 0.75rem; font-weight: 700; min-width: 24px; }
+
+  /* Day Section */
+  .day-section { margin-bottom: 56px; scroll-margin-top: 24px; }
+  .day-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #1e293b; }
+  .day-badge { flex-shrink: 0; width: 52px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; background: linear-gradient(135deg, var(--dc), color-mix(in srgb, var(--dc) 60%, #000)); color: #fff; font-weight: 900; }
+  .day-badge .d-label { font-size: 0.55rem; letter-spacing: 1px; opacity: 0.8; }
+  .day-badge .d-num { font-size: 1.3rem; line-height: 1; }
+  .day-title { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; }
+  .day-subtitle { font-size: 0.82rem; color: #64748b; margin-top: 2px; }
+
+  /* Topic Block */
+  .topic { background: linear-gradient(160deg, #111827, #0c1018); border: 1px solid #1e293b; border-radius: 12px; margin-bottom: 14px; overflow: hidden; transition: border-color 0.3s; }
+  .topic:hover { border-color: color-mix(in srgb, var(--dc) 40%, transparent); }
+  .topic-head { padding: 16px 20px; display: flex; align-items: center; gap: 10px; }
+  .topic-icon { font-size: 1.2rem; }
+  .topic-name { font-weight: 700; font-size: 0.95rem; color: #e2e8f0; flex: 1; }
+  .topic-tag { font-size: 0.65rem; padding: 2px 8px; border-radius: 5px; font-weight: 600; }
+  .tag-must { background: rgba(239,68,68,0.12); color: #f87171; }
+  .tag-imp  { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .tag-nice { background: rgba(148,163,184,0.1); color: #94a3b8; }
+  .topic-body { padding: 0 20px 20px; }
+  .explain { font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px; line-height: 1.7; }
+
+  /* Code Block */
+  .code-block { background: #0d1117; border: 1px solid #21262d; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  .code-label { padding: 6px 14px; font-size: 0.7rem; font-weight: 600; color: #7c8496; background: #161b22; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+  .code-label .dot { width: 6px; height: 6px; border-radius: 50%; }
+  pre { padding: 14px 18px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.7; color: #c9d1d9; }
+  .cm { color: #8b949e; } .kw { color: #ff7b72; } .fn { color: #d2a8ff; } .st { color: #a5d6ff; }
+  .nu { color: #79c0ff; } .bi { color: #ffa657; } .op { color: #ff7b72; } .var { color: #ffa657; }
+
+  /* Key Points */
+  .key-points { background: rgba(59,130,246,0.05); border-left: 3px solid rgba(59,130,246,0.3); border-radius: 0 8px 8px 0; padding: 12px 16px; margin-top: 12px; }
+  .key-points h4 { font-size: 0.78rem; color: #60a5fa; margin-bottom: 6px; letter-spacing: 1px; }
+  .key-points li { font-size: 0.82rem; color: #94a3b8; margin-bottom: 4px; margin-left: 16px; }
+
+  /* Practice */
+  .practice { background: linear-gradient(135deg, rgba(52,211,153,0.06), rgba(16,185,129,0.02)); border: 1px solid rgba(52,211,153,0.2); border-radius: 12px; padding: 18px 20px; margin-top: 20px; }
+  .practice h3 { color: #34d399; font-size: 0.9rem; margin-bottom: 10px; }
+  .practice-item { font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px; padding-left: 20px; position: relative; }
+  .practice-item::before { content: '✦'; position: absolute; left: 0; color: #34d399; font-size: 0.7rem; top: 2px; }
+
+  /* Tip / Warn */
+  .tip-box { background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.15); border-radius: 10px; padding: 14px 18px; margin-top: 14px; }
+  .tip-box h4 { color: #60a5fa; font-size: 0.82rem; margin-bottom: 6px; }
+  .tip-box p { font-size: 0.8rem; color: #94a3b8; }
+  .warn-box { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.15); border-radius: 10px; padding: 14px 18px; margin-top: 14px; }
+  .warn-box h4 { color: #f87171; font-size: 0.82rem; margin-bottom: 6px; }
+  .warn-box p { font-size: 0.8rem; color: #94a3b8; }
+
+  /* Versus table */
+  .vs-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.82rem; }
+  .vs-table th { background: #161b22; color: #8b949e; padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 1px solid #21262d; }
+  .vs-table td { padding: 8px 12px; border-bottom: 1px solid #161b22; color: #c9d1d9; }
+  .vs-table tr:hover td { background: rgba(139,92,246,0.04); }
+
+  /* Checkpoint */
+  .checkpoint { background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.03)); border: 1.5px solid rgba(251,191,36,0.25); border-radius: 14px; padding: 22px 24px; margin-top: 24px; text-align: center; }
+  .checkpoint h3 { color: #fbbf24; font-size: 1rem; margin-bottom: 8px; }
+  .checkpoint p { font-size: 0.85rem; color: #94a3b8; }
+  .check-list { list-style: none; text-align: left; margin-top: 14px; }
+  .check-list li { font-size: 0.85rem; padding: 6px 0; color: #cbd5e1; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(251,191,36,0.08); }
+  .check-list li:last-child { border: none; }
+  .chk { color: #fbbf24; font-size: 0.9rem; }
+
+  /* Resources */
+  .resources { background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(139,92,246,0.02)); border: 1px solid rgba(168,85,247,0.2); border-radius: 12px; padding: 18px 20px; margin-top: 14px; }
+  .resources h3 { color: #a78bfa; font-size: 0.88rem; margin-bottom: 10px; }
+  .res-item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.83rem; color: #94a3b8; margin-bottom: 8px; }
+  .res-type { flex-shrink: 0; font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: rgba(168,85,247,0.1); color: #c4b5fd; }
+
+  /* Final */
+  .final-box { margin-top: 56px; background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(16,185,129,0.05)); border: 1.5px solid rgba(139,92,246,0.25); border-radius: 16px; padding: 28px; text-align: center; }
+  .final-box h2 { color: #a78bfa; font-size: 1.2rem; margin-bottom: 8px; }
+  .final-box p { color: #64748b; font-size: 0.88rem; }
+
+  @media (max-width: 600px) { .toc-list { grid-template-columns: 1fr; } h1 { font-size: 1.6rem; } .page { padding: 32px 14px 60px; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge">PHASE 02 · 详细版</div>
+    <h1>数据处理能力</h1>
+    <p>Pandas + SQL + JSON — AI 工程师的日常"主食"</p>
+    <div class="meta-bar">
+      <div class="meta-item"><div class="meta-dot" style="background:#8b5cf6;"></div>总时长：2~3 周</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#f59e0b;"></div>每天投入：2~3 小时</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#10b981;"></div>前置要求：Phase 1 完成</div>
+    </div>
+  </div>
+
+  <!-- WHY -->
+  <div class="why-box">
+    <h2>为什么数据处理这么重要？</h2>
+    <p>AI 工程师 80% 的时间不是在训练模型，而是在处理数据。无论是清洗训练数据、解析 API 返回值、整理用户日志，还是构建 RAG 的文档管线——所有这些都是数据处理。</p>
+    <p>Pandas 就是你的"数据瑞士军刀"：它能读 CSV、Excel、JSON、SQL 数据库，能筛选、分组、聚合、透视、合并，一行代码顶你写几十行 for 循环。学会 Pandas，你的生产力会有质的飞跃。</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>📋 学习日程目录</h2>
+    <ul class="toc-list">
+      <li><a href="#d1"><span class="toc-num">Day 1-2</span>Pandas 入门：Series 与 DataFrame</a></li>
+      <li><a href="#d3"><span class="toc-num">Day 3-4</span>数据读取与基本探索</a></li>
+      <li><a href="#d5"><span class="toc-num">Day 5-6</span>筛选、排序与索引</a></li>
+      <li><a href="#d7"><span class="toc-num">Day 7-8</span>数据清洗实战</a></li>
+      <li><a href="#d9"><span class="toc-num">Day 9-10</span>分组聚合与透视表</a></li>
+      <li><a href="#d11"><span class="toc-num">Day 11-12</span>多表合并与连接</a></li>
+      <li><a href="#d13"><span class="toc-num">Day 13-14</span>SQL 基础查询</a></li>
+      <li><a href="#d15"><span class="toc-num">Day 15-17</span>JSON 深度处理 + 综合项目</a></li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 1-2 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d1" style="--dc: #8b5cf6;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">1-2</span></div>
+      <div>
+        <div class="day-title">Pandas 入门：Series 与 DataFrame</div>
+        <div class="day-subtitle">认识 Pandas 的两个核心数据结构</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">⬇️</span>
+        <span class="topic-name">安装与导入</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> TERMINAL</div>
+<pre>pip install pandas numpy openpyxl   <span class="cm"># openpyxl 用于读写 Excel</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> 约定俗成的导入方式</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="fn">print</span>(pd.__version__)   <span class="cm"># 确认安装成功</span></pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 为什么缩写成 pd ？</h4>
+          <p>这是全球 Python 社区的约定。看到 <code>pd.XXX</code> 就知道是 Pandas，看到 <code>np.XXX</code> 就知道是 NumPy，任何教程和项目都这样写。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📊</span>
+        <span class="topic-name">Series — 一维数据（一列数据）</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">Series 就像 Excel 里的"一列"，有数据也有索引。理解它是理解 DataFrame 的基础。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> series.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 从列表创建 Series ----</span>
+scores = pd.Series([<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">96</span>, <span class="nu">88</span>])
+<span class="fn">print</span>(scores)
+<span class="cm"># 0    85</span>
+<span class="cm"># 1    92</span>
+<span class="cm"># 2    78</span>
+<span class="cm"># 3    96</span>
+<span class="cm"># 4    88</span>
+
+<span class="cm"># ---- 自定义索引 ----</span>
+scores = pd.Series(
+    [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">96</span>, <span class="nu">88</span>],
+    index=[<span class="st">"小明"</span>, <span class="st">"小红"</span>, <span class="st">"小刚"</span>, <span class="st">"小李"</span>, <span class="st">"小王"</span>]
+)
+<span class="fn">print</span>(scores[<span class="st">"小红"</span>])     <span class="cm"># 92</span>
+
+<span class="cm"># ---- 常用统计 ----</span>
+<span class="fn">print</span>(scores.mean())      <span class="cm"># 平均值: 87.8</span>
+<span class="fn">print</span>(scores.max())       <span class="cm"># 最大值: 96</span>
+<span class="fn">print</span>(scores.min())       <span class="cm"># 最小值: 78</span>
+<span class="fn">print</span>(scores.std())       <span class="cm"># 标准差</span>
+<span class="fn">print</span>(scores.describe())  <span class="cm"># 一次性看全部统计信息</span>
+
+<span class="cm"># ---- 向量化运算（不用 for 循环！）----</span>
+<span class="fn">print</span>(scores + <span class="nu">5</span>)         <span class="cm"># 每人加 5 分</span>
+<span class="fn">print</span>(scores > <span class="nu">90</span>)        <span class="cm"># 返回布尔 Series</span>
+<span class="fn">print</span>(scores[scores > <span class="nu">90</span>]) <span class="cm"># 筛选出 >90 的</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📋</span>
+        <span class="topic-name">DataFrame — 二维表格（核心中的核心）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">DataFrame 就是一张表格，有行有列，就像 Excel 的一个 sheet。你在 Pandas 里 95% 的时间都在操作 DataFrame。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> dataframe.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 从字典创建（最常见方式）----</span>
+data = {
+    <span class="st">"name"</span>:  [<span class="st">"小明"</span>, <span class="st">"小红"</span>, <span class="st">"小刚"</span>, <span class="st">"小李"</span>, <span class="st">"小王"</span>],
+    <span class="st">"age"</span>:   [<span class="nu">22</span>, <span class="nu">21</span>, <span class="nu">23</span>, <span class="nu">22</span>, <span class="nu">24</span>],
+    <span class="st">"score"</span>: [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">96</span>, <span class="nu">88</span>],
+    <span class="st">"city"</span>:  [<span class="st">"北京"</span>, <span class="st">"上海"</span>, <span class="st">"北京"</span>, <span class="st">"深圳"</span>, <span class="st">"上海"</span>]
+}
+df = pd.DataFrame(data)
+<span class="fn">print</span>(df)
+<span class="cm">#   name  age  score city</span>
+<span class="cm"># 0  小明   22     85  北京</span>
+<span class="cm"># 1  小红   21     92  上海</span>
+<span class="cm"># 2  小刚   23     78  北京</span>
+<span class="cm"># 3  小李   22     96  深圳</span>
+<span class="cm"># 4  小王   24     88  上海</span>
+
+<span class="cm"># ---- 基本属性 ----</span>
+<span class="fn">print</span>(df.shape)        <span class="cm"># (5, 4) → 5行4列</span>
+<span class="fn">print</span>(df.columns)      <span class="cm"># Index(['name', 'age', 'score', 'city'])</span>
+<span class="fn">print</span>(df.dtypes)       <span class="cm"># 每列的数据类型</span>
+<span class="fn">print</span>(df.info())       <span class="cm"># 完整信息摘要</span>
+
+<span class="cm"># ---- 取列（返回 Series）----</span>
+<span class="fn">print</span>(df[<span class="st">"name"</span>])       <span class="cm"># 取一列</span>
+<span class="fn">print</span>(df[[<span class="st">"name"</span>, <span class="st">"score"</span>]])  <span class="cm"># 取多列（双层中括号）</span>
+
+<span class="cm"># ---- 取行 ----</span>
+<span class="fn">print</span>(df.head(<span class="nu">3</span>))       <span class="cm"># 前 3 行</span>
+<span class="fn">print</span>(df.tail(<span class="nu">2</span>))       <span class="cm"># 后 2 行</span>
+
+<span class="cm"># ---- 快速统计 ----</span>
+<span class="fn">print</span>(df.describe())   <span class="cm"># 数值列的统计摘要</span>
+<span class="fn">print</span>(df[<span class="st">"score"</span>].mean())  <span class="cm"># 平均分</span>
+<span class="fn">print</span>(df[<span class="st">"city"</span>].value_counts())  <span class="cm"># 每个城市出现几次</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 DataFrame 和 Phase 1 学的字典有什么关系？</h4>
+          <ul>
+            <li>字典的 key → DataFrame 的列名</li>
+            <li>字典的 value（列表）→ DataFrame 的列数据</li>
+            <li>API 返回的 JSON 列表 → 可以直接用 <code>pd.DataFrame(json_list)</code> 转成表格</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 1-2 练习</h3>
+      <div class="practice-item">手动创建一个包含 5 个同学信息的 DataFrame（姓名、年龄、成绩、城市），做基本统计</div>
+      <div class="practice-item">用 <code>.describe()</code> 查看数值列摘要，用 <code>.value_counts()</code> 统计城市分布</div>
+      <div class="practice-item">练习取列、取行：取出所有人的名字和成绩，取出前 3 行数据</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 3-4 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d3" style="--dc: #6366f1;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">3-4</span></div>
+      <div>
+        <div class="day-title">数据读取与基本探索</div>
+        <div class="day-subtitle">读文件是第一步——CSV、Excel、JSON 全搞定</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📁</span>
+        <span class="topic-name">读取各种格式的数据</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> read_data.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 读取 CSV（最常见）----</span>
+df = pd.read_csv(<span class="st">"data.csv"</span>)
+df = pd.read_csv(<span class="st">"data.csv"</span>, encoding=<span class="st">"utf-8"</span>)        <span class="cm"># 指定编码</span>
+df = pd.read_csv(<span class="st">"data.csv"</span>, usecols=[<span class="st">"name"</span>, <span class="st">"score"</span>])  <span class="cm"># 只读某几列</span>
+df = pd.read_csv(<span class="st">"data.csv"</span>, nrows=<span class="nu">100</span>)                <span class="cm"># 只读前100行</span>
+
+<span class="cm"># ---- 读取 Excel ----</span>
+df = pd.read_excel(<span class="st">"data.xlsx"</span>)
+df = pd.read_excel(<span class="st">"data.xlsx"</span>, sheet_name=<span class="st">"Sheet2"</span>)  <span class="cm"># 指定工作表</span>
+
+<span class="cm"># ---- 读取 JSON ----</span>
+df = pd.read_json(<span class="st">"data.json"</span>)
+
+<span class="cm"># ---- 从字典列表创建（API 返回值常用）----</span>
+api_data = [
+    {<span class="st">"id"</span>: <span class="nu">1</span>, <span class="st">"text"</span>: <span class="st">"你好"</span>, <span class="st">"score"</span>: <span class="nu">0.95</span>},
+    {<span class="st">"id"</span>: <span class="nu">2</span>, <span class="st">"text"</span>: <span class="st">"世界"</span>, <span class="st">"score"</span>: <span class="nu">0.87</span>},
+]
+df = pd.DataFrame(api_data)
+
+<span class="cm"># ---- 保存数据 ----</span>
+df.to_csv(<span class="st">"output.csv"</span>, index=<span class="kw">False</span>)        <span class="cm"># 不保存行号</span>
+df.to_excel(<span class="st">"output.xlsx"</span>, index=<span class="kw">False</span>)
+df.to_json(<span class="st">"output.json"</span>, orient=<span class="st">"records"</span>, force_ascii=<span class="kw">False</span>)</pre>
+        </div>
+        <div class="warn-box">
+          <h4>⚠️ 常见坑</h4>
+          <p><code>to_csv()</code> 默认会保存行索引，导致多出一列数字。记得加 <code>index=False</code>。中文文件注意 <code>encoding="utf-8-sig"</code>（Excel 打开不乱码）。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔍</span>
+        <span class="topic-name">数据探索三板斧</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">拿到任何数据，第一件事就是"探索"——看看有什么列、多少行、有没有缺失值、数据分布是啥样。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> explore.py — 拿到数据后的标准流程</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.read_csv(<span class="st">"data.csv"</span>)
+
+<span class="cm"># ========== 第一斧：看结构 ==========</span>
+<span class="fn">print</span>(df.shape)            <span class="cm"># 几行几列？</span>
+<span class="fn">print</span>(df.columns.tolist())  <span class="cm"># 列名列表</span>
+<span class="fn">print</span>(df.dtypes)            <span class="cm"># 每列数据类型</span>
+<span class="fn">print</span>(df.head())            <span class="cm"># 看前 5 行长什么样</span>
+
+<span class="cm"># ========== 第二斧：看缺失 ==========</span>
+<span class="fn">print</span>(df.isnull().sum())    <span class="cm"># 每列有多少缺失值</span>
+<span class="fn">print</span>(df.isnull().sum() / <span class="fn">len</span>(df) * <span class="nu">100</span>)  <span class="cm"># 缺失率（%）</span>
+
+<span class="cm"># ========== 第三斧：看分布 ==========</span>
+<span class="fn">print</span>(df.describe())           <span class="cm"># 数值列统计</span>
+<span class="fn">print</span>(df[<span class="st">"city"</span>].value_counts())  <span class="cm"># 分类列频次</span>
+<span class="fn">print</span>(df[<span class="st">"score"</span>].hist())         <span class="cm"># 分布直方图（可选）</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 养成习惯：每次读取数据后，先跑这三板斧</h4>
+          <ul>
+            <li><strong>看结构</strong> → 知道有什么数据可以用</li>
+            <li><strong>看缺失</strong> → 决定后续怎么清洗</li>
+            <li><strong>看分布</strong> → 发现异常值和数据特征</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 3-4 练习</h3>
+      <div class="practice-item">从 Kaggle 下载一个 CSV 数据集（推荐：Titanic 数据集），用三板斧做完整探索</div>
+      <div class="practice-item">把一个 JSON 格式的 API 返回值转成 DataFrame，再导出为 CSV</div>
+      <div class="practice-item">读取一个 Excel 文件的特定 sheet，只读取前 50 行和指定列</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 5-6 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d5" style="--dc: #f59e0b;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">5-6</span></div>
+      <div>
+        <div class="day-title">筛选、排序与索引</div>
+        <div class="day-subtitle">从海量数据中"挑出"你要的那部分</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🎯</span>
+        <span class="topic-name">条件筛选（最常用的操作，没有之一）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> filtering.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.DataFrame({
+    <span class="st">"name"</span>:  [<span class="st">"小明"</span>, <span class="st">"小红"</span>, <span class="st">"小刚"</span>, <span class="st">"小李"</span>, <span class="st">"小王"</span>],
+    <span class="st">"age"</span>:   [<span class="nu">22</span>, <span class="nu">21</span>, <span class="nu">23</span>, <span class="nu">22</span>, <span class="nu">24</span>],
+    <span class="st">"score"</span>: [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">96</span>, <span class="nu">88</span>],
+    <span class="st">"city"</span>:  [<span class="st">"北京"</span>, <span class="st">"上海"</span>, <span class="st">"北京"</span>, <span class="st">"深圳"</span>, <span class="st">"上海"</span>]
+})
+
+<span class="cm"># ---- 单条件筛选 ----</span>
+high_score = df[df[<span class="st">"score"</span>] > <span class="nu">90</span>]           <span class="cm"># 成绩 > 90</span>
+beijing = df[df[<span class="st">"city"</span>] == <span class="st">"北京"</span>]          <span class="cm"># 北京的同学</span>
+
+<span class="cm"># ---- 多条件筛选（& 且 | 或）----</span>
+result = df[(df[<span class="st">"score"</span>] > <span class="nu">80</span>) & (df[<span class="st">"city"</span>] == <span class="st">"上海"</span>)]
+result = df[(df[<span class="st">"city"</span>] == <span class="st">"北京"</span>) | (df[<span class="st">"city"</span>] == <span class="st">"上海"</span>)]
+
+<span class="cm"># ---- isin() 多值匹配 ----</span>
+big_city = df[df[<span class="st">"city"</span>].isin([<span class="st">"北京"</span>, <span class="st">"上海"</span>])]
+
+<span class="cm"># ---- 字符串筛选 ----</span>
+df[df[<span class="st">"name"</span>].str.contains(<span class="st">"小"</span>)]    <span class="cm"># 名字包含"小"</span>
+df[df[<span class="st">"name"</span>].str.startswith(<span class="st">"小"</span>)]  <span class="cm"># 名字以"小"开头</span>
+
+<span class="cm"># ---- between() 范围筛选 ----</span>
+df[df[<span class="st">"score"</span>].between(<span class="nu">80</span>, <span class="nu">95</span>)]       <span class="cm"># 80 ≤ score ≤ 95</span></pre>
+        </div>
+        <div class="warn-box">
+          <h4>⚠️ 多条件筛选必须加括号！</h4>
+          <p>错误写法：<code>df[df["score"] > 80 & df["city"] == "上海"]</code><br>
+          正确写法：<code>df[(df["score"] > 80) & (df["city"] == "上海")]</code><br>
+          因为 <code>&</code> 的优先级高于 <code>></code>，不加括号会报错。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔃</span>
+        <span class="topic-name">排序</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> sorting.py</div>
+<pre><span class="cm"># ---- 单列排序 ----</span>
+df.sort_values(<span class="st">"score"</span>, ascending=<span class="kw">False</span>)    <span class="cm"># 成绩从高到低</span>
+
+<span class="cm"># ---- 多列排序 ----</span>
+df.sort_values([<span class="st">"city"</span>, <span class="st">"score"</span>], ascending=[<span class="kw">True</span>, <span class="kw">False</span>])
+<span class="cm"># 先按城市升序，同城市内按成绩降序</span>
+
+<span class="cm"># ---- 取 Top N ----</span>
+df.nlargest(<span class="nu">3</span>, <span class="st">"score"</span>)    <span class="cm"># 成绩前 3 名</span>
+df.nsmallest(<span class="nu">3</span>, <span class="st">"age"</span>)     <span class="cm"># 年龄最小的 3 人</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📍</span>
+        <span class="topic-name">loc 和 iloc — 精准定位</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> loc_iloc.py</div>
+<pre><span class="cm"># ---- loc：按标签（名称）选取 ----</span>
+df.loc[<span class="nu">0</span>, <span class="st">"name"</span>]              <span class="cm"># 第 0 行的 name → "小明"</span>
+df.loc[<span class="nu">0</span>:<span class="nu">2</span>, [<span class="st">"name"</span>, <span class="st">"score"</span>]]  <span class="cm"># 0~2 行的 name 和 score</span>
+df.loc[df[<span class="st">"score"</span>] > <span class="nu">90</span>, <span class="st">"name"</span>]  <span class="cm"># 成绩>90 的人的名字</span>
+
+<span class="cm"># ---- iloc：按位置（数字）选取 ----</span>
+df.iloc[<span class="nu">0</span>, <span class="nu">0</span>]         <span class="cm"># 第 0 行第 0 列</span>
+df.iloc[<span class="nu">0</span>:<span class="nu">3</span>, <span class="nu">0</span>:<span class="nu">2</span>]     <span class="cm"># 前 3 行，前 2 列</span>
+df.iloc[<span class="op">-</span><span class="nu">1</span>]            <span class="cm"># 最后一行</span>
+
+<span class="cm"># ---- 修改值 ----</span>
+df.loc[<span class="nu">0</span>, <span class="st">"score"</span>] = <span class="nu">90</span>    <span class="cm"># 修改小明的成绩</span>
+df.loc[df[<span class="st">"city"</span>] == <span class="st">"北京"</span>, <span class="st">"score"</span>] += <span class="nu">5</span>  <span class="cm"># 北京的加 5 分</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 loc vs iloc 一句话区分</h4>
+          <ul>
+            <li><code>loc</code> → 用名字找（label-based），支持条件筛选</li>
+            <li><code>iloc</code> → 用位置号找（integer-based），纯数字下标</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 5-6 练习</h3>
+      <div class="practice-item">筛选出成绩在 80~95 之间、且城市为北京或上海的同学</div>
+      <div class="practice-item">按成绩从高到低排序，取 Top 3，用 loc 取出他们的名字和城市</div>
+      <div class="practice-item">把所有深圳同学的成绩乘以 1.1（加 10% 加分），保存到新 CSV</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 7-8 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d7" style="--dc: #10b981;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">7-8</span></div>
+      <div>
+        <div class="day-title">数据清洗实战</div>
+        <div class="day-subtitle">真实数据永远是脏的——缺失值、重复值、类型错误</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🕳️</span>
+        <span class="topic-name">处理缺失值 (NaN)</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> missing_values.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+df = pd.DataFrame({
+    <span class="st">"name"</span>:  [<span class="st">"小明"</span>, <span class="st">"小红"</span>, <span class="st">"小刚"</span>, np.nan, <span class="st">"小王"</span>],
+    <span class="st">"score"</span>: [<span class="nu">85</span>, np.nan, <span class="nu">78</span>, <span class="nu">96</span>, np.nan],
+    <span class="st">"city"</span>:  [<span class="st">"北京"</span>, <span class="st">"上海"</span>, np.nan, <span class="st">"深圳"</span>, <span class="st">"上海"</span>]
+})
+
+<span class="cm"># ---- 检查缺失 ----</span>
+<span class="fn">print</span>(df.isnull())             <span class="cm"># 每个格子是否为空</span>
+<span class="fn">print</span>(df.isnull().sum())        <span class="cm"># 每列缺失数量</span>
+
+<span class="cm"># ---- 删除缺失 ----</span>
+df.dropna()                     <span class="cm"># 删除含缺失值的行</span>
+df.dropna(subset=[<span class="st">"name"</span>])      <span class="cm"># 只删 name 为空的行</span>
+df.dropna(thresh=<span class="nu">2</span>)             <span class="cm"># 至少有 2 个非空值才保留</span>
+
+<span class="cm"># ---- 填充缺失 ----</span>
+df[<span class="st">"score"</span>].fillna(<span class="nu">0</span>)           <span class="cm"># 填 0</span>
+df[<span class="st">"score"</span>].fillna(df[<span class="st">"score"</span>].mean())  <span class="cm"># 填平均值（常用）</span>
+df[<span class="st">"city"</span>].fillna(<span class="st">"未知"</span>)       <span class="cm"># 填自定义文本</span>
+df.fillna(method=<span class="st">"ffill"</span>)       <span class="cm"># 用上一行的值填充</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">👯</span>
+        <span class="topic-name">处理重复值</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> duplicates.py</div>
+<pre><span class="cm"># ---- 检测重复 ----</span>
+<span class="fn">print</span>(df.duplicated().sum())           <span class="cm"># 有多少重复行</span>
+<span class="fn">print</span>(df[df.duplicated()])             <span class="cm"># 查看重复行</span>
+<span class="fn">print</span>(df.duplicated(subset=[<span class="st">"name"</span>]))  <span class="cm"># 按某列判断是否重复</span>
+
+<span class="cm"># ---- 删除重复 ----</span>
+df.drop_duplicates()                    <span class="cm"># 完全相同的行</span>
+df.drop_duplicates(subset=[<span class="st">"name"</span>], keep=<span class="st">"first"</span>)  <span class="cm"># 按 name 去重，保留第一条</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔄</span>
+        <span class="topic-name">类型转换与文本清洗</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> type_cleaning.py</div>
+<pre><span class="cm"># ---- 类型转换 ----</span>
+df[<span class="st">"score"</span>] = df[<span class="st">"score"</span>].astype(<span class="fn">float</span>)      <span class="cm"># 转浮点数</span>
+df[<span class="st">"age"</span>] = pd.to_numeric(df[<span class="st">"age"</span>], errors=<span class="st">"coerce"</span>)  <span class="cm"># 安全转数字，无法转的变 NaN</span>
+df[<span class="st">"date"</span>] = pd.to_datetime(df[<span class="st">"date"</span>])     <span class="cm"># 转日期</span>
+
+<span class="cm"># ---- 文本清洗（AI 开发中超级常用）----</span>
+df[<span class="st">"name"</span>] = df[<span class="st">"name"</span>].str.strip()         <span class="cm"># 去首尾空格</span>
+df[<span class="st">"name"</span>] = df[<span class="st">"name"</span>].str.lower()         <span class="cm"># 转小写</span>
+df[<span class="st">"text"</span>] = df[<span class="st">"text"</span>].str.replace(<span class="st">"\n"</span>, <span class="st">" "</span>)  <span class="cm"># 换行转空格</span>
+df[<span class="st">"text"</span>] = df[<span class="st">"text"</span>].str.replace(<span class="st">r"\s+"</span>, <span class="st">" "</span>, regex=<span class="kw">True</span>)  <span class="cm"># 多空格合一</span>
+
+<span class="cm"># ---- 新增计算列 ----</span>
+df[<span class="st">"pass"</span>] = df[<span class="st">"score"</span>] >= <span class="nu">60</span>              <span class="cm"># 布尔列：是否及格</span>
+df[<span class="st">"level"</span>] = df[<span class="st">"score"</span>].apply(
+    <span class="kw">lambda</span> x: <span class="st">"优秀"</span> <span class="kw">if</span> x >= <span class="nu">90</span> <span class="kw">else</span> (<span class="st">"及格"</span> <span class="kw">if</span> x >= <span class="nu">60</span> <span class="kw">else</span> <span class="st">"不及格"</span>)
+)
+
+<span class="cm"># ---- rename 重命名列 ----</span>
+df = df.rename(columns={<span class="st">"name"</span>: <span class="st">"姓名"</span>, <span class="st">"score"</span>: <span class="st">"成绩"</span>})</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 apply() 的作用</h4>
+          <ul>
+            <li><code>apply()</code> 对每一行/每个值执行自定义函数</li>
+            <li>搭配 <code>lambda</code> 可以一行搞定复杂的转换逻辑</li>
+            <li>以后做 Prompt 拼接时经常用：<code>df["prompt"] = df["text"].apply(lambda x: f"请翻译：{x}")</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 7-8 练习</h3>
+      <div class="practice-item">下载 Titanic 数据集，检查缺失值，用合理策略填充（年龄用中位数，港口用众数）</div>
+      <div class="practice-item">清洗一份有多余空格、大小写不一致、重复行的数据</div>
+      <div class="practice-item">新增一列"年龄段"：18 以下=未成年，18-60=成年，60 以上=老年（用 apply + lambda）</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 9-10 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d9" style="--dc: #ec4899;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">9-10</span></div>
+      <div>
+        <div class="day-title">分组聚合与透视表</div>
+        <div class="day-subtitle">groupby 是 Pandas 最强大的功能——"按XX分组，统计YY"</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📊</span>
+        <span class="topic-name">groupby — 分组聚合</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">groupby 的思维模式：<strong>拆分 → 应用 → 合并</strong>。先按某列分组，再对每组做统计，最后合并结果。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> groupby.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.DataFrame({
+    <span class="st">"name"</span>:     [<span class="st">"小明"</span>,<span class="st">"小红"</span>,<span class="st">"小刚"</span>,<span class="st">"小李"</span>,<span class="st">"小王"</span>,<span class="st">"小张"</span>],
+    <span class="st">"city"</span>:     [<span class="st">"北京"</span>,<span class="st">"上海"</span>,<span class="st">"北京"</span>,<span class="st">"深圳"</span>,<span class="st">"上海"</span>,<span class="st">"北京"</span>],
+    <span class="st">"department"</span>: [<span class="st">"技术"</span>,<span class="st">"技术"</span>,<span class="st">"产品"</span>,<span class="st">"技术"</span>,<span class="st">"产品"</span>,<span class="st">"技术"</span>],
+    <span class="st">"salary"</span>:   [<span class="nu">15000</span>,<span class="nu">18000</span>,<span class="nu">12000</span>,<span class="nu">20000</span>,<span class="nu">13000</span>,<span class="nu">16000</span>],
+    <span class="st">"age"</span>:      [<span class="nu">25</span>,<span class="nu">28</span>,<span class="nu">30</span>,<span class="nu">26</span>,<span class="nu">32</span>,<span class="nu">24</span>]
+})
+
+<span class="cm"># ---- 按城市分组，算平均工资 ----</span>
+<span class="fn">print</span>(df.groupby(<span class="st">"city"</span>)[<span class="st">"salary"</span>].mean())
+<span class="cm"># city</span>
+<span class="cm"># 上海    15500</span>
+<span class="cm"># 北京    14333</span>
+<span class="cm"># 深圳    20000</span>
+
+<span class="cm"># ---- 多个聚合函数 ----</span>
+<span class="fn">print</span>(df.groupby(<span class="st">"city"</span>)[<span class="st">"salary"</span>].agg([<span class="st">"mean"</span>, <span class="st">"max"</span>, <span class="st">"min"</span>, <span class="st">"count"</span>]))
+
+<span class="cm"># ---- 多列分组 ----</span>
+<span class="fn">print</span>(df.groupby([<span class="st">"city"</span>, <span class="st">"department"</span>])[<span class="st">"salary"</span>].mean())
+
+<span class="cm"># ---- agg() 对不同列做不同统计 ----</span>
+result = df.groupby(<span class="st">"city"</span>).agg({
+    <span class="st">"salary"</span>: [<span class="st">"mean"</span>, <span class="st">"max"</span>],
+    <span class="st">"age"</span>: <span class="st">"mean"</span>,
+    <span class="st">"name"</span>: <span class="st">"count"</span>       <span class="cm"># 计数</span>
+})
+<span class="fn">print</span>(result)
+
+<span class="cm"># ---- 分组后排序 ----</span>
+city_salary = df.groupby(<span class="st">"city"</span>)[<span class="st">"salary"</span>].mean().sort_values(ascending=<span class="kw">False</span>)
+<span class="fn">print</span>(city_salary)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📐</span>
+        <span class="topic-name">pivot_table — 透视表</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">透视表就是 Excel 里的"数据透视表"功能——行列交叉统计，一行代码搞定。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> pivot.py</div>
+<pre><span class="cm"># ---- 基本透视表 ----</span>
+pivot = df.pivot_table(
+    values=<span class="st">"salary"</span>,         <span class="cm"># 统计的值</span>
+    index=<span class="st">"city"</span>,             <span class="cm"># 行</span>
+    columns=<span class="st">"department"</span>,     <span class="cm"># 列</span>
+    aggfunc=<span class="st">"mean"</span>            <span class="cm"># 聚合方式</span>
+)
+<span class="fn">print</span>(pivot)
+<span class="cm"># department   产品      技术</span>
+<span class="cm"># city</span>
+<span class="cm"># 上海       13000.0  18000.0</span>
+<span class="cm"># 北京       12000.0  15500.0</span>
+<span class="cm"># 深圳           NaN  20000.0</span>
+
+<span class="cm"># ---- 添加行/列汇总 ----</span>
+pivot = df.pivot_table(
+    values=<span class="st">"salary"</span>, index=<span class="st">"city"</span>, columns=<span class="st">"department"</span>,
+    aggfunc=<span class="st">"mean"</span>, margins=<span class="kw">True</span>, margins_name=<span class="st">"总计"</span>
+)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 9-10 练习</h3>
+      <div class="practice-item">按部门统计平均工资、最高工资、人数</div>
+      <div class="practice-item">做一个透视表：行=城市，列=部门，值=平均工资</div>
+      <div class="practice-item">找出每个城市工资最高的人（提示：用 <code>groupby + idxmax</code>）</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 11-12 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d11" style="--dc: #f97316;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">11-12</span></div>
+      <div>
+        <div class="day-title">多表合并与连接</div>
+        <div class="day-subtitle">真实项目数据分散在多个表——merge 帮你拼起来</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔗</span>
+        <span class="topic-name">merge — 表连接（类似 SQL 的 JOIN）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> merge.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 两张表</span>
+users = pd.DataFrame({
+    <span class="st">"user_id"</span>: [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>],
+    <span class="st">"name"</span>: [<span class="st">"小明"</span>, <span class="st">"小红"</span>, <span class="st">"小刚"</span>, <span class="st">"小李"</span>]
+})
+orders = pd.DataFrame({
+    <span class="st">"order_id"</span>: [<span class="nu">101</span>, <span class="nu">102</span>, <span class="nu">103</span>, <span class="nu">104</span>],
+    <span class="st">"user_id"</span>: [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">2</span>, <span class="nu">5</span>],
+    <span class="st">"amount"</span>: [<span class="nu">100</span>, <span class="nu">200</span>, <span class="nu">150</span>, <span class="nu">300</span>]
+})
+
+<span class="cm"># ---- inner join（只保留两边都有的）----</span>
+result = pd.merge(users, orders, on=<span class="st">"user_id"</span>, how=<span class="st">"inner"</span>)
+
+<span class="cm"># ---- left join（保留左表全部）----</span>
+result = pd.merge(users, orders, on=<span class="st">"user_id"</span>, how=<span class="st">"left"</span>)
+
+<span class="cm"># ---- right join（保留右表全部）----</span>
+result = pd.merge(users, orders, on=<span class="st">"user_id"</span>, how=<span class="st">"right"</span>)
+
+<span class="cm"># ---- outer join（两边全保留）----</span>
+result = pd.merge(users, orders, on=<span class="st">"user_id"</span>, how=<span class="st">"outer"</span>)</pre>
+        </div>
+
+        <table class="vs-table">
+          <tr><th>连接方式</th><th>保留数据</th><th>类比</th></tr>
+          <tr><td><code>inner</code></td><td>两边都有的</td><td>取交集</td></tr>
+          <tr><td><code>left</code></td><td>左表全部 + 右表匹配</td><td>以左表为主</td></tr>
+          <tr><td><code>right</code></td><td>右表全部 + 左表匹配</td><td>以右表为主</td></tr>
+          <tr><td><code>outer</code></td><td>两边全部</td><td>取并集</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📎</span>
+        <span class="topic-name">concat — 上下/左右拼接</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> concat.py</div>
+<pre><span class="cm"># ---- 上下拼接（追加行）----</span>
+df1 = pd.DataFrame({<span class="st">"name"</span>: [<span class="st">"A"</span>, <span class="st">"B"</span>], <span class="st">"score"</span>: [<span class="nu">80</span>, <span class="nu">90</span>]})
+df2 = pd.DataFrame({<span class="st">"name"</span>: [<span class="st">"C"</span>, <span class="st">"D"</span>], <span class="st">"score"</span>: [<span class="nu">85</span>, <span class="nu">95</span>]})
+
+combined = pd.concat([df1, df2], ignore_index=<span class="kw">True</span>)
+<span class="cm"># ignore_index=True 重新编号索引</span>
+
+<span class="cm"># ---- 左右拼接（追加列）----</span>
+info = pd.DataFrame({<span class="st">"city"</span>: [<span class="st">"北京"</span>, <span class="st">"上海"</span>]})
+combined = pd.concat([df1, info], axis=<span class="nu">1</span>)
+
+<span class="cm"># ---- 实际场景：合并多个 CSV ----</span>
+<span class="kw">import</span> glob
+files = glob.glob(<span class="st">"data/*.csv"</span>)
+all_dfs = [pd.read_csv(f) <span class="kw">for</span> f <span class="kw">in</span> files]
+merged = pd.concat(all_dfs, ignore_index=<span class="kw">True</span>)</pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 merge vs concat</h4>
+          <p><code>merge</code> = 按共同列关联（像 SQL JOIN）<br><code>concat</code> = 简单堆叠（上下追加行 或 左右追加列）</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 11-12 练习</h3>
+      <div class="practice-item">创建"用户表"和"订单表"，用 merge 做 left join，找出没有订单的用户</div>
+      <div class="practice-item">把 3 个结构相同的 CSV 文件合并成一个大表</div>
+      <div class="practice-item">合并用户表和部门表，计算每个部门的平均消费金额</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 13-14 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d13" style="--dc: #06b6d4;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">13-14</span></div>
+      <div>
+        <div class="day-title">SQL 基础查询</div>
+        <div class="day-subtitle">数据库是企业数据的大本营——学会 SELECT 就够用了</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🗄️</span>
+        <span class="topic-name">SQL 核心语法</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">SQL 的核心就一个模式：<strong>从哪张表（FROM）选哪些列（SELECT），满足什么条件（WHERE）</strong>。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> SQL 基础语法</div>
+<pre><span class="cm">-- ---- 基本查询 ----</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users;                       <span class="cm">-- 查全部</span>
+<span class="kw">SELECT</span> name, age <span class="kw">FROM</span> users;               <span class="cm">-- 选列</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> age > <span class="nu">20</span>;       <span class="cm">-- 条件筛选</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> city = <span class="st">'北京'</span>;  <span class="cm">-- 文字条件</span>
+
+<span class="cm">-- ---- AND / OR / IN ----</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> age > <span class="nu">20</span> <span class="kw">AND</span> city = <span class="st">'北京'</span>;
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> city <span class="kw">IN</span> (<span class="st">'北京'</span>, <span class="st">'上海'</span>);
+
+<span class="cm">-- ---- 排序 ----</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">ORDER BY</span> age <span class="kw">DESC</span>;   <span class="cm">-- 降序</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">ORDER BY</span> age <span class="kw">ASC</span>;    <span class="cm">-- 升序（默认）</span>
+
+<span class="cm">-- ---- LIMIT ----</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">ORDER BY</span> score <span class="kw">DESC</span> <span class="kw">LIMIT</span> <span class="nu">10</span>;  <span class="cm">-- 前 10 名</span>
+
+<span class="cm">-- ---- 去重 ----</span>
+<span class="kw">SELECT DISTINCT</span> city <span class="kw">FROM</span> users;           <span class="cm">-- 有哪些城市</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📈</span>
+        <span class="topic-name">GROUP BY 与聚合函数</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> SQL 分组聚合</div>
+<pre><span class="cm">-- ---- 聚合函数 ----</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> users;               <span class="cm">-- 总行数</span>
+<span class="kw">SELECT</span> <span class="fn">AVG</span>(score) <span class="kw">FROM</span> users;              <span class="cm">-- 平均分</span>
+<span class="kw">SELECT</span> <span class="fn">MAX</span>(score), <span class="fn">MIN</span>(score) <span class="kw">FROM</span> users;  <span class="cm">-- 最高最低分</span>
+<span class="kw">SELECT</span> <span class="fn">SUM</span>(salary) <span class="kw">FROM</span> users;             <span class="cm">-- 工资总和</span>
+
+<span class="cm">-- ---- GROUP BY 分组 ----</span>
+<span class="kw">SELECT</span> city, <span class="fn">AVG</span>(salary) <span class="kw">AS</span> avg_salary
+<span class="kw">FROM</span> users
+<span class="kw">GROUP BY</span> city;
+
+<span class="cm">-- ---- HAVING 对分组结果筛选 ----</span>
+<span class="kw">SELECT</span> city, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> cnt
+<span class="kw">FROM</span> users
+<span class="kw">GROUP BY</span> city
+<span class="kw">HAVING</span> cnt > <span class="nu">2</span>;                     <span class="cm">-- 人数 > 2 的城市</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔗</span>
+        <span class="topic-name">JOIN 表连接</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> SQL JOIN</div>
+<pre><span class="cm">-- ---- INNER JOIN ----</span>
+<span class="kw">SELECT</span> u.name, o.amount
+<span class="kw">FROM</span> users u
+<span class="kw">INNER JOIN</span> orders o <span class="kw">ON</span> u.user_id = o.user_id;
+
+<span class="cm">-- ---- LEFT JOIN ----</span>
+<span class="kw">SELECT</span> u.name, o.amount
+<span class="kw">FROM</span> users u
+<span class="kw">LEFT JOIN</span> orders o <span class="kw">ON</span> u.user_id = o.user_id;
+<span class="cm">-- 保留所有用户，没订单的 amount 为 NULL</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🐍</span>
+        <span class="topic-name">Python 中执行 SQL（用 SQLite 练习）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> sql_in_python.py</div>
+<pre><span class="kw">import</span> sqlite3
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 创建内存数据库 + 导入数据 ----</span>
+conn = sqlite3.connect(<span class="st">":memory:"</span>)
+
+df = pd.DataFrame({
+    <span class="st">"name"</span>: [<span class="st">"小明"</span>,<span class="st">"小红"</span>,<span class="st">"小刚"</span>],
+    <span class="st">"city"</span>: [<span class="st">"北京"</span>,<span class="st">"上海"</span>,<span class="st">"北京"</span>],
+    <span class="st">"score"</span>: [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>]
+})
+df.to_sql(<span class="st">"students"</span>, conn, index=<span class="kw">False</span>)
+
+<span class="cm"># ---- 用 SQL 查询，结果直接变 DataFrame ----</span>
+result = pd.read_sql(<span class="st">"SELECT * FROM students WHERE score > 80"</span>, conn)
+<span class="fn">print</span>(result)
+
+<span class="cm"># ---- 分组统计 ----</span>
+result = pd.read_sql(<span class="st">"""
+    SELECT city, AVG(score) AS avg_score, COUNT(*) AS cnt
+    FROM students
+    GROUP BY city
+"""</span>, conn)
+<span class="fn">print</span>(result)
+
+conn.close()</pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 Pandas 和 SQL 的对照关系</h4>
+          <p>学了 Pandas 再学 SQL 会非常快，因为概念一一对应：<code>df[条件]</code> = WHERE，<code>df.groupby()</code> = GROUP BY，<code>pd.merge()</code> = JOIN，<code>df.sort_values()</code> = ORDER BY。</p>
+        </div>
+
+        <table class="vs-table" style="margin-top: 14px;">
+          <tr><th>操作</th><th>Pandas</th><th>SQL</th></tr>
+          <tr><td>筛选</td><td><code>df[df["score"] > 80]</code></td><td><code>WHERE score > 80</code></td></tr>
+          <tr><td>选列</td><td><code>df[["name","score"]]</code></td><td><code>SELECT name, score</code></td></tr>
+          <tr><td>排序</td><td><code>df.sort_values("score")</code></td><td><code>ORDER BY score</code></td></tr>
+          <tr><td>分组</td><td><code>df.groupby("city").mean()</code></td><td><code>GROUP BY city</code></td></tr>
+          <tr><td>合并</td><td><code>pd.merge(a, b, on="id")</code></td><td><code>JOIN b ON a.id = b.id</code></td></tr>
+          <tr><td>去重</td><td><code>df["city"].unique()</code></td><td><code>SELECT DISTINCT city</code></td></tr>
+          <tr><td>计数</td><td><code>df["city"].value_counts()</code></td><td><code>COUNT(*) GROUP BY city</code></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 13-14 练习</h3>
+      <div class="practice-item">用 SQLite + Pandas 创建一个学生数据库，练习 SELECT / WHERE / GROUP BY / JOIN</div>
+      <div class="practice-item">写 SQL 找出每个城市成绩最高的学生</div>
+      <div class="practice-item">同一个问题分别用 Pandas 和 SQL 实现，对比理解</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 15-17 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d15" style="--dc: #f43f5e;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">15-17</span></div>
+      <div>
+        <div class="day-title">JSON 深度处理 + 综合项目</div>
+        <div class="day-subtitle">把所有知识串起来——AI 工程师的真实工作场景模拟</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📦</span>
+        <span class="topic-name">嵌套 JSON 处理（AI API 返回值的标配）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">大模型 API 的返回值通常是多层嵌套的 JSON。学会"剥洋葱"般提取数据是关键技能。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> nested_json.py</div>
+<pre><span class="kw">import</span> json
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 模拟 AI API 返回值</span>
+api_response = {
+    <span class="st">"id"</span>: <span class="st">"chatcmpl-abc123"</span>,
+    <span class="st">"model"</span>: <span class="st">"gpt-4"</span>,
+    <span class="st">"choices"</span>: [
+        {
+            <span class="st">"index"</span>: <span class="nu">0</span>,
+            <span class="st">"message"</span>: {
+                <span class="st">"role"</span>: <span class="st">"assistant"</span>,
+                <span class="st">"content"</span>: <span class="st">"Python 是一种编程语言。"</span>
+            },
+            <span class="st">"finish_reason"</span>: <span class="st">"stop"</span>
+        }
+    ],
+    <span class="st">"usage"</span>: {
+        <span class="st">"prompt_tokens"</span>: <span class="nu">10</span>,
+        <span class="st">"completion_tokens"</span>: <span class="nu">15</span>,
+        <span class="st">"total_tokens"</span>: <span class="nu">25</span>
+    }
+}
+
+<span class="cm"># ---- 逐层提取 ----</span>
+content = api_response[<span class="st">"choices"</span>][<span class="nu">0</span>][<span class="st">"message"</span>][<span class="st">"content"</span>]
+tokens = api_response[<span class="st">"usage"</span>][<span class="st">"total_tokens"</span>]
+<span class="fn">print</span>(<span class="st">f"回答: </span><span class="var">{content}</span><span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"消耗 token: </span><span class="var">{tokens}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 批量 API 结果 → DataFrame ----</span>
+results = [
+    {<span class="st">"question"</span>: <span class="st">"Q1"</span>, <span class="st">"answer"</span>: <span class="st">"A1"</span>, <span class="st">"tokens"</span>: <span class="nu">20</span>},
+    {<span class="st">"question"</span>: <span class="st">"Q2"</span>, <span class="st">"answer"</span>: <span class="st">"A2"</span>, <span class="st">"tokens"</span>: <span class="nu">35</span>},
+    {<span class="st">"question"</span>: <span class="st">"Q3"</span>, <span class="st">"answer"</span>: <span class="st">"A3"</span>, <span class="st">"tokens"</span>: <span class="nu">18</span>},
+]
+df = pd.DataFrame(results)
+<span class="fn">print</span>(<span class="st">f"总 token 消耗: </span><span class="var">{df['tokens'].sum()}</span><span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"平均 token: </span><span class="var">{df['tokens'].mean():.1f}</span><span class="st">"</span>)
+
+<span class="cm"># ---- json_normalize：自动展平嵌套 JSON ----</span>
+nested_data = [
+    {<span class="st">"name"</span>: <span class="st">"小明"</span>, <span class="st">"info"</span>: {<span class="st">"city"</span>: <span class="st">"北京"</span>, <span class="st">"age"</span>: <span class="nu">25</span>}},
+    {<span class="st">"name"</span>: <span class="st">"小红"</span>, <span class="st">"info"</span>: {<span class="st">"city"</span>: <span class="st">"上海"</span>, <span class="st">"age"</span>: <span class="nu">28</span>}},
+]
+df = pd.json_normalize(nested_data)
+<span class="fn">print</span>(df)
+<span class="cm">#   name info.city  info.age</span>
+<span class="cm"># 0  小明       北京        25</span>
+<span class="cm"># 1  小红       上海        28</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 pd.json_normalize() 是处理嵌套 JSON 的神器</h4>
+          <ul>
+            <li>自动把嵌套字段"展平"成普通列</li>
+            <li>处理 API 批量返回数据时能省大量代码</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🏆</span>
+        <span class="topic-name">Phase 2 综合项目：AI 对话日志分析器</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">模拟真实场景：你是 AI 应用开发者，需要分析用户和 AI 的对话日志，生成报告。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> project_chat_analyzer.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+<span class="cm"># ---- Step 1: 加载模拟数据 ----</span>
+chat_logs = [
+    {<span class="st">"user_id"</span>:<span class="st">"u1"</span>, <span class="st">"time"</span>:<span class="st">"2026-03-28 10:00"</span>, <span class="st">"role"</span>:<span class="st">"user"</span>,
+     <span class="st">"content"</span>:<span class="st">"Python怎么读CSV？"</span>, <span class="st">"tokens"</span>:<span class="nu">8</span>},
+    {<span class="st">"user_id"</span>:<span class="st">"u1"</span>, <span class="st">"time"</span>:<span class="st">"2026-03-28 10:00"</span>, <span class="st">"role"</span>:<span class="st">"assistant"</span>,
+     <span class="st">"content"</span>:<span class="st">"用 pandas 的 read_csv..."</span>, <span class="st">"tokens"</span>:<span class="nu">120</span>},
+    {<span class="st">"user_id"</span>:<span class="st">"u2"</span>, <span class="st">"time"</span>:<span class="st">"2026-03-28 11:30"</span>, <span class="st">"role"</span>:<span class="st">"user"</span>,
+     <span class="st">"content"</span>:<span class="st">"帮我写个爬虫"</span>, <span class="st">"tokens"</span>:<span class="nu">6</span>},
+    <span class="cm"># ... 更多数据</span>
+]
+
+df = pd.DataFrame(chat_logs)
+df[<span class="st">"time"</span>] = pd.to_datetime(df[<span class="st">"time"</span>])
+
+<span class="cm"># ---- Step 2: 数据清洗 ----</span>
+df[<span class="st">"content"</span>] = df[<span class="st">"content"</span>].str.strip()
+df = df.dropna(subset=[<span class="st">"content"</span>])
+df[<span class="st">"hour"</span>] = df[<span class="st">"time"</span>].dt.hour
+
+<span class="cm"># ---- Step 3: 统计分析 ----</span>
+<span class="cm"># 每个用户的对话次数</span>
+user_stats = df[df[<span class="st">"role"</span>]==<span class="st">"user"</span>].groupby(<span class="st">"user_id"</span>).agg(
+    对话次数=(<span class="st">"content"</span>, <span class="st">"count"</span>),
+    总token=(<span class="st">"tokens"</span>, <span class="st">"sum"</span>)
+).reset_index()
+
+<span class="cm"># AI 回复的 token 统计</span>
+ai_stats = df[df[<span class="st">"role"</span>]==<span class="st">"assistant"</span>][<span class="st">"tokens"</span>].describe()
+
+<span class="cm"># 按小时统计活跃度</span>
+hourly = df.groupby(<span class="st">"hour"</span>).size()
+
+<span class="cm"># ---- Step 4: 导出报告 ----</span>
+report = {
+    <span class="st">"总对话数"</span>: <span class="fn">len</span>(df),
+    <span class="st">"独立用户数"</span>: df[<span class="st">"user_id"</span>].nunique(),
+    <span class="st">"总token消耗"</span>: <span class="fn">int</span>(df[<span class="st">"tokens"</span>].sum()),
+    <span class="st">"平均回复token"</span>: <span class="fn">round</span>(<span class="fn">float</span>(ai_stats[<span class="st">"mean"</span>]), <span class="nu">1</span>),
+    <span class="st">"生成时间"</span>: datetime.now().strftime(<span class="st">"%Y-%m-%d %H:%M"</span>)
+}
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"chat_report.json"</span>, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    json.dump(report, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>)
+
+user_stats.to_csv(<span class="st">"user_stats.csv"</span>, index=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">"报告生成完毕！"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ 综合项目扩展挑战</h3>
+      <div class="practice-item">添加"热门问题 Top 10"统计（按关键词频率）</div>
+      <div class="practice-item">计算每个用户的平均对话长度和 token 消耗，找出"高频用户"</div>
+      <div class="practice-item">按日期分组，画出每天对话量的变化趋势</div>
+      <div class="practice-item">生成一份完整的 CSV 报告，包含所有统计指标</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CHECKPOINT -->
+  <!-- ======================================================================== -->
+  <div class="checkpoint">
+    <h3>🏁 Phase 2 通关自测清单</h3>
+    <p>完成以下所有项目，你就具备了进入 Phase 3 的能力：</p>
+    <ul class="check-list">
+      <li><span class="chk">□</span> 能用 <code>pd.read_csv()</code> / <code>read_excel()</code> / <code>read_json()</code> 读取各格式数据</li>
+      <li><span class="chk">□</span> 拿到数据后能快速做"三板斧"探索（结构、缺失、分布）</li>
+      <li><span class="chk">□</span> 能用条件筛选、loc/iloc 精准提取数据</li>
+      <li><span class="chk">□</span> 能处理缺失值（删除/填充）和重复值</li>
+      <li><span class="chk">□</span> 能用 apply + lambda 做自定义转换</li>
+      <li><span class="chk">□</span> 能用 groupby 做分组聚合统计</li>
+      <li><span class="chk">□</span> 能用 merge 和 concat 合并多张表</li>
+      <li><span class="chk">□</span> 能写基本的 SQL（SELECT / WHERE / GROUP BY / JOIN）</li>
+      <li><span class="chk">□</span> 能解析嵌套 JSON，提取 API 返回数据</li>
+      <li><span class="chk">□</span> 完成综合项目：AI 对话日志分析器</li>
+    </ul>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="resources" style="margin-top: 32px;">
+    <h3>📚 推荐学习资源</h3>
+    <div class="res-item"><span class="res-type">官方文档</span>Pandas 官方教程 — pandas.pydata.org/docs（权威参考）</div>
+    <div class="res-item"><span class="res-type">免费教程</span>Kaggle Learn: Pandas — kaggle.com/learn/pandas（交互式练习）</div>
+    <div class="res-item"><span class="res-type">练习数据</span>Kaggle Datasets — kaggle.com/datasets（海量真实数据集）</div>
+    <div class="res-item"><span class="res-type">SQL 练习</span>SQLBolt — sqlbolt.com（交互式 SQL 教程，免费）</div>
+    <div class="res-item"><span class="res-type">速查表</span>Pandas Cheat Sheet — 搜索 "pandas cheat sheet pdf" 打印一份放桌上</div>
+  </div>
+
+  <!-- FINAL -->
+  <div class="final-box">
+    <h2>完成 Phase 2 后 → 进入 Phase 3：大模型 API 与 Prompt 工程</h2>
+    <p>你已经具备了数据处理的核心能力！接下来你将正式接触大模型 API，所有 Phase 1 和 Phase 2 学的技能都会在调 API、处理返回值、构建数据管线时派上用场。</p>
+  </div>
+
+</div>
+</body>
+</html>
