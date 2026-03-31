@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 5 · Agent 프레임워크와 엔지니어링 · 상세 학습 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#06080f;color:#c9d1d9;line-height:1.75;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 25%,rgba(244,63,94,.07) 0%,transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(168,85,247,.06) 0%,transparent 50%);pointer-events:none}
+  .page{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:48px 24px 80px}
+
+  .header{text-align:center;margin-bottom:48px}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;color:#f43f5e;background:rgba(244,63,94,.1);padding:4px 14px;border-radius:6px;margin-bottom:12px}
+  h1{font-size:2.2rem;font-weight:900;color:#f1f5f9;margin-bottom:6px}
+  .header p{color:#64748b;font-size:.9rem}
+  .meta-bar{display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap}
+  .meta-item{font-size:.8rem;color:#94a3b8;display:flex;align-items:center;gap:6px}
+  .meta-dot{width:8px;height:8px;border-radius:50%}
+
+  .why-box{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid rgba(244,63,94,.2);border-radius:14px;padding:24px 28px;margin-bottom:40px}
+  .why-box h2{font-size:1rem;color:#fb7185;margin-bottom:10px}
+  .why-box p{font-size:.88rem;color:#94a3b8;line-height:1.8}
+  .why-box p+p{margin-top:8px}
+
+  /* Agent Loop Diagram */
+  .agent-loop{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:24px 0;padding:20px 0}
+  .al-step{background:linear-gradient(135deg,#111827,#0c1018);border:1.5px solid var(--ac,#f43f5e);border-radius:14px;padding:12px 18px;text-align:center;min-width:110px;position:relative}
+  .al-step .al-icon{font-size:1.4rem;margin-bottom:2px}
+  .al-step .al-title{font-size:.8rem;font-weight:700;color:var(--ac,#f43f5e)}
+  .al-step .al-sub{font-size:.65rem;color:#64748b}
+  .al-arrow{color:#334155;font-size:1.3rem;margin:0 8px}
+  .al-loop-back{display:block;text-align:center;font-size:.7rem;color:#475569;margin-top:8px;letter-spacing:2px}
+
+  .toc{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid #1e293b;border-radius:14px;padding:24px 28px;margin-bottom:48px}
+  .toc h2{font-size:.85rem;color:#64748b;letter-spacing:3px;margin-bottom:14px;text-transform:uppercase}
+  .toc-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .toc-list a{color:#93c5fd;text-decoration:none;font-size:.88rem;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:8px;transition:all .2s}
+  .toc-list a:hover{background:rgba(59,130,246,.08);color:#60a5fa}
+  .toc-num{color:#475569;font-size:.75rem;font-weight:700;min-width:24px}
+
+  .day-section{margin-bottom:56px;scroll-margin-top:24px}
+  .day-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #1e293b}
+  .day-badge{flex-shrink:0;width:52px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(135deg,var(--dc),color-mix(in srgb,var(--dc) 60%,#000));color:#fff;font-weight:900}
+  .day-badge .d-label{font-size:.55rem;letter-spacing:1px;opacity:.8}
+  .day-badge .d-num{font-size:1.2rem;line-height:1}
+  .day-title{font-size:1.3rem;font-weight:700;color:#f1f5f9}
+  .day-subtitle{font-size:.82rem;color:#64748b;margin-top:2px}
+
+  .topic{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid #1e293b;border-radius:12px;margin-bottom:14px;overflow:hidden;transition:border-color .3s}
+  .topic:hover{border-color:color-mix(in srgb,var(--dc) 40%,transparent)}
+  .topic-head{padding:16px 20px;display:flex;align-items:center;gap:10px}
+  .topic-icon{font-size:1.2rem}
+  .topic-name{font-weight:700;font-size:.95rem;color:#e2e8f0;flex:1}
+  .topic-tag{font-size:.65rem;padding:2px 8px;border-radius:5px;font-weight:600}
+  .tag-must{background:rgba(239,68,68,.12);color:#f87171}
+  .tag-imp{background:rgba(251,191,36,.12);color:#fbbf24}
+  .tag-nice{background:rgba(148,163,184,.1);color:#94a3b8}
+  .topic-body{padding:0 20px 20px}
+  .explain{font-size:.85rem;color:#94a3b8;margin-bottom:14px;line-height:1.7}
+
+  .code-block{background:#0d1117;border:1px solid #21262d;border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .code-label{padding:6px 14px;font-size:.7rem;font-weight:600;color:#7c8496;background:#161b22;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+  .code-label .dot{width:6px;height:6px;border-radius:50%}
+  pre{padding:14px 18px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.7;color:#c9d1d9}
+  .cm{color:#8b949e}.kw{color:#ff7b72}.fn{color:#d2a8ff}.st{color:#a5d6ff}
+  .nu{color:#79c0ff}.bi{color:#ffa657}.op{color:#ff7b72}.var{color:#ffa657}
+
+  .key-points{background:rgba(59,130,246,.05);border-left:3px solid rgba(59,130,246,.3);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:12px}
+  .key-points h4{font-size:.78rem;color:#60a5fa;margin-bottom:6px;letter-spacing:1px}
+  .key-points li{font-size:.82rem;color:#94a3b8;margin-bottom:4px;margin-left:16px}
+
+  .practice{background:linear-gradient(135deg,rgba(52,211,153,.06),rgba(16,185,129,.02));border:1px solid rgba(52,211,153,.2);border-radius:12px;padding:18px 20px;margin-top:20px}
+  .practice h3{color:#34d399;font-size:.9rem;margin-bottom:10px}
+  .practice-item{font-size:.85rem;color:#94a3b8;margin-bottom:8px;padding-left:20px;position:relative}
+  .practice-item::before{content:'✦';position:absolute;left:0;color:#34d399;font-size:.7rem;top:2px}
+
+  .tip-box{background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:14px 18px;margin-top:14px}
+  .tip-box h4{color:#60a5fa;font-size:.82rem;margin-bottom:6px}
+  .tip-box p{font-size:.8rem;color:#94a3b8;line-height:1.7}
+  .warn-box{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:10px;padding:14px 18px;margin-top:14px}
+  .warn-box h4{color:#f87171;font-size:.82rem;margin-bottom:6px}
+  .warn-box p{font-size:.8rem;color:#94a3b8;line-height:1.7}
+
+  .vs-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem}
+  .vs-table th{background:#161b22;color:#8b949e;padding:8px 12px;text-align:left;font-weight:600;border-bottom:1px solid #21262d}
+  .vs-table td{padding:8px 12px;border-bottom:1px solid #161b22;color:#c9d1d9}
+  .vs-table tr:hover td{background:rgba(244,63,94,.04)}
+
+  .checkpoint{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(245,158,11,.03));border:1.5px solid rgba(251,191,36,.25);border-radius:14px;padding:22px 24px;margin-top:24px;text-align:center}
+  .checkpoint h3{color:#fbbf24;font-size:1rem;margin-bottom:8px}
+  .checkpoint p{font-size:.85rem;color:#94a3b8}
+  .check-list{list-style:none;text-align:left;margin-top:14px}
+  .check-list li{font-size:.85rem;padding:6px 0;color:#cbd5e1;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(251,191,36,.08)}
+  .check-list li:last-child{border:none}
+  .chk{color:#fbbf24;font-size:.9rem}
+
+  .resources{background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(139,92,246,.02));border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:18px 20px;margin-top:14px}
+  .resources h3{color:#a78bfa;font-size:.88rem;margin-bottom:10px}
+  .res-item{display:flex;align-items:flex-start;gap:10px;font-size:.83rem;color:#94a3b8;margin-bottom:8px}
+  .res-type{flex-shrink:0;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(168,85,247,.1);color:#c4b5fd}
+
+  .final-box{margin-top:56px;background:linear-gradient(135deg,rgba(244,63,94,.08),rgba(168,85,247,.06));border:1.5px solid rgba(244,63,94,.25);border-radius:16px;padding:28px;text-align:center}
+  .final-box h2{color:#fb7185;font-size:1.2rem;margin-bottom:8px}
+  .final-box p{color:#64748b;font-size:.88rem}
+  .final-box p+p{margin-top:6px}
+
+  @media(max-width:600px){.toc-list{grid-template-columns:1fr}h1{font-size:1.6rem}.page{padding:32px 14px 60px}.agent-loop{flex-direction:column;gap:8px}.al-arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">PHASE 05 · 상세판</div>
+    <h1>Agent 프레임워크와 엔지니어링</h1>
+    <p>AI가 스스로 복잡한 작업을 완수하게 하기 + 애플리케이션 배포하기</p>
+    <div class="meta-bar">
+      <div class="meta-item"><div class="meta-dot" style="background:#f43f5e"></div>총 기간: 2~4주</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#f59e0b"></div>일일 투자: 2~3시간</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#10b981"></div>업무와 병행 가능</div>
+    </div>
+  </div>
+
+  <div class="why-box">
+    <h2>Phase 5는 "쓸 수 있는" 수준에서 "잘 쓸 수 있는" 수준으로 만들어 줍니다</h2>
+    <p>Phase 1-4에서 API 호출, Prompt 작성, RAG 구현을 배웠습니다. 하지만 실무에서는 더 많은 것이 필요합니다: AI가 스스로 계획을 세우고 여러 단계의 작업을 완수하게 하기(Agent), 데모 가능한 인터페이스 빠르게 구축하기(Streamlit/Gradio), 서비스 배포하기(FastAPI/Docker), AI 출력 품질을 지속적으로 평가하고 최적화하기(Eval).</p>
+    <p>이 단계는 "데모를 만들 수 있는" 수준에서 "제품을 납품할 수 있는" 수준으로 진화시켜 줍니다. 완료하면 AI 프로젝트를 독립적으로 담당할 수 있는 풀스택 역량을 갖추게 됩니다.</p>
+  </div>
+
+  <!-- Agent Loop -->
+  <div class="agent-loop">
+    <div class="al-step" style="--ac:#3b82f6"><div class="al-icon">🤔</div><div class="al-title">사고 Think</div><div class="al-sub">작업 이해, 계획 수립</div></div>
+    <div class="al-arrow">→</div>
+    <div class="al-step" style="--ac:#f59e0b"><div class="al-icon">🛠️</div><div class="al-title">행동 Act</div><div class="al-sub">도구 호출, 작업 실행</div></div>
+    <div class="al-arrow">→</div>
+    <div class="al-step" style="--ac:#10b981"><div class="al-icon">👀</div><div class="al-title">관찰 Observe</div><div class="al-sub">결과 확인, 상태 판단</div></div>
+    <div class="al-arrow">→</div>
+    <div class="al-step" style="--ac:#f43f5e"><div class="al-icon">✅</div><div class="al-title">결정 Decide</div><div class="al-sub">계속 or 완료</div></div>
+  </div>
+  <p class="al-loop-back">↩ 미완료 시 「사고」로 돌아가 계속 실행 — 이것이 Agent Loop입니다</p>
+
+  <div class="toc">
+    <h2>📋 학습 일정 목차</h2>
+    <ul class="toc-list">
+      <li><a href="#d1"><span class="toc-num">Day 1-3</span>AI Agent 핵심 원리와 직접 구현</a></li>
+      <li><a href="#d4"><span class="toc-num">Day 4-6</span>LangChain Agent 실전</a></li>
+      <li><a href="#d7"><span class="toc-num">Day 7-9</span>Web 인터페이스: Streamlit / Gradio</a></li>
+      <li><a href="#d10"><span class="toc-num">Day 10-12</span>API 서비스: FastAPI 배포</a></li>
+      <li><a href="#d13"><span class="toc-num">Day 13-15</span>Eval 평가와 지속적 최적화</a></li>
+      <li><a href="#d16"><span class="toc-num">Day 16-18</span>Docker + Git + 엔지니어링 실습</a></li>
+      <li><a href="#d19"><span class="toc-num">Day 19-24</span>졸업 프로젝트: 풀스택 AI Agent 애플리케이션</a></li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 1-3 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d1" style="--dc:#3b82f6">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">1-3</span></div>
+      <div>
+        <div class="day-title">AI Agent 핵심 원리와 직접 구현</div>
+        <div class="day-subtitle">프레임워크 없이 먼저——Agent가 어떻게 "스스로 사고"하는지 처음부터 이해하기</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🧠</span>
+        <span class="topic-name">Agent vs 일반 API 호출</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <table class="vs-table">
+          <tr><th></th><th>일반 API 호출</th><th>AI Agent</th></tr>
+          <tr><td>프로세스</td><td>모든 단계를 직접 코딩</td><td>AI가 스스로 실행할 내용을 결정</td></tr>
+          <tr><td>도구</td><td>직접 호출</td><td>AI가 자동으로 어떤 도구를 호출할지 선택</td></tr>
+          <tr><td>루프</td><td>한 번 호출하면 끝</td><td>작업이 완료될 때까지 반복 실행</td></tr>
+          <tr><td>오류 처리</td><td>직접 예외 처리</td><td>AI가 오류를 관찰한 후 스스로 전략 조정</td></tr>
+          <tr><td>비유</td><td>리모컨 자동차</td><td>자율주행</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔧</span>
+        <span class="topic-name">처음부터 직접 ReAct Agent 만들기</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">ReAct(Reasoning + Acting)는 가장 클래식한 Agent 패턴입니다. AI가 먼저 추론(Thought)하고, 행동(Action)한 다음, 결과를 관찰(Observation)하며, 완료될 때까지 반복 실행합니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> react_agent.py — 직접 만드는 ReAct Agent</div>
+<pre><span class="kw">import</span> json, re
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+client = OpenAI()
+
+<span class="cm"># ========== 1. 도구 정의 ==========</span>
+<span class="kw">def</span> <span class="fn">search_web</span>(query):
+    <span class="st">"""웹 검색 시뮬레이션"""</span>
+    fake_results = {
+        <span class="st">"Python"</span>: <span class="st">"Python은 고급 프로그래밍 언어이며, 최신 버전은 3.12입니다."</span>,
+        <span class="st">"RAG"</span>: <span class="st">"RAG는 검색 증강 생성으로, 2024-2025년 가장 인기 있는 AI 기술 중 하나입니다."</span>,
+    }
+    <span class="kw">for</span> key, val <span class="kw">in</span> fake_results.items():
+        <span class="kw">if</span> key.lower() <span class="kw">in</span> query.lower():
+            <span class="kw">return</span> val
+    <span class="kw">return</span> <span class="st">f"'{query}'에 대한 검색 결과를 찾을 수 없습니다"</span>
+
+<span class="kw">def</span> <span class="fn">calculator</span>(expression):
+    <span class="st">"""수학 표현식 안전 계산"""</span>
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="fn">str</span>(<span class="fn">eval</span>(expression, {<span class="st">"__builtins__"</span>: {}}, {}))
+    <span class="kw">except</span>:
+        <span class="kw">return</span> <span class="st">"계산 오류"</span>
+
+<span class="kw">def</span> <span class="fn">get_current_time</span>():
+    <span class="st">"""현재 시간 가져오기"""</span>
+    <span class="kw">return</span> datetime.now().strftime(<span class="st">"%Y-%m-%d %H:%M:%S"</span>)
+
+TOOLS = {
+    <span class="st">"search_web"</span>: {<span class="st">"func"</span>: search_web, <span class="st">"desc"</span>: <span class="st">"웹 정보 검색, 매개변수: query"</span>},
+    <span class="st">"calculator"</span>: {<span class="st">"func"</span>: calculator, <span class="st">"desc"</span>: <span class="st">"수학 표현식 계산, 매개변수: expression"</span>},
+    <span class="st">"get_current_time"</span>: {<span class="st">"func"</span>: get_current_time, <span class="st">"desc"</span>: <span class="st">"현재 시간 가져오기, 매개변수 없음"</span>},
+}
+
+<span class="cm"># ========== 2. Agent 시스템 Prompt ==========</span>
+AGENT_PROMPT = <span class="st">"""당신은 도구를 사용하여 작업을 완수할 수 있는 지능형 어시스턴트입니다.
+
+사용 가능한 도구:
+{tool_descriptions}
+
+작업 흐름:
+1. 사용자 요구 분석
+2. 필요시 도구를 호출하여 정보 획득
+3. 결과를 바탕으로 질문에 답변
+
+도구 호출 시, 다음 JSON 형식을 엄격히 사용하세요 (한 줄로 작성):
+TOOL_CALL: {{"tool": "도구명", "args": {{"매개변수명": "매개변수값"}}}}
+
+도구가 필요 없으면 바로 답변하세요.
+작업이 완료되면 FINAL_ANSWER: 로 시작하는 최종 답변을 제공하세요."""</span>
+
+<span class="cm"># ========== 3. Agent 루프 ==========</span>
+<span class="kw">class</span> <span class="fn">SimpleAgent</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, tools, max_steps=<span class="nu">5</span>):
+        self.tools = tools
+        self.max_steps = max_steps
+
+        tool_desc = <span class="st">"\n"</span>.join(
+            [<span class="st">f"- {name}: {t['desc']}"</span> <span class="kw">for</span> name, t <span class="kw">in</span> tools.items()]
+        )
+        self.system_prompt = AGENT_PROMPT.format(tool_descriptions=tool_desc)
+
+    <span class="kw">def</span> <span class="fn">run</span>(self, task):
+        messages = [
+            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: self.system_prompt},
+            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: task}
+        ]
+
+        <span class="kw">for</span> step <span class="kw">in</span> <span class="fn">range</span>(self.max_steps):
+            <span class="fn">print</span>(<span class="st">f"\n--- Step </span><span class="var">{step + 1}</span><span class="st"> ---"</span>)
+
+            response = client.chat.completions.create(
+                model=<span class="st">"gpt-4o"</span>, messages=messages, temperature=<span class="nu">0.3</span>
+            )
+            reply = response.choices[<span class="nu">0</span>].message.content
+            <span class="fn">print</span>(<span class="st">f"AI: </span><span class="var">{reply}</span><span class="st">"</span>)
+            messages.append({<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: reply})
+
+            <span class="cm"># 최종 답변 확인</span>
+            <span class="kw">if</span> <span class="st">"FINAL_ANSWER:"</span> <span class="kw">in</span> reply:
+                <span class="kw">return</span> reply.split(<span class="st">"FINAL_ANSWER:"</span>)[<span class="nu">1</span>].strip()
+
+            <span class="cm"># 도구 호출 확인</span>
+            <span class="kw">if</span> <span class="st">"TOOL_CALL:"</span> <span class="kw">in</span> reply:
+                tool_json = reply.split(<span class="st">"TOOL_CALL:"</span>)[<span class="nu">1</span>].strip()
+                <span class="kw">try</span>:
+                    call = json.loads(tool_json)
+                    tool_name = call[<span class="st">"tool"</span>]
+                    tool_args = call.get(<span class="st">"args"</span>, {})
+
+                    <span class="fn">print</span>(<span class="st">f"🔧 도구 호출: </span><span class="var">{tool_name}</span><span class="st">(</span><span class="var">{tool_args}</span><span class="st">)"</span>)
+                    result = self.tools[tool_name][<span class="st">"func"</span>](**tool_args)
+                    <span class="fn">print</span>(<span class="st">f"📋 결과: </span><span class="var">{result}</span><span class="st">"</span>)
+
+                    messages.append({
+                        <span class="st">"role"</span>: <span class="st">"user"</span>,
+                        <span class="st">"content"</span>: <span class="st">f"도구 {tool_name}의 실행 결과: {result}"</span>
+                    })
+                <span class="kw">except</span> Exception <span class="kw">as</span> e:
+                    messages.append({
+                        <span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">f"도구 호출 실패: {e}"</span>
+                    })
+
+        <span class="kw">return</span> <span class="st">"최대 단계 수에 도달, 작업 미완료"</span>
+
+<span class="cm"># ========== 사용 ==========</span>
+agent = SimpleAgent(TOOLS)
+answer = agent.run(<span class="st">"지금 몇 시야? 그리고 1024 * 768이 얼마인지 계산해줘"</span>)
+<span class="fn">print</span>(<span class="st">f"\n최종 답변: </span><span class="var">{answer}</span><span class="st">"</span>)</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 Agent의 핵심은 하나의 While 루프입니다</h4>
+          <ul>
+            <li>① LLM이 사고하고, 다음에 할 일을 결정</li>
+            <li>② 도구가 필요하면 → 도구 호출 → 결과를 LLM에 다시 전달</li>
+            <li>③ 도구가 필요 없으면 → 최종 답변 출력 → 루프 종료</li>
+            <li>④ max_steps 설정으로 무한 루프 방지</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 1-3 연습</h3>
+      <div class="practice-item">Agent에 "파일 읽기" 도구를 추가하여 로컬 txt 파일을 읽고 질문에 답할 수 있게 하기</div>
+      <div class="practice-item">Agent에 RAG 도구 추가: Phase 4의 지식 베이스 검색 기능 연동</div>
+      <div class="practice-item">복잡한 작업에 대한 Agent 처리 테스트: 2-3개의 도구를 호출해야 완료되는 문제</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 4-6 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d4" style="--dc:#8b5cf6">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">4-6</span></div>
+      <div>
+        <div class="day-title">LangChain Agent 실전</div>
+        <div class="day-subtitle">프레임워크로 강력한 Agent를 빠르게 구축——바퀴를 다시 발명할 필요 없이</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🦜</span>
+        <span class="topic-name">LangChain Agent 빠른 구축</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL</div>
+<pre>pip install langchain langchain-openai langchain-community duckduckgo-search</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> langchain_agent.py</div>
+<pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+<span class="kw">from</span> langchain.agents <span class="kw">import</span> create_tool_calling_agent, AgentExecutor
+<span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
+<span class="kw">from</span> langchain_core.tools <span class="kw">import</span> tool
+
+<span class="cm"># ---- 1. 도구 정의 (데코레이터 사용, 매우 간단) ----</span>
+@tool
+<span class="kw">def</span> <span class="fn">calculator</span>(expression: <span class="fn">str</span>) -> <span class="fn">str</span>:
+    <span class="st">"""수학 표현식을 계산합니다. '2 + 3 * 4'와 같은 수학 표현식 문자열을 입력합니다"""</span>
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="fn">str</span>(<span class="fn">eval</span>(expression, {<span class="st">"__builtins__"</span>: {}}, {}))
+    <span class="kw">except</span>:
+        <span class="kw">return</span> <span class="st">"계산 오류"</span>
+
+@tool
+<span class="kw">def</span> <span class="fn">get_word_count</span>(text: <span class="fn">str</span>) -> <span class="fn">str</span>:
+    <span class="st">"""텍스트의 단어 수와 문자 수를 집계합니다"""</span>
+    words = <span class="fn">len</span>(text.split())
+    chars = <span class="fn">len</span>(text)
+    <span class="kw">return</span> <span class="st">f"단어 수: {words}, 문자 수: {chars}"</span>
+
+tools = [calculator, get_word_count]
+
+<span class="cm"># ---- 2. Agent 생성 ----</span>
+llm = ChatOpenAI(model=<span class="st">"gpt-4o"</span>, temperature=<span class="nu">0.3</span>)
+prompt = ChatPromptTemplate.from_messages([
+    (<span class="st">"system"</span>, <span class="st">"당신은 도구를 사용하여 작업을 완수할 수 있는 유능한 AI 어시스턴트입니다."</span>),
+    (<span class="st">"human"</span>, <span class="st">"{input}"</span>),
+    (<span class="st">"placeholder"</span>, <span class="st">"{agent_scratchpad}"</span>),
+])
+
+agent = create_tool_calling_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools, verbose=<span class="kw">True</span>)
+
+<span class="cm"># ---- 3. 실행 ----</span>
+result = executor.invoke({<span class="st">"input"</span>: <span class="st">"(125 * 37) + (89 * 43)의 결과를 계산해주세요"</span>})
+<span class="fn">print</span>(result[<span class="st">"output"</span>])</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔗</span>
+        <span class="topic-name">RAG + Agent 결합 (최강 조합)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">RAG 지식 베이스 검색을 하나의 도구로 캡슐화하면, Agent가 자동으로 "언제 지식 베이스를 조회해야 하는지" 판단할 수 있습니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> rag_agent.py</div>
+<pre>@tool
+<span class="kw">def</span> <span class="fn">search_knowledge_base</span>(query: <span class="fn">str</span>) -> <span class="fn">str</span>:
+    <span class="st">"""기업 지식 베이스에서 관련 정보를 검색합니다. 사용자가 제품, 정책, 프로세스 관련 질문을 할 때 사용합니다."""</span>
+    <span class="cm"># Phase 4의 검색 로직 재사용</span>
+    emb = get_embeddings([query])[<span class="nu">0</span>]
+    results = collection.query(query_embeddings=[emb], n_results=<span class="nu">3</span>)
+    <span class="kw">if</span> results[<span class="st">"documents"</span>][<span class="nu">0</span>]:
+        <span class="kw">return</span> <span class="st">"\n---\n"</span>.join(results[<span class="st">"documents"</span>][<span class="nu">0</span>])
+    <span class="kw">return</span> <span class="st">"지식 베이스에서 관련 정보를 찾을 수 없습니다"</span>
+
+<span class="cm"># Agent가 동시에 보유: 지식 베이스 검색 + 계산기 + 기타 도구</span>
+tools = [search_knowledge_base, calculator, get_word_count]
+<span class="cm"># AI가 자동 판단: 사용자가 제품 질문 → 지식 베이스 조회, 수학 질문 → 계산기 사용</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 4-6 연습</h3>
+      <div class="practice-item">LangChain으로 최소 3개의 도구(검색, 계산, 지식 베이스)를 포함하는 Agent 구축</div>
+      <div class="practice-item">Agent에게 복잡한 작업 완수시키기: "XXX 제품의 가격을 조회하고, 5개 구매 시 총 비용을 계산해줘"</div>
+      <div class="practice-item"><code>verbose=True</code>를 활성화하여 Agent의 사고 과정을 관찰하고, 각 단계의 결정을 이해하기</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 7-9 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d7" style="--dc:#10b981">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">7-9</span></div>
+      <div>
+        <div class="day-title">Web 인터페이스: Streamlit / Gradio</div>
+        <div class="day-subtitle">AI 애플리케이션에 "얼굴"을 달아주기——10분 만에 데모 가능한 Web 인터페이스 구축</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🎨</span>
+        <span class="topic-name">Streamlit — Python 세계에서 가장 빠른 Web 프레임워크</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL</div>
+<pre>pip install streamlit</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> app.py — RAG 지식 베이스 Q&A 인터페이스</div>
+<pre><span class="kw">import</span> streamlit <span class="kw">as</span> st
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+st.set_page_config(page_title=<span class="st">"AI 知识库问答"</span>, page_icon=<span class="st">"🧠"</span>)
+st.title(<span class="st">"🧠 企业知识库问答系统"</span>)
+
+<span class="cm"># ---- 사이드바: 파일 업로드 ----</span>
+<span class="kw">with</span> st.sidebar:
+    st.header(<span class="st">"📁 文档管理"</span>)
+    uploaded = st.file_uploader(<span class="st">"문서 업로드"</span>, type=[<span class="st">"pdf"</span>, <span class="st">"txt"</span>], accept_multiple_files=<span class="kw">True</span>)
+    <span class="kw">if</span> uploaded:
+        st.success(<span class="st">f"{len(uploaded)}개 파일 업로드 완료"</span>)
+        <span class="cm"># 여기서 입고 로직 호출...</span>
+
+<span class="cm"># ---- 채팅 인터페이스 ----</span>
+<span class="kw">if</span> <span class="st">"messages"</span> <span class="kw">not in</span> st.session_state:
+    st.session_state.messages = []
+
+<span class="cm"># 이전 메시지 표시</span>
+<span class="kw">for</span> msg <span class="kw">in</span> st.session_state.messages:
+    <span class="kw">with</span> st.chat_message(msg[<span class="st">"role"</span>]):
+        st.markdown(msg[<span class="st">"content"</span>])
+
+<span class="cm"># 입력창</span>
+<span class="kw">if</span> question := st.chat_input(<span class="st">"질문을 입력하세요..."</span>):
+    <span class="cm"># 사용자 메시지 표시</span>
+    st.session_state.messages.append({<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: question})
+    <span class="kw">with</span> st.chat_message(<span class="st">"user"</span>):
+        st.markdown(question)
+
+    <span class="cm"># AI 답변 표시</span>
+    <span class="kw">with</span> st.chat_message(<span class="st">"assistant"</span>):
+        <span class="kw">with</span> st.spinner(<span class="st">"생각 중..."</span>):
+            <span class="cm"># RAG Q&A 함수 호출</span>
+            result = rag_query(question)  <span class="cm"># Phase 4의 함수</span>
+            st.markdown(result[<span class="st">"answer"</span>])
+            <span class="kw">if</span> result[<span class="st">"sources"</span>]:
+                st.caption(<span class="st">f"📎 출처: {', '.join(result['sources'])}"</span>)
+
+    st.session_state.messages.append({<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: result[<span class="st">"answer"</span>]})</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL — 실행</div>
+<pre>streamlit run app.py    <span class="cm"># 브라우저가 자동으로 http://localhost:8501 열기</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🖼️</span>
+        <span class="topic-name">Gradio — AI 데모에 더 적합한 프레임워크</span>
+        <span class="topic-tag tag-imp">중요</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> gradio_app.py — 5줄로 채팅 인터페이스 완성</div>
+<pre><span class="kw">import</span> gradio <span class="kw">as</span> gr
+
+<span class="kw">def</span> <span class="fn">chat_fn</span>(message, history):
+    result = rag_query(message)
+    <span class="kw">return</span> result[<span class="st">"answer"</span>]
+
+demo = gr.ChatInterface(fn=chat_fn, title=<span class="st">"AI 知识库问答"</span>)
+demo.launch()   <span class="cm"># → http://localhost:7860</span></pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 Streamlit vs Gradio</h4>
+          <p><strong>Streamlit</strong> — 더 유연하며, 완전한 Web 애플리케이션 제작 가능 (대시보드, 폼, 멀티페이지)<br>
+          <strong>Gradio</strong> — 더 빠르며, 몇 줄의 코드로 채팅 인터페이스 완성, 원클릭으로 공개 링크 공유 가능<br>
+          <strong>권장</strong>: 프로토타입/데모는 Gradio, 완성된 제품은 Streamlit</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 7-9 연습</h3>
+      <div class="practice-item">Streamlit으로 RAG Q&A 인터페이스 구축: 파일 업로드 + 채팅 + 출처 표시</div>
+      <div class="practice-item">Gradio로 동일한 기능을 구축하고, 개발 속도와 결과 비교</div>
+      <div class="practice-item">인터페이스에 token 소비 통계, 대화 내보내기 기능 추가</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 10-12 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d10" style="--dc:#f59e0b">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">10-12</span></div>
+      <div>
+        <div class="day-title">API 서비스: FastAPI 배포</div>
+        <div class="day-subtitle">AI 기능을 API로 래핑——프론트엔드/다른 시스템에서 호출 가능하게</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">⚡</span>
+        <span class="topic-name">FastAPI로 AI API 빠르게 구축</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL</div>
+<pre>pip install fastapi uvicorn</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> api_server.py</div>
+<pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> typing <span class="kw">import</span> List
+
+app = FastAPI(title=<span class="st">"AI 知识库 API"</span>)
+
+<span class="cm"># ---- 요청/응답 모델 ----</span>
+<span class="kw">class</span> <span class="fn">QueryRequest</span>(BaseModel):
+    question: <span class="fn">str</span>
+    top_k: <span class="fn">int</span> = <span class="nu">3</span>
+
+<span class="kw">class</span> <span class="fn">QueryResponse</span>(BaseModel):
+    answer: <span class="fn">str</span>
+    sources: List[<span class="fn">str</span>]
+    tokens: <span class="fn">int</span>
+
+<span class="cm"># ---- API 라우트 ----</span>
+@app.post(<span class="st">"/ask"</span>, response_model=QueryResponse)
+<span class="kw">async def</span> <span class="fn">ask_question</span>(req: QueryRequest):
+    <span class="kw">try</span>:
+        result = rag_query(req.question, top_k=req.top_k)
+        <span class="kw">return</span> QueryResponse(
+            answer=result[<span class="st">"answer"</span>],
+            sources=result[<span class="st">"sources"</span>],
+            tokens=result.get(<span class="st">"tokens"</span>, <span class="nu">0</span>)
+        )
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="nu">500</span>, detail=<span class="fn">str</span>(e))
+
+@app.get(<span class="st">"/health"</span>)
+<span class="kw">async def</span> <span class="fn">health</span>():
+    <span class="kw">return</span> {<span class="st">"status"</span>: <span class="st">"ok"</span>}
+
+<span class="cm"># 실행: uvicorn api_server:app --reload</span>
+<span class="cm"># 자동 문서: http://localhost:8000/docs</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 10-12 연습</h3>
+      <div class="practice-item">FastAPI로 RAG Q&A를 래핑하고, <code>/ask</code>와 <code>/upload</code> 두 개의 엔드포인트 제공</div>
+      <div class="practice-item">requests 또는 curl로 API를 테스트하여 정상 작동 확인</div>
+      <div class="practice-item"><code>/docs</code>에 접속하여 자동 생성된 Swagger 문서 확인</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 13-15 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d13" style="--dc:#ec4899">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">13-15</span></div>
+      <div>
+        <div class="day-title">Eval 평가와 지속적 최적화</div>
+        <div class="day-subtitle">"AI가 잘 답하고 있는지 어떻게 알 수 있을까?"——데이터로 말하기</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📏</span>
+        <span class="topic-name">평가 데이터셋 구축</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> eval_dataset.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 수동으로 평가 데이터셋 구축 ----</span>
+eval_data = [
+    {<span class="st">"question"</span>: <span class="st">"반품 절차가 어떻게 되나요?"</span>,
+     <span class="st">"expected_answer"</span>: <span class="st">"7일 이내 반품 가능, 반품 신청서 제출 필요"</span>,
+     <span class="st">"expected_source"</span>: <span class="st">"반품교환정책.pdf"</span>},
+    {<span class="st">"question"</span>: <span class="st">"제품 보증 기간은 얼마나 되나요?"</span>,
+     <span class="st">"expected_answer"</span>: <span class="st">"표준 보증 1년"</span>,
+     <span class="st">"expected_source"</span>: <span class="st">"제품매뉴얼.pdf"</span>},
+    <span class="cm"># ... 최소 20-50개</span>
+]
+eval_df = pd.DataFrame(eval_data)
+
+<span class="cm"># ---- 일괄 평가 실행 ----</span>
+results = []
+<span class="kw">for</span> _, row <span class="kw">in</span> eval_df.iterrows():
+    result = rag_query(row[<span class="st">"question"</span>])
+    results.append({
+        <span class="st">"question"</span>: row[<span class="st">"question"</span>],
+        <span class="st">"expected"</span>: row[<span class="st">"expected_answer"</span>],
+        <span class="st">"actual"</span>: result[<span class="st">"answer"</span>],
+        <span class="st">"sources"</span>: result[<span class="st">"sources"</span>],
+        <span class="st">"source_hit"</span>: row[<span class="st">"expected_source"</span>] <span class="kw">in</span> result[<span class="st">"sources"</span>]
+    })
+
+results_df = pd.DataFrame(results)
+<span class="fn">print</span>(<span class="st">f"출처 적중률: </span><span class="var">{results_df['source_hit'].mean():.1%}</span><span class="st">"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🤖</span>
+        <span class="topic-name">LLM-as-Judge (AI로 AI를 평가)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> llm_judge.py</div>
+<pre>JUDGE_PROMPT = <span class="st">"""당신은 AI 답변 품질 평가관입니다. 아래 답변의 품질을 평가해 주세요.
+
+질문: {question}
+참고 답변: {expected}
+실제 답변: {actual}
+
+다음 차원에서 점수를 매겨주세요 (1-5):
+- 정확성: 답변이 올바른가
+- 완전성: 핵심 정보를 포함하고 있는가
+- 간결성: 간결하고 명확한가
+
+JSON 출력: {{"accuracy": X, "completeness": X, "conciseness": X, "total": X, "comment": "..."}}"""</span>
+
+<span class="kw">def</span> <span class="fn">judge_answer</span>(question, expected, actual):
+    resp = client.chat.completions.create(
+        model=<span class="st">"gpt-4o"</span>,
+        messages=[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: JUDGE_PROMPT.format(
+            question=question, expected=expected, actual=actual
+        )}],
+        response_format={<span class="st">"type"</span>: <span class="st">"json_object"</span>},
+        temperature=<span class="nu">0</span>
+    )
+    <span class="kw">return</span> json.loads(resp.choices[<span class="nu">0</span>].message.content)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 13-15 연습</h3>
+      <div class="practice-item">30개 이상의 평가 데이터셋 구축</div>
+      <div class="practice-item">LLM-as-Judge로 일괄 채점하고, 평가 보고서 생성 (평균 점수, 최악의 case)</div>
+      <div class="practice-item">평가 결과를 바탕으로 Prompt 또는 chunk_size를 최적화하고, 재평가하여 개선 효과 비교</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 16-18 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d16" style="--dc:#f97316">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">16-18</span></div>
+      <div>
+        <div class="day-title">Docker + Git + 엔지니어링 실습</div>
+        <div class="day-subtitle">프로젝트를 "배포 가능, 협업 가능, 재현 가능"하게 만들기</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🐳</span>
+        <span class="topic-name">Docker 컨테이너화</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> Dockerfile</div>
+<pre><span class="kw">FROM</span> python:3.12-slim
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> requirements.txt .
+<span class="kw">RUN</span> pip install --no-cache-dir -r requirements.txt
+<span class="kw">COPY</span> . .
+<span class="kw">EXPOSE</span> 8000
+<span class="kw">CMD</span> ["uvicorn", "api_server:app", "--host", "0.0.0.0", "--port", "8000"]</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL</div>
+<pre>docker build -t my-ai-app .           <span class="cm"># 이미지 빌드</span>
+docker run -p 8000:8000 my-ai-app     <span class="cm"># 컨테이너 실행</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📁</span>
+        <span class="topic-name">표준 프로젝트 구조</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> 권장 디렉토리 구조</div>
+<pre>my-ai-project/
+├── app/
+│   ├── main.py            <span class="cm"># FastAPI 진입점</span>
+│   ├── rag.py             <span class="cm"># RAG 핵심 로직</span>
+│   ├── agent.py           <span class="cm"># Agent 로직</span>
+│   ├── tools.py           <span class="cm"># 도구 정의</span>
+│   └── prompts.py         <span class="cm"># Prompt 템플릿</span>
+├── data/
+│   └── docs/              <span class="cm"># 지식 베이스 문서</span>
+├── eval/
+│   ├── dataset.json       <span class="cm"># 평가 데이터</span>
+│   └── run_eval.py        <span class="cm"># 평가 스크립트</span>
+├── streamlit_app.py       <span class="cm"># Web 인터페이스</span>
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── .env                   <span class="cm"># API Key (Git에 커밋하지 않음)</span>
+├── .gitignore
+└── README.md</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 16-18 연습</h3>
+      <div class="practice-item">표준 구조로 프로젝트를 리팩토링하고, 코드를 모듈별로 분리</div>
+      <div class="practice-item">Dockerfile을 작성하고, Docker로 서비스를 시작할 수 있는지 확인</div>
+      <div class="practice-item">Git 저장소를 초기화하고, .gitignore 작성 (.env, __pycache__, chroma_db/ 제외)</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 19-24 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d19" style="--dc:#f43f5e">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">19-24</span></div>
+      <div>
+        <div class="day-title">졸업 프로젝트: 풀스택 AI Agent 애플리케이션</div>
+        <div class="day-subtitle">포트폴리오의 핵심——완전하고 데모 가능한 AI 제품</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🏆</span>
+        <span class="topic-name">프로젝트 요구사항: AI 리서치 어시스턴트</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">문서를 업로드하여 지식 베이스를 구축하고, 웹 검색, 데이터 분석을 수행하며, 구조화된 보고서를 생성하는 AI 리서치 어시스턴트를 구축합니다. 이 프로젝트는 Phase 1-5의 모든 기술을 활용합니다.</p>
+        <div class="key-points">
+          <h4>📌 기능 목록</h4>
+          <ul>
+            <li><strong>문서 관리</strong> — PDF/Word/TXT 업로드, 자동 분할, 벡터화, 저장</li>
+            <li><strong>지능형 Q&A</strong> — RAG 검색 + 대규모 모델 생성, 출처 인용 포함</li>
+            <li><strong>Agent 능력</strong> — 지식 베이스 조회, 웹 검색, 계산 시점을 자동 결정</li>
+            <li><strong>보고서 생성</strong> — 주제 입력 시, Agent가 자동으로 정보를 수집하고 구조화된 보고서 생성</li>
+            <li><strong>Web 인터페이스</strong> — Streamlit 채팅 인터페이스 + 파일 업로드 + 보고서 다운로드</li>
+            <li><strong>API 서비스</strong> — FastAPI 백엔드, 외부 시스템 연동 지원</li>
+            <li><strong>평가 체계</strong> — 평가 데이터셋 + 자동화 평가 스크립트</li>
+          </ul>
+        </div>
+
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> 프로젝트 핵심 아키텍처 — research_agent.py</div>
+<pre><span class="kw">class</span> <span class="fn">ResearchAgent</span>:
+    <span class="st">"""AI 리서치 어시스턴트 — RAG + Agent + 보고서 생성 통합"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.kb = KnowledgeBaseQA()       <span class="cm"># Phase 4의 지식 베이스</span>
+        self.tools = self._init_tools()    <span class="cm"># Agent 도구 모음</span>
+        self.cost_tracker = CostTracker()  <span class="cm"># Phase 3의 비용 추적</span>
+
+    <span class="kw">def</span> <span class="fn">_init_tools</span>(self):
+        <span class="kw">return</span> {
+            <span class="st">"search_kb"</span>: self.kb.ask,           <span class="cm"># 지식 베이스 검색</span>
+            <span class="st">"web_search"</span>: web_search,           <span class="cm"># 웹 검색</span>
+            <span class="st">"calculator"</span>: calculator,            <span class="cm"># 계산기</span>
+            <span class="st">"generate_report"</span>: self.gen_report, <span class="cm"># 보고서 생성</span>
+        }
+
+    <span class="kw">def</span> <span class="fn">chat</span>(self, user_input):
+        <span class="st">"""Agent 기반 채팅"""</span>
+        <span class="cm"># Agent 루프: 사고 → 행동 → 관찰 → 결정</span>
+        ...
+
+    <span class="kw">def</span> <span class="fn">gen_report</span>(self, topic):
+        <span class="st">"""연구 보고서 자동 생성"""</span>
+        <span class="cm"># 1. 지식 베이스에서 관련 정보 검색</span>
+        <span class="cm"># 2. 웹 검색으로 보충 정보 획득</span>
+        <span class="cm"># 3. LLM으로 구조화된 보고서 통합</span>
+        <span class="cm"># 4. Markdown 형식 보고서 반환</span>
+        ...
+
+    <span class="kw">def</span> <span class="fn">upload_docs</span>(self, files):
+        <span class="st">"""문서 일괄 업로드"""</span>
+        <span class="kw">for</span> f <span class="kw">in</span> files:
+            self.kb.add_document(f)
+
+    <span class="kw">def</span> <span class="fn">get_stats</span>(self):
+        <span class="st">"""시스템 통계 정보"""</span>
+        <span class="kw">return</span> {
+            <span class="st">"kb_chunks"</span>: self.kb.stats()[<span class="st">"total_chunks"</span>],
+            <span class="st">"total_cost"</span>: self.cost_tracker.total_cost,
+            <span class="st">"total_calls"</span>: self.cost_tracker.call_count,
+        }</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ 졸업 프로젝트 마일스톤</h3>
+      <div class="practice-item"><strong>Day 19-20</strong> — 프로젝트 골격 구축, RAG 핵심 기능, Agent 도구 모음</div>
+      <div class="practice-item"><strong>Day 21-22</strong> — Streamlit Web 인터페이스 (채팅 + 파일 업로드 + 보고서 생성)</div>
+      <div class="practice-item"><strong>Day 23</strong> — FastAPI 백엔드 + Docker 컨테이너화</div>
+      <div class="practice-item"><strong>Day 24</strong> — 평가 체계 + 최적화 + README + GitHub에 푸시</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CHECKPOINT -->
+  <!-- ======================================================================== -->
+  <div class="checkpoint">
+    <h3>🏁 Phase 5 통과 자가 진단 체크리스트</h3>
+    <p>아래 모든 항목을 완료하면, AI 프로젝트를 독립적으로 납품할 수 있는 풀스택 역량을 갖추게 됩니다:</p>
+    <ul class="check-list">
+      <li><span class="chk">□</span> Agent의 Think → Act → Observe 루프를 이해하고, 간단한 Agent를 직접 작성할 수 있다</li>
+      <li><span class="chk">□</span> LangChain으로 다중 도구 Agent를 구축할 수 있다 (RAG + 검색 + 계산)</li>
+      <li><span class="chk">□</span> Streamlit 또는 Gradio로 Web 채팅 인터페이스를 구축할 수 있다</li>
+      <li><span class="chk">□</span> FastAPI로 AI 기능을 REST API로 래핑할 수 있다</li>
+      <li><span class="chk">□</span> 평가 데이터셋을 구축하고, LLM-as-Judge로 품질을 평가할 수 있다</li>
+      <li><span class="chk">□</span> Docker로 프로젝트를 컨테이너화할 수 있다</li>
+      <li><span class="chk">□</span> 표준 프로젝트 구조와 Git 워크플로우를 숙지하고 있다</li>
+      <li><span class="chk">□</span> 졸업 프로젝트 완료: 풀스택 AI Agent 애플리케이션</li>
+    </ul>
+  </div>
+
+  <div class="resources" style="margin-top:32px">
+    <h3>📚 추천 학습 자료</h3>
+    <div class="res-item"><span class="res-type">공식 문서</span>LangChain Agents — python.langchain.com/docs/modules/agents</div>
+    <div class="res-item"><span class="res-type">공식 문서</span>Streamlit Docs — docs.streamlit.io</div>
+    <div class="res-item"><span class="res-type">공식 문서</span>FastAPI Docs — fastapi.tiangolo.com (한국어 버전 있음)</div>
+    <div class="res-item"><span class="res-type">무료 강의</span>Functions, Tools and Agents with LangChain — DeepLearning.AI</div>
+    <div class="res-item"><span class="res-type">실전 튜토리얼</span>Docker 입문 — docker-curriculum.com</div>
+    <div class="res-item"><span class="res-type">도서</span>Building LLM Apps — O'Reilly (2025 신간, 풀스택 AI 개발 커버)</div>
+  </div>
+
+  <div class="final-box">
+    <h2>🎓 5개 Phase 전체 완료!</h2>
+    <p>완전 초보자에서 AI 프로젝트를 독립적으로 납품할 수 있는 풀스택 엔지니어까지, 완전한 학습 경로를 마쳤습니다.</p>
+    <p style="margin-top:12px"><strong>Python → 데이터 처리 → 대규모 모델 API → RAG → Agent + 엔지니어링</strong></p>
+    <p style="margin-top:12px">지금 갖추게 된 역량: AI 애플리케이션 개발 엔지니어 / LLM 엔지니어 / AI 풀스택 엔지니어. 졸업 프로젝트를 GitHub에 푸시하고, 이력서에 기재하고, AI 커리어를 시작하세요!</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -2,10 +2,14 @@
 
 import { useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function Phase2Page() {
+    const { lang } = useLanguage()
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const [iframeHeight, setIframeHeight] = useState(3000)
+
+    const src = lang === 'ko' ? '/phase2-data-processing-guide-ko.html' : '/phase2-data-processing-guide.html'
 
     const handleLoad = useCallback(() => {
         const iframe = iframeRef.current
@@ -26,19 +30,12 @@ export default function Phase2Page() {
                     <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
-                    학습 목표로 돌아가기
+                    {lang === 'ko' ? '학습 목표로 돌아가기' : '返回学习目标'}
                 </Link>
             </nav>
             <div className="rounded-xl overflow-hidden border border-gray-700 bg-gray-900">
-                <iframe
-                    ref={iframeRef}
-                    src="/phase2-data-processing-guide.html"
-                    className="w-full border-0"
-                    style={{ height: `${iframeHeight}px` }}
-                    scrolling="no"
-                    onLoad={handleLoad}
-                    title="Phase 2 - Data Processing"
-                />
+                <iframe ref={iframeRef} key={lang} src={src} className="w-full border-0"
+                    style={{ height: `${iframeHeight}px` }} scrolling="no" onLoad={handleLoad} title="Phase 2" />
             </div>
         </div>
     )

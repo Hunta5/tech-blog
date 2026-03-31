@@ -1,10 +1,14 @@
 'use client'
 
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useRef, useState, useCallback } from 'react'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 
 export default function LearningPage() {
+    const { lang } = useLanguage()
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const [iframeHeight, setIframeHeight] = useState(2000)
+
+    const src = lang === 'ko' ? '/ai-learning-roadmap-ko.html' : '/ai-learning-roadmap.html'
 
     const handleLoad = useCallback(() => {
         const iframe = iframeRef.current
@@ -15,9 +19,7 @@ export default function LearningPage() {
                 const height = doc.documentElement.scrollHeight || doc.body.scrollHeight
                 setIframeHeight(height)
             }
-        } catch {
-            // cross-origin fallback
-        }
+        } catch {}
     }, [])
 
     return (
@@ -25,7 +27,8 @@ export default function LearningPage() {
             <div className="rounded-xl overflow-hidden border border-gray-700 bg-gray-900">
                 <iframe
                     ref={iframeRef}
-                    src="/ai-learning-roadmap.html"
+                    key={lang}
+                    src={src}
                     className="w-full border-0"
                     style={{ height: `${iframeHeight}px` }}
                     scrolling="no"

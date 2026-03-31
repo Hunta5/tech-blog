@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 · 데이터 처리 능력 · Pandas + SQL + JSON 상세 학습 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: #06080f;
+    color: #c9d1d9;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(139,92,246,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(16,185,129,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 48px; }
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; color: #8b5cf6; background: rgba(139,92,246,0.1); padding: 4px 14px; border-radius: 6px; margin-bottom: 12px; }
+  h1 { font-size: 2.2rem; font-weight: 900; color: #f1f5f9; margin-bottom: 6px; }
+  .header p { color: #64748b; font-size: 0.9rem; }
+  .meta-bar { display: flex; justify-content: center; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+  .meta-item { font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+  .meta-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Why box */
+  .why-box {
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid rgba(139,92,246,0.2);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+  .why-box h2 { font-size: 1rem; color: #a78bfa; margin-bottom: 10px; }
+  .why-box p { font-size: 0.88rem; color: #94a3b8; line-height: 1.8; }
+  .why-box p + p { margin-top: 8px; }
+
+  /* TOC */
+  .toc {
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+  .toc h2 { font-size: 0.85rem; color: #64748b; letter-spacing: 3px; margin-bottom: 14px; text-transform: uppercase; }
+  .toc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toc-list a { color: #93c5fd; text-decoration: none; font-size: 0.88rem; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+  .toc-list a:hover { background: rgba(59,130,246,0.08); color: #60a5fa; }
+  .toc-num { color: #475569; font-size: 0.75rem; font-weight: 700; min-width: 24px; }
+
+  /* Day Section */
+  .day-section { margin-bottom: 56px; scroll-margin-top: 24px; }
+  .day-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #1e293b; }
+  .day-badge { flex-shrink: 0; width: 52px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; background: linear-gradient(135deg, var(--dc), color-mix(in srgb, var(--dc) 60%, #000)); color: #fff; font-weight: 900; }
+  .day-badge .d-label { font-size: 0.55rem; letter-spacing: 1px; opacity: 0.8; }
+  .day-badge .d-num { font-size: 1.3rem; line-height: 1; }
+  .day-title { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; }
+  .day-subtitle { font-size: 0.82rem; color: #64748b; margin-top: 2px; }
+
+  /* Topic Block */
+  .topic { background: linear-gradient(160deg, #111827, #0c1018); border: 1px solid #1e293b; border-radius: 12px; margin-bottom: 14px; overflow: hidden; transition: border-color 0.3s; }
+  .topic:hover { border-color: color-mix(in srgb, var(--dc) 40%, transparent); }
+  .topic-head { padding: 16px 20px; display: flex; align-items: center; gap: 10px; }
+  .topic-icon { font-size: 1.2rem; }
+  .topic-name { font-weight: 700; font-size: 0.95rem; color: #e2e8f0; flex: 1; }
+  .topic-tag { font-size: 0.65rem; padding: 2px 8px; border-radius: 5px; font-weight: 600; }
+  .tag-must { background: rgba(239,68,68,0.12); color: #f87171; }
+  .tag-imp  { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .tag-nice { background: rgba(148,163,184,0.1); color: #94a3b8; }
+  .topic-body { padding: 0 20px 20px; }
+  .explain { font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px; line-height: 1.7; }
+
+  /* Code Block */
+  .code-block { background: #0d1117; border: 1px solid #21262d; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  .code-label { padding: 6px 14px; font-size: 0.7rem; font-weight: 600; color: #7c8496; background: #161b22; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+  .code-label .dot { width: 6px; height: 6px; border-radius: 50%; }
+  pre { padding: 14px 18px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.7; color: #c9d1d9; }
+  .cm { color: #8b949e; } .kw { color: #ff7b72; } .fn { color: #d2a8ff; } .st { color: #a5d6ff; }
+  .nu { color: #79c0ff; } .bi { color: #ffa657; } .op { color: #ff7b72; } .var { color: #ffa657; }
+
+  /* Key Points */
+  .key-points { background: rgba(59,130,246,0.05); border-left: 3px solid rgba(59,130,246,0.3); border-radius: 0 8px 8px 0; padding: 12px 16px; margin-top: 12px; }
+  .key-points h4 { font-size: 0.78rem; color: #60a5fa; margin-bottom: 6px; letter-spacing: 1px; }
+  .key-points li { font-size: 0.82rem; color: #94a3b8; margin-bottom: 4px; margin-left: 16px; }
+
+  /* Practice */
+  .practice { background: linear-gradient(135deg, rgba(52,211,153,0.06), rgba(16,185,129,0.02)); border: 1px solid rgba(52,211,153,0.2); border-radius: 12px; padding: 18px 20px; margin-top: 20px; }
+  .practice h3 { color: #34d399; font-size: 0.9rem; margin-bottom: 10px; }
+  .practice-item { font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px; padding-left: 20px; position: relative; }
+  .practice-item::before { content: '✦'; position: absolute; left: 0; color: #34d399; font-size: 0.7rem; top: 2px; }
+
+  /* Tip / Warn */
+  .tip-box { background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.15); border-radius: 10px; padding: 14px 18px; margin-top: 14px; }
+  .tip-box h4 { color: #60a5fa; font-size: 0.82rem; margin-bottom: 6px; }
+  .tip-box p { font-size: 0.8rem; color: #94a3b8; }
+  .warn-box { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.15); border-radius: 10px; padding: 14px 18px; margin-top: 14px; }
+  .warn-box h4 { color: #f87171; font-size: 0.82rem; margin-bottom: 6px; }
+  .warn-box p { font-size: 0.8rem; color: #94a3b8; }
+
+  /* Versus table */
+  .vs-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.82rem; }
+  .vs-table th { background: #161b22; color: #8b949e; padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 1px solid #21262d; }
+  .vs-table td { padding: 8px 12px; border-bottom: 1px solid #161b22; color: #c9d1d9; }
+  .vs-table tr:hover td { background: rgba(139,92,246,0.04); }
+
+  /* Checkpoint */
+  .checkpoint { background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.03)); border: 1.5px solid rgba(251,191,36,0.25); border-radius: 14px; padding: 22px 24px; margin-top: 24px; text-align: center; }
+  .checkpoint h3 { color: #fbbf24; font-size: 1rem; margin-bottom: 8px; }
+  .checkpoint p { font-size: 0.85rem; color: #94a3b8; }
+  .check-list { list-style: none; text-align: left; margin-top: 14px; }
+  .check-list li { font-size: 0.85rem; padding: 6px 0; color: #cbd5e1; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(251,191,36,0.08); }
+  .check-list li:last-child { border: none; }
+  .chk { color: #fbbf24; font-size: 0.9rem; }
+
+  /* Resources */
+  .resources { background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(139,92,246,0.02)); border: 1px solid rgba(168,85,247,0.2); border-radius: 12px; padding: 18px 20px; margin-top: 14px; }
+  .resources h3 { color: #a78bfa; font-size: 0.88rem; margin-bottom: 10px; }
+  .res-item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.83rem; color: #94a3b8; margin-bottom: 8px; }
+  .res-type { flex-shrink: 0; font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: rgba(168,85,247,0.1); color: #c4b5fd; }
+
+  /* Final */
+  .final-box { margin-top: 56px; background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(16,185,129,0.05)); border: 1.5px solid rgba(139,92,246,0.25); border-radius: 16px; padding: 28px; text-align: center; }
+  .final-box h2 { color: #a78bfa; font-size: 1.2rem; margin-bottom: 8px; }
+  .final-box p { color: #64748b; font-size: 0.88rem; }
+
+  @media (max-width: 600px) { .toc-list { grid-template-columns: 1fr; } h1 { font-size: 1.6rem; } .page { padding: 32px 14px 60px; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge">PHASE 02 · 상세판</div>
+    <h1>데이터 처리 능력</h1>
+    <p>Pandas + SQL + JSON — AI 엔지니어의 일상 "주식"</p>
+    <div class="meta-bar">
+      <div class="meta-item"><div class="meta-dot" style="background:#8b5cf6;"></div>총 기간: 2~3주</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#f59e0b;"></div>매일 투자: 2~3시간</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#10b981;"></div>사전 요구사항: Phase 1 완료</div>
+    </div>
+  </div>
+
+  <!-- WHY -->
+  <div class="why-box">
+    <h2>왜 데이터 처리가 이렇게 중요할까?</h2>
+    <p>AI 엔지니어는 80%의 시간을 모델 훈련이 아닌 데이터 처리에 씁니다. 훈련 데이터 정리, API 반환값 파싱, 사용자 로그 정리, RAG 문서 파이프라인 구축 — 이 모든 것이 데이터 처리입니다.</p>
+    <p>Pandas는 당신의 "데이터 만능 도구"입니다: CSV, Excel, JSON, SQL 데이터베이스를 읽을 수 있고, 필터링, 그룹화, 집계, 피벗, 병합이 가능하며, 한 줄의 코드가 수십 줄의 for 루프를 대체합니다. Pandas를 익히면 생산성이 비약적으로 향상됩니다.</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>📋 학습 일정 목차</h2>
+    <ul class="toc-list">
+      <li><a href="#d1"><span class="toc-num">Day 1-2</span>Pandas 입문: Series와 DataFrame</a></li>
+      <li><a href="#d3"><span class="toc-num">Day 3-4</span>데이터 읽기와 기본 탐색</a></li>
+      <li><a href="#d5"><span class="toc-num">Day 5-6</span>필터링, 정렬과 인덱싱</a></li>
+      <li><a href="#d7"><span class="toc-num">Day 7-8</span>데이터 정제 실전</a></li>
+      <li><a href="#d9"><span class="toc-num">Day 9-10</span>그룹 집계와 피벗 테이블</a></li>
+      <li><a href="#d11"><span class="toc-num">Day 11-12</span>다중 테이블 병합과 연결</a></li>
+      <li><a href="#d13"><span class="toc-num">Day 13-14</span>SQL 기본 쿼리</a></li>
+      <li><a href="#d15"><span class="toc-num">Day 15-17</span>JSON 심화 처리 + 종합 프로젝트</a></li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 1-2 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d1" style="--dc: #8b5cf6;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">1-2</span></div>
+      <div>
+        <div class="day-title">Pandas 입문: Series와 DataFrame</div>
+        <div class="day-subtitle">Pandas의 두 가지 핵심 데이터 구조 알아보기</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">⬇️</span>
+        <span class="topic-name">설치와 임포트</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> TERMINAL</div>
+<pre>pip install pandas numpy openpyxl   <span class="cm"># openpyxl은 Excel 읽기/쓰기에 사용</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> 관례적인 임포트 방식</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="fn">print</span>(pd.__version__)   <span class="cm"># 설치 확인</span></pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 왜 pd로 축약할까?</h4>
+          <p>이것은 전 세계 Python 커뮤니티의 관례입니다. <code>pd.XXX</code>를 보면 Pandas라는 것을 알고, <code>np.XXX</code>를 보면 NumPy라는 것을 알 수 있습니다. 모든 튜토리얼과 프로젝트에서 이렇게 씁니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📊</span>
+        <span class="topic-name">Series — 1차원 데이터 (한 열의 데이터)</span>
+        <span class="topic-tag tag-imp">중요</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">Series는 Excel의 "한 열"과 같습니다. 데이터와 인덱스가 있습니다. Series를 이해하는 것이 DataFrame을 이해하는 기초입니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> series.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 리스트에서 Series 생성 ----</span>
+scores = pd.Series([<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">96</span>, <span class="nu">88</span>])
+<span class="fn">print</span>(scores)
+<span class="cm"># 0    85</span>
+<span class="cm"># 1    92</span>
+<span class="cm"># 2    78</span>
+<span class="cm"># 3    96</span>
+<span class="cm"># 4    88</span>
+
+<span class="cm"># ---- 커스텀 인덱스 ----</span>
+scores = pd.Series(
+    [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">96</span>, <span class="nu">88</span>],
+    index=[<span class="st">"철수"</span>, <span class="st">"영희"</span>, <span class="st">"민수"</span>, <span class="st">"지훈"</span>, <span class="st">"수진"</span>]
+)
+<span class="fn">print</span>(scores[<span class="st">"영희"</span>])     <span class="cm"># 92</span>
+
+<span class="cm"># ---- 자주 쓰는 통계 ----</span>
+<span class="fn">print</span>(scores.mean())      <span class="cm"># 평균값: 87.8</span>
+<span class="fn">print</span>(scores.max())       <span class="cm"># 최대값: 96</span>
+<span class="fn">print</span>(scores.min())       <span class="cm"># 최소값: 78</span>
+<span class="fn">print</span>(scores.std())       <span class="cm"># 표준편차</span>
+<span class="fn">print</span>(scores.describe())  <span class="cm"># 한 번에 전체 통계 정보 보기</span>
+
+<span class="cm"># ---- 벡터화 연산 (for 루프 불필요!) ----</span>
+<span class="fn">print</span>(scores + <span class="nu">5</span>)         <span class="cm"># 모든 사람에게 5점 추가</span>
+<span class="fn">print</span>(scores > <span class="nu">90</span>)        <span class="cm"># 불리언 Series 반환</span>
+<span class="fn">print</span>(scores[scores > <span class="nu">90</span>]) <span class="cm"># 90점 초과 필터링</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📋</span>
+        <span class="topic-name">DataFrame — 2차원 테이블 (핵심 중의 핵심)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">DataFrame은 행과 열이 있는 테이블로, Excel의 시트와 같습니다. Pandas에서 95%의 시간은 DataFrame을 다루는 데 씁니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> dataframe.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 딕셔너리에서 생성 (가장 일반적인 방법) ----</span>
+data = {
+    <span class="st">"name"</span>:  [<span class="st">"철수"</span>, <span class="st">"영희"</span>, <span class="st">"민수"</span>, <span class="st">"지훈"</span>, <span class="st">"수진"</span>],
+    <span class="st">"age"</span>:   [<span class="nu">22</span>, <span class="nu">21</span>, <span class="nu">23</span>, <span class="nu">22</span>, <span class="nu">24</span>],
+    <span class="st">"score"</span>: [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">96</span>, <span class="nu">88</span>],
+    <span class="st">"city"</span>:  [<span class="st">"서울"</span>, <span class="st">"부산"</span>, <span class="st">"서울"</span>, <span class="st">"대전"</span>, <span class="st">"부산"</span>]
+}
+df = pd.DataFrame(data)
+<span class="fn">print</span>(df)
+<span class="cm">#   name  age  score city</span>
+<span class="cm"># 0  철수   22     85  서울</span>
+<span class="cm"># 1  영희   21     92  부산</span>
+<span class="cm"># 2  민수   23     78  서울</span>
+<span class="cm"># 3  지훈   22     96  대전</span>
+<span class="cm"># 4  수진   24     88  부산</span>
+
+<span class="cm"># ---- 기본 속성 ----</span>
+<span class="fn">print</span>(df.shape)        <span class="cm"># (5, 4) → 5행 4열</span>
+<span class="fn">print</span>(df.columns)      <span class="cm"># Index(['name', 'age', 'score', 'city'])</span>
+<span class="fn">print</span>(df.dtypes)       <span class="cm"># 각 열의 데이터 타입</span>
+<span class="fn">print</span>(df.info())       <span class="cm"># 전체 정보 요약</span>
+
+<span class="cm"># ---- 열 추출 (Series 반환) ----</span>
+<span class="fn">print</span>(df[<span class="st">"name"</span>])       <span class="cm"># 한 열 추출</span>
+<span class="fn">print</span>(df[[<span class="st">"name"</span>, <span class="st">"score"</span>]])  <span class="cm"># 여러 열 추출 (이중 대괄호)</span>
+
+<span class="cm"># ---- 행 추출 ----</span>
+<span class="fn">print</span>(df.head(<span class="nu">3</span>))       <span class="cm"># 앞 3행</span>
+<span class="fn">print</span>(df.tail(<span class="nu">2</span>))       <span class="cm"># 뒤 2행</span>
+
+<span class="cm"># ---- 빠른 통계 ----</span>
+<span class="fn">print</span>(df.describe())   <span class="cm"># 수치 열의 통계 요약</span>
+<span class="fn">print</span>(df[<span class="st">"score"</span>].mean())  <span class="cm"># 평균 점수</span>
+<span class="fn">print</span>(df[<span class="st">"city"</span>].value_counts())  <span class="cm"># 각 도시 출현 횟수</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 DataFrame과 Phase 1에서 배운 딕셔너리의 관계는?</h4>
+          <ul>
+            <li>딕셔너리의 key → DataFrame의 열 이름</li>
+            <li>딕셔너리의 value(리스트) → DataFrame의 열 데이터</li>
+            <li>API가 반환하는 JSON 리스트 → <code>pd.DataFrame(json_list)</code>로 바로 테이블로 변환 가능</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 1-2 연습</h3>
+      <div class="practice-item">5명의 학생 정보가 포함된 DataFrame을 직접 만들고 (이름, 나이, 성적, 도시) 기본 통계 수행</div>
+      <div class="practice-item"><code>.describe()</code>로 수치 열 요약 보기, <code>.value_counts()</code>로 도시 분포 통계</div>
+      <div class="practice-item">열 추출, 행 추출 연습: 모든 사람의 이름과 성적 추출, 앞 3행 데이터 추출</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 3-4 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d3" style="--dc: #6366f1;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">3-4</span></div>
+      <div>
+        <div class="day-title">데이터 읽기와 기본 탐색</div>
+        <div class="day-subtitle">파일 읽기가 첫 단계 — CSV, Excel, JSON 모두 해결</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📁</span>
+        <span class="topic-name">다양한 형식의 데이터 읽기</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> read_data.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- CSV 읽기 (가장 일반적) ----</span>
+df = pd.read_csv(<span class="st">"data.csv"</span>)
+df = pd.read_csv(<span class="st">"data.csv"</span>, encoding=<span class="st">"utf-8"</span>)        <span class="cm"># 인코딩 지정</span>
+df = pd.read_csv(<span class="st">"data.csv"</span>, usecols=[<span class="st">"name"</span>, <span class="st">"score"</span>])  <span class="cm"># 특정 열만 읽기</span>
+df = pd.read_csv(<span class="st">"data.csv"</span>, nrows=<span class="nu">100</span>)                <span class="cm"># 앞 100행만 읽기</span>
+
+<span class="cm"># ---- Excel 읽기 ----</span>
+df = pd.read_excel(<span class="st">"data.xlsx"</span>)
+df = pd.read_excel(<span class="st">"data.xlsx"</span>, sheet_name=<span class="st">"Sheet2"</span>)  <span class="cm"># 워크시트 지정</span>
+
+<span class="cm"># ---- JSON 읽기 ----</span>
+df = pd.read_json(<span class="st">"data.json"</span>)
+
+<span class="cm"># ---- 딕셔너리 리스트에서 생성 (API 반환값에서 자주 사용) ----</span>
+api_data = [
+    {<span class="st">"id"</span>: <span class="nu">1</span>, <span class="st">"text"</span>: <span class="st">"안녕하세요"</span>, <span class="st">"score"</span>: <span class="nu">0.95</span>},
+    {<span class="st">"id"</span>: <span class="nu">2</span>, <span class="st">"text"</span>: <span class="st">"세계"</span>, <span class="st">"score"</span>: <span class="nu">0.87</span>},
+]
+df = pd.DataFrame(api_data)
+
+<span class="cm"># ---- 데이터 저장 ----</span>
+df.to_csv(<span class="st">"output.csv"</span>, index=<span class="kw">False</span>)        <span class="cm"># 행 번호 저장 안 함</span>
+df.to_excel(<span class="st">"output.xlsx"</span>, index=<span class="kw">False</span>)
+df.to_json(<span class="st">"output.json"</span>, orient=<span class="st">"records"</span>, force_ascii=<span class="kw">False</span>)</pre>
+        </div>
+        <div class="warn-box">
+          <h4>⚠️ 자주 빠지는 함정</h4>
+          <p><code>to_csv()</code>는 기본적으로 행 인덱스를 저장하여 숫자 열이 하나 추가됩니다. 반드시 <code>index=False</code>를 추가하세요. 한국어 파일은 <code>encoding="utf-8-sig"</code>에 주의하세요 (Excel에서 깨지지 않게).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔍</span>
+        <span class="topic-name">데이터 탐색 3종 세트</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">어떤 데이터든 받으면 첫 번째로 할 일은 "탐색"입니다 — 어떤 열이 있는지, 몇 행인지, 결측값이 있는지, 데이터 분포가 어떤지 확인합니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> explore.py — 데이터를 받은 후 표준 절차</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.read_csv(<span class="st">"data.csv"</span>)
+
+<span class="cm"># ========== 첫 번째: 구조 보기 ==========</span>
+<span class="fn">print</span>(df.shape)            <span class="cm"># 몇 행 몇 열?</span>
+<span class="fn">print</span>(df.columns.tolist())  <span class="cm"># 열 이름 리스트</span>
+<span class="fn">print</span>(df.dtypes)            <span class="cm"># 각 열 데이터 타입</span>
+<span class="fn">print</span>(df.head())            <span class="cm"># 앞 5행이 어떻게 생겼는지 보기</span>
+
+<span class="cm"># ========== 두 번째: 결측값 보기 ==========</span>
+<span class="fn">print</span>(df.isnull().sum())    <span class="cm"># 각 열의 결측값 개수</span>
+<span class="fn">print</span>(df.isnull().sum() / <span class="fn">len</span>(df) * <span class="nu">100</span>)  <span class="cm"># 결측률 (%)</span>
+
+<span class="cm"># ========== 세 번째: 분포 보기 ==========</span>
+<span class="fn">print</span>(df.describe())           <span class="cm"># 수치 열 통계</span>
+<span class="fn">print</span>(df[<span class="st">"city"</span>].value_counts())  <span class="cm"># 범주형 열 빈도</span>
+<span class="fn">print</span>(df[<span class="st">"score"</span>].hist())         <span class="cm"># 분포 히스토그램 (선택)</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 습관 만들기: 데이터를 읽을 때마다 이 3종 세트를 먼저 실행하세요</h4>
+          <ul>
+            <li><strong>구조 보기</strong> → 어떤 데이터를 사용할 수 있는지 파악</li>
+            <li><strong>결측값 보기</strong> → 이후 정제 방법 결정</li>
+            <li><strong>분포 보기</strong> → 이상값과 데이터 특성 발견</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 3-4 연습</h3>
+      <div class="practice-item">Kaggle에서 CSV 데이터셋 다운로드 (추천: Titanic 데이터셋), 3종 세트로 완전한 탐색 수행</div>
+      <div class="practice-item">JSON 형식의 API 반환값을 DataFrame으로 변환한 후 CSV로 내보내기</div>
+      <div class="practice-item">Excel 파일의 특정 시트를 읽어 앞 50행과 지정 열만 읽기</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 5-6 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d5" style="--dc: #f59e0b;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">5-6</span></div>
+      <div>
+        <div class="day-title">필터링, 정렬과 인덱싱</div>
+        <div class="day-subtitle">대량의 데이터에서 원하는 부분을 "골라내기"</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🎯</span>
+        <span class="topic-name">조건 필터링 (가장 자주 쓰는 작업, 단연 1위)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> filtering.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.DataFrame({
+    <span class="st">"name"</span>:  [<span class="st">"철수"</span>, <span class="st">"영희"</span>, <span class="st">"민수"</span>, <span class="st">"지훈"</span>, <span class="st">"수진"</span>],
+    <span class="st">"age"</span>:   [<span class="nu">22</span>, <span class="nu">21</span>, <span class="nu">23</span>, <span class="nu">22</span>, <span class="nu">24</span>],
+    <span class="st">"score"</span>: [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">96</span>, <span class="nu">88</span>],
+    <span class="st">"city"</span>:  [<span class="st">"서울"</span>, <span class="st">"부산"</span>, <span class="st">"서울"</span>, <span class="st">"대전"</span>, <span class="st">"부산"</span>]
+})
+
+<span class="cm"># ---- 단일 조건 필터링 ----</span>
+high_score = df[df[<span class="st">"score"</span>] > <span class="nu">90</span>]           <span class="cm"># 성적 > 90</span>
+seoul = df[df[<span class="st">"city"</span>] == <span class="st">"서울"</span>]          <span class="cm"># 서울 학생</span>
+
+<span class="cm"># ---- 다중 조건 필터링 (& 그리고 | 또는) ----</span>
+result = df[(df[<span class="st">"score"</span>] > <span class="nu">80</span>) & (df[<span class="st">"city"</span>] == <span class="st">"부산"</span>)]
+result = df[(df[<span class="st">"city"</span>] == <span class="st">"서울"</span>) | (df[<span class="st">"city"</span>] == <span class="st">"부산"</span>)]
+
+<span class="cm"># ---- isin() 다중 값 매칭 ----</span>
+big_city = df[df[<span class="st">"city"</span>].isin([<span class="st">"서울"</span>, <span class="st">"부산"</span>])]
+
+<span class="cm"># ---- 문자열 필터링 ----</span>
+df[df[<span class="st">"name"</span>].str.contains(<span class="st">"수"</span>)]    <span class="cm"># 이름에 "수" 포함</span>
+df[df[<span class="st">"name"</span>].str.startswith(<span class="st">"철"</span>)]  <span class="cm"># 이름이 "철"로 시작</span>
+
+<span class="cm"># ---- between() 범위 필터링 ----</span>
+df[df[<span class="st">"score"</span>].between(<span class="nu">80</span>, <span class="nu">95</span>)]       <span class="cm"># 80 ≤ score ≤ 95</span></pre>
+        </div>
+        <div class="warn-box">
+          <h4>⚠️ 다중 조건 필터링에는 반드시 괄호를 넣으세요!</h4>
+          <p>잘못된 작성법: <code>df[df["score"] > 80 & df["city"] == "부산"]</code><br>
+          올바른 작성법: <code>df[(df["score"] > 80) & (df["city"] == "부산")]</code><br>
+          <code>&</code>의 우선순위가 <code>></code>보다 높기 때문에 괄호가 없으면 에러가 발생합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔃</span>
+        <span class="topic-name">정렬</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> sorting.py</div>
+<pre><span class="cm"># ---- 단일 열 정렬 ----</span>
+df.sort_values(<span class="st">"score"</span>, ascending=<span class="kw">False</span>)    <span class="cm"># 성적 높은 순</span>
+
+<span class="cm"># ---- 다중 열 정렬 ----</span>
+df.sort_values([<span class="st">"city"</span>, <span class="st">"score"</span>], ascending=[<span class="kw">True</span>, <span class="kw">False</span>])
+<span class="cm"># 도시 오름차순, 같은 도시 내에서 성적 내림차순</span>
+
+<span class="cm"># ---- Top N 추출 ----</span>
+df.nlargest(<span class="nu">3</span>, <span class="st">"score"</span>)    <span class="cm"># 성적 상위 3명</span>
+df.nsmallest(<span class="nu">3</span>, <span class="st">"age"</span>)     <span class="cm"># 나이 가장 어린 3명</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📍</span>
+        <span class="topic-name">loc과 iloc — 정밀 위치 지정</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> loc_iloc.py</div>
+<pre><span class="cm"># ---- loc: 라벨(이름)로 선택 ----</span>
+df.loc[<span class="nu">0</span>, <span class="st">"name"</span>]              <span class="cm"># 0번째 행의 name → "철수"</span>
+df.loc[<span class="nu">0</span>:<span class="nu">2</span>, [<span class="st">"name"</span>, <span class="st">"score"</span>]]  <span class="cm"># 0~2행의 name과 score</span>
+df.loc[df[<span class="st">"score"</span>] > <span class="nu">90</span>, <span class="st">"name"</span>]  <span class="cm"># 성적>90인 사람의 이름</span>
+
+<span class="cm"># ---- iloc: 위치(숫자)로 선택 ----</span>
+df.iloc[<span class="nu">0</span>, <span class="nu">0</span>]         <span class="cm"># 0행 0열</span>
+df.iloc[<span class="nu">0</span>:<span class="nu">3</span>, <span class="nu">0</span>:<span class="nu">2</span>]     <span class="cm"># 앞 3행, 앞 2열</span>
+df.iloc[<span class="op">-</span><span class="nu">1</span>]            <span class="cm"># 마지막 행</span>
+
+<span class="cm"># ---- 값 수정 ----</span>
+df.loc[<span class="nu">0</span>, <span class="st">"score"</span>] = <span class="nu">90</span>    <span class="cm"># 철수의 성적 수정</span>
+df.loc[df[<span class="st">"city"</span>] == <span class="st">"서울"</span>, <span class="st">"score"</span>] += <span class="nu">5</span>  <span class="cm"># 서울 학생 5점 추가</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 loc vs iloc 한 마디로 구분</h4>
+          <ul>
+            <li><code>loc</code> → 이름으로 찾기 (label-based), 조건 필터링 지원</li>
+            <li><code>iloc</code> → 위치 번호로 찾기 (integer-based), 순수 숫자 인덱스</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 5-6 연습</h3>
+      <div class="practice-item">성적이 80~95 사이이고, 도시가 서울 또는 부산인 학생 필터링</div>
+      <div class="practice-item">성적 높은 순으로 정렬하여 Top 3를 추출하고, loc으로 이름과 도시 추출</div>
+      <div class="practice-item">모든 대전 학생의 성적에 1.1을 곱하고 (10% 가산점), 새 CSV로 저장</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 7-8 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d7" style="--dc: #10b981;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">7-8</span></div>
+      <div>
+        <div class="day-title">데이터 정제 실전</div>
+        <div class="day-subtitle">실제 데이터는 항상 지저분합니다 — 결측값, 중복값, 타입 에러</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🕳️</span>
+        <span class="topic-name">결측값 (NaN) 처리</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> missing_values.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+df = pd.DataFrame({
+    <span class="st">"name"</span>:  [<span class="st">"철수"</span>, <span class="st">"영희"</span>, <span class="st">"민수"</span>, np.nan, <span class="st">"수진"</span>],
+    <span class="st">"score"</span>: [<span class="nu">85</span>, np.nan, <span class="nu">78</span>, <span class="nu">96</span>, np.nan],
+    <span class="st">"city"</span>:  [<span class="st">"서울"</span>, <span class="st">"부산"</span>, np.nan, <span class="st">"대전"</span>, <span class="st">"부산"</span>]
+})
+
+<span class="cm"># ---- 결측값 확인 ----</span>
+<span class="fn">print</span>(df.isnull())             <span class="cm"># 각 셀이 비어 있는지</span>
+<span class="fn">print</span>(df.isnull().sum())        <span class="cm"># 각 열의 결측 수량</span>
+
+<span class="cm"># ---- 결측값 삭제 ----</span>
+df.dropna()                     <span class="cm"># 결측값이 있는 행 삭제</span>
+df.dropna(subset=[<span class="st">"name"</span>])      <span class="cm"># name이 비어 있는 행만 삭제</span>
+df.dropna(thresh=<span class="nu">2</span>)             <span class="cm"># 비어 있지 않은 값이 최소 2개인 행만 유지</span>
+
+<span class="cm"># ---- 결측값 채우기 ----</span>
+df[<span class="st">"score"</span>].fillna(<span class="nu">0</span>)           <span class="cm"># 0으로 채우기</span>
+df[<span class="st">"score"</span>].fillna(df[<span class="st">"score"</span>].mean())  <span class="cm"># 평균값으로 채우기 (자주 사용)</span>
+df[<span class="st">"city"</span>].fillna(<span class="st">"미정"</span>)       <span class="cm"># 커스텀 텍스트로 채우기</span>
+df.fillna(method=<span class="st">"ffill"</span>)       <span class="cm"># 이전 행의 값으로 채우기</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">👯</span>
+        <span class="topic-name">중복값 처리</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> duplicates.py</div>
+<pre><span class="cm"># ---- 중복 감지 ----</span>
+<span class="fn">print</span>(df.duplicated().sum())           <span class="cm"># 중복 행이 몇 개인지</span>
+<span class="fn">print</span>(df[df.duplicated()])             <span class="cm"># 중복 행 보기</span>
+<span class="fn">print</span>(df.duplicated(subset=[<span class="st">"name"</span>]))  <span class="cm"># 특정 열 기준으로 중복 판단</span>
+
+<span class="cm"># ---- 중복 삭제 ----</span>
+df.drop_duplicates()                    <span class="cm"># 완전히 동일한 행</span>
+df.drop_duplicates(subset=[<span class="st">"name"</span>], keep=<span class="st">"first"</span>)  <span class="cm"># name 기준 중복 제거, 첫 번째 유지</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔄</span>
+        <span class="topic-name">타입 변환과 텍스트 정제</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> type_cleaning.py</div>
+<pre><span class="cm"># ---- 타입 변환 ----</span>
+df[<span class="st">"score"</span>] = df[<span class="st">"score"</span>].astype(<span class="fn">float</span>)      <span class="cm"># 부동소수점으로 변환</span>
+df[<span class="st">"age"</span>] = pd.to_numeric(df[<span class="st">"age"</span>], errors=<span class="st">"coerce"</span>)  <span class="cm"># 안전하게 숫자로 변환, 불가능한 값은 NaN</span>
+df[<span class="st">"date"</span>] = pd.to_datetime(df[<span class="st">"date"</span>])     <span class="cm"># 날짜로 변환</span>
+
+<span class="cm"># ---- 텍스트 정제 (AI 개발에서 매우 자주 사용) ----</span>
+df[<span class="st">"name"</span>] = df[<span class="st">"name"</span>].str.strip()         <span class="cm"># 앞뒤 공백 제거</span>
+df[<span class="st">"name"</span>] = df[<span class="st">"name"</span>].str.lower()         <span class="cm"># 소문자로 변환</span>
+df[<span class="st">"text"</span>] = df[<span class="st">"text"</span>].str.replace(<span class="st">"\n"</span>, <span class="st">" "</span>)  <span class="cm"># 줄바꿈을 공백으로</span>
+df[<span class="st">"text"</span>] = df[<span class="st">"text"</span>].str.replace(<span class="st">r"\s+"</span>, <span class="st">" "</span>, regex=<span class="kw">True</span>)  <span class="cm"># 다중 공백을 하나로</span>
+
+<span class="cm"># ---- 계산 열 추가 ----</span>
+df[<span class="st">"pass"</span>] = df[<span class="st">"score"</span>] >= <span class="nu">60</span>              <span class="cm"># 불리언 열: 합격 여부</span>
+df[<span class="st">"level"</span>] = df[<span class="st">"score"</span>].apply(
+    <span class="kw">lambda</span> x: <span class="st">"우수"</span> <span class="kw">if</span> x >= <span class="nu">90</span> <span class="kw">else</span> (<span class="st">"합격"</span> <span class="kw">if</span> x >= <span class="nu">60</span> <span class="kw">else</span> <span class="st">"불합격"</span>)
+)
+
+<span class="cm"># ---- rename 열 이름 변경 ----</span>
+df = df.rename(columns={<span class="st">"name"</span>: <span class="st">"이름"</span>, <span class="st">"score"</span>: <span class="st">"성적"</span>})</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 apply()의 역할</h4>
+          <ul>
+            <li><code>apply()</code>는 각 행/각 값에 대해 커스텀 함수를 실행</li>
+            <li><code>lambda</code>와 함께 사용하면 복잡한 변환 로직도 한 줄로 해결</li>
+            <li>이후 Prompt 조합 시 자주 사용: <code>df["prompt"] = df["text"].apply(lambda x: f"번역해 주세요: {x}")</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 7-8 연습</h3>
+      <div class="practice-item">Titanic 데이터셋을 다운로드하여 결측값을 확인하고 합리적인 전략으로 채우기 (나이는 중앙값, 항구는 최빈값)</div>
+      <div class="practice-item">불필요한 공백, 대소문자 불일치, 중복 행이 있는 데이터를 정제</div>
+      <div class="practice-item">"연령대" 열 추가: 18세 미만=미성년자, 18-60=성인, 60세 이상=노인 (apply + lambda 사용)</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 9-10 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d9" style="--dc: #ec4899;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">9-10</span></div>
+      <div>
+        <div class="day-title">그룹 집계와 피벗 테이블</div>
+        <div class="day-subtitle">groupby는 Pandas의 가장 강력한 기능 — "XX별로 그룹화하여 YY를 통계"</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📊</span>
+        <span class="topic-name">groupby — 그룹 집계</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">groupby의 사고 방식: <strong>분할 → 적용 → 결합</strong>. 먼저 특정 열로 그룹화하고, 각 그룹에 통계를 적용한 후, 결과를 결합합니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> groupby.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.DataFrame({
+    <span class="st">"name"</span>:     [<span class="st">"철수"</span>,<span class="st">"영희"</span>,<span class="st">"민수"</span>,<span class="st">"지훈"</span>,<span class="st">"수진"</span>,<span class="st">"현우"</span>],
+    <span class="st">"city"</span>:     [<span class="st">"서울"</span>,<span class="st">"부산"</span>,<span class="st">"서울"</span>,<span class="st">"대전"</span>,<span class="st">"부산"</span>,<span class="st">"서울"</span>],
+    <span class="st">"department"</span>: [<span class="st">"기술"</span>,<span class="st">"기술"</span>,<span class="st">"제품"</span>,<span class="st">"기술"</span>,<span class="st">"제품"</span>,<span class="st">"기술"</span>],
+    <span class="st">"salary"</span>:   [<span class="nu">15000</span>,<span class="nu">18000</span>,<span class="nu">12000</span>,<span class="nu">20000</span>,<span class="nu">13000</span>,<span class="nu">16000</span>],
+    <span class="st">"age"</span>:      [<span class="nu">25</span>,<span class="nu">28</span>,<span class="nu">30</span>,<span class="nu">26</span>,<span class="nu">32</span>,<span class="nu">24</span>]
+})
+
+<span class="cm"># ---- 도시별 그룹화, 평균 급여 계산 ----</span>
+<span class="fn">print</span>(df.groupby(<span class="st">"city"</span>)[<span class="st">"salary"</span>].mean())
+<span class="cm"># city</span>
+<span class="cm"># 부산    15500</span>
+<span class="cm"># 서울    14333</span>
+<span class="cm"># 대전    20000</span>
+
+<span class="cm"># ---- 여러 집계 함수 ----</span>
+<span class="fn">print</span>(df.groupby(<span class="st">"city"</span>)[<span class="st">"salary"</span>].agg([<span class="st">"mean"</span>, <span class="st">"max"</span>, <span class="st">"min"</span>, <span class="st">"count"</span>]))
+
+<span class="cm"># ---- 다중 열 그룹화 ----</span>
+<span class="fn">print</span>(df.groupby([<span class="st">"city"</span>, <span class="st">"department"</span>])[<span class="st">"salary"</span>].mean())
+
+<span class="cm"># ---- agg()로 열마다 다른 통계 적용 ----</span>
+result = df.groupby(<span class="st">"city"</span>).agg({
+    <span class="st">"salary"</span>: [<span class="st">"mean"</span>, <span class="st">"max"</span>],
+    <span class="st">"age"</span>: <span class="st">"mean"</span>,
+    <span class="st">"name"</span>: <span class="st">"count"</span>       <span class="cm"># 카운트</span>
+})
+<span class="fn">print</span>(result)
+
+<span class="cm"># ---- 그룹화 후 정렬 ----</span>
+city_salary = df.groupby(<span class="st">"city"</span>)[<span class="st">"salary"</span>].mean().sort_values(ascending=<span class="kw">False</span>)
+<span class="fn">print</span>(city_salary)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📐</span>
+        <span class="topic-name">pivot_table — 피벗 테이블</span>
+        <span class="topic-tag tag-imp">중요</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">피벗 테이블은 Excel의 "데이터 피벗 테이블" 기능과 같습니다 — 행과 열을 교차 통계하며, 한 줄의 코드로 해결됩니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> pivot.py</div>
+<pre><span class="cm"># ---- 기본 피벗 테이블 ----</span>
+pivot = df.pivot_table(
+    values=<span class="st">"salary"</span>,         <span class="cm"># 통계할 값</span>
+    index=<span class="st">"city"</span>,             <span class="cm"># 행</span>
+    columns=<span class="st">"department"</span>,     <span class="cm"># 열</span>
+    aggfunc=<span class="st">"mean"</span>            <span class="cm"># 집계 방식</span>
+)
+<span class="fn">print</span>(pivot)
+<span class="cm"># department   제품      기술</span>
+<span class="cm"># city</span>
+<span class="cm"># 부산       13000.0  18000.0</span>
+<span class="cm"># 서울       12000.0  15500.0</span>
+<span class="cm"># 대전           NaN  20000.0</span>
+
+<span class="cm"># ---- 행/열 합계 추가 ----</span>
+pivot = df.pivot_table(
+    values=<span class="st">"salary"</span>, index=<span class="st">"city"</span>, columns=<span class="st">"department"</span>,
+    aggfunc=<span class="st">"mean"</span>, margins=<span class="kw">True</span>, margins_name=<span class="st">"합계"</span>
+)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 9-10 연습</h3>
+      <div class="practice-item">부서별 평균 급여, 최고 급여, 인원 수 통계</div>
+      <div class="practice-item">피벗 테이블 만들기: 행=도시, 열=부서, 값=평균 급여</div>
+      <div class="practice-item">각 도시에서 급여가 가장 높은 사람 찾기 (힌트: <code>groupby + idxmax</code> 사용)</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 11-12 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d11" style="--dc: #f97316;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">11-12</span></div>
+      <div>
+        <div class="day-title">다중 테이블 병합과 연결</div>
+        <div class="day-subtitle">실제 프로젝트에서 데이터는 여러 테이블에 흩어져 있습니다 — merge로 합치기</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔗</span>
+        <span class="topic-name">merge — 테이블 연결 (SQL의 JOIN과 유사)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> merge.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 두 개의 테이블</span>
+users = pd.DataFrame({
+    <span class="st">"user_id"</span>: [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>],
+    <span class="st">"name"</span>: [<span class="st">"철수"</span>, <span class="st">"영희"</span>, <span class="st">"민수"</span>, <span class="st">"지훈"</span>]
+})
+orders = pd.DataFrame({
+    <span class="st">"order_id"</span>: [<span class="nu">101</span>, <span class="nu">102</span>, <span class="nu">103</span>, <span class="nu">104</span>],
+    <span class="st">"user_id"</span>: [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">2</span>, <span class="nu">5</span>],
+    <span class="st">"amount"</span>: [<span class="nu">100</span>, <span class="nu">200</span>, <span class="nu">150</span>, <span class="nu">300</span>]
+})
+
+<span class="cm"># ---- inner join (양쪽 모두에 있는 것만 유지) ----</span>
+result = pd.merge(users, orders, on=<span class="st">"user_id"</span>, how=<span class="st">"inner"</span>)
+
+<span class="cm"># ---- left join (왼쪽 테이블 전체 유지) ----</span>
+result = pd.merge(users, orders, on=<span class="st">"user_id"</span>, how=<span class="st">"left"</span>)
+
+<span class="cm"># ---- right join (오른쪽 테이블 전체 유지) ----</span>
+result = pd.merge(users, orders, on=<span class="st">"user_id"</span>, how=<span class="st">"right"</span>)
+
+<span class="cm"># ---- outer join (양쪽 모두 유지) ----</span>
+result = pd.merge(users, orders, on=<span class="st">"user_id"</span>, how=<span class="st">"outer"</span>)</pre>
+        </div>
+
+        <table class="vs-table">
+          <tr><th>연결 방식</th><th>유지 데이터</th><th>비유</th></tr>
+          <tr><td><code>inner</code></td><td>양쪽 모두에 있는 것</td><td>교집합</td></tr>
+          <tr><td><code>left</code></td><td>왼쪽 테이블 전부 + 오른쪽 매칭</td><td>왼쪽 테이블 기준</td></tr>
+          <tr><td><code>right</code></td><td>오른쪽 테이블 전부 + 왼쪽 매칭</td><td>오른쪽 테이블 기준</td></tr>
+          <tr><td><code>outer</code></td><td>양쪽 전부</td><td>합집합</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📎</span>
+        <span class="topic-name">concat — 상하/좌우 이어붙이기</span>
+        <span class="topic-tag tag-imp">중요</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> concat.py</div>
+<pre><span class="cm"># ---- 상하 이어붙이기 (행 추가) ----</span>
+df1 = pd.DataFrame({<span class="st">"name"</span>: [<span class="st">"A"</span>, <span class="st">"B"</span>], <span class="st">"score"</span>: [<span class="nu">80</span>, <span class="nu">90</span>]})
+df2 = pd.DataFrame({<span class="st">"name"</span>: [<span class="st">"C"</span>, <span class="st">"D"</span>], <span class="st">"score"</span>: [<span class="nu">85</span>, <span class="nu">95</span>]})
+
+combined = pd.concat([df1, df2], ignore_index=<span class="kw">True</span>)
+<span class="cm"># ignore_index=True 인덱스 재번호 매기기</span>
+
+<span class="cm"># ---- 좌우 이어붙이기 (열 추가) ----</span>
+info = pd.DataFrame({<span class="st">"city"</span>: [<span class="st">"서울"</span>, <span class="st">"부산"</span>]})
+combined = pd.concat([df1, info], axis=<span class="nu">1</span>)
+
+<span class="cm"># ---- 실제 시나리오: 여러 CSV 합치기 ----</span>
+<span class="kw">import</span> glob
+files = glob.glob(<span class="st">"data/*.csv"</span>)
+all_dfs = [pd.read_csv(f) <span class="kw">for</span> f <span class="kw">in</span> files]
+merged = pd.concat(all_dfs, ignore_index=<span class="kw">True</span>)</pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 merge vs concat</h4>
+          <p><code>merge</code> = 공통 열을 기준으로 관련 (SQL JOIN과 유사)<br><code>concat</code> = 단순 연결 (상하로 행 추가 또는 좌우로 열 추가)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 11-12 연습</h3>
+      <div class="practice-item">"사용자 테이블"과 "주문 테이블"을 만들고, merge로 left join하여 주문이 없는 사용자 찾기</div>
+      <div class="practice-item">구조가 동일한 3개의 CSV 파일을 하나의 큰 테이블로 합치기</div>
+      <div class="practice-item">사용자 테이블과 부서 테이블을 합치고, 각 부서의 평균 소비 금액 계산</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 13-14 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d13" style="--dc: #06b6d4;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">13-14</span></div>
+      <div>
+        <div class="day-title">SQL 기본 쿼리</div>
+        <div class="day-subtitle">데이터베이스는 기업 데이터의 본거지 — SELECT만 배우면 충분합니다</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🗄️</span>
+        <span class="topic-name">SQL 핵심 문법</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">SQL의 핵심은 하나의 패턴입니다: <strong>어떤 테이블에서(FROM) 어떤 열을 선택하고(SELECT), 어떤 조건을 만족하는지(WHERE)</strong>.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> SQL 기본 문법</div>
+<pre><span class="cm">-- ---- 기본 조회 ----</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users;                       <span class="cm">-- 전체 조회</span>
+<span class="kw">SELECT</span> name, age <span class="kw">FROM</span> users;               <span class="cm">-- 열 선택</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> age > <span class="nu">20</span>;       <span class="cm">-- 조건 필터링</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> city = <span class="st">'서울'</span>;  <span class="cm">-- 텍스트 조건</span>
+
+<span class="cm">-- ---- AND / OR / IN ----</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> age > <span class="nu">20</span> <span class="kw">AND</span> city = <span class="st">'서울'</span>;
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> city <span class="kw">IN</span> (<span class="st">'서울'</span>, <span class="st">'부산'</span>);
+
+<span class="cm">-- ---- 정렬 ----</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">ORDER BY</span> age <span class="kw">DESC</span>;   <span class="cm">-- 내림차순</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">ORDER BY</span> age <span class="kw">ASC</span>;    <span class="cm">-- 오름차순 (기본값)</span>
+
+<span class="cm">-- ---- LIMIT ----</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">ORDER BY</span> score <span class="kw">DESC</span> <span class="kw">LIMIT</span> <span class="nu">10</span>;  <span class="cm">-- 상위 10명</span>
+
+<span class="cm">-- ---- 중복 제거 ----</span>
+<span class="kw">SELECT DISTINCT</span> city <span class="kw">FROM</span> users;           <span class="cm">-- 어떤 도시들이 있는지</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📈</span>
+        <span class="topic-name">GROUP BY와 집계 함수</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> SQL 그룹 집계</div>
+<pre><span class="cm">-- ---- 집계 함수 ----</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> users;               <span class="cm">-- 총 행 수</span>
+<span class="kw">SELECT</span> <span class="fn">AVG</span>(score) <span class="kw">FROM</span> users;              <span class="cm">-- 평균 점수</span>
+<span class="kw">SELECT</span> <span class="fn">MAX</span>(score), <span class="fn">MIN</span>(score) <span class="kw">FROM</span> users;  <span class="cm">-- 최고/최저 점수</span>
+<span class="kw">SELECT</span> <span class="fn">SUM</span>(salary) <span class="kw">FROM</span> users;             <span class="cm">-- 급여 합계</span>
+
+<span class="cm">-- ---- GROUP BY 그룹화 ----</span>
+<span class="kw">SELECT</span> city, <span class="fn">AVG</span>(salary) <span class="kw">AS</span> avg_salary
+<span class="kw">FROM</span> users
+<span class="kw">GROUP BY</span> city;
+
+<span class="cm">-- ---- HAVING 그룹 결과 필터링 ----</span>
+<span class="kw">SELECT</span> city, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> cnt
+<span class="kw">FROM</span> users
+<span class="kw">GROUP BY</span> city
+<span class="kw">HAVING</span> cnt > <span class="nu">2</span>;                     <span class="cm">-- 인원 > 2인 도시</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔗</span>
+        <span class="topic-name">JOIN 테이블 연결</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> SQL JOIN</div>
+<pre><span class="cm">-- ---- INNER JOIN ----</span>
+<span class="kw">SELECT</span> u.name, o.amount
+<span class="kw">FROM</span> users u
+<span class="kw">INNER JOIN</span> orders o <span class="kw">ON</span> u.user_id = o.user_id;
+
+<span class="cm">-- ---- LEFT JOIN ----</span>
+<span class="kw">SELECT</span> u.name, o.amount
+<span class="kw">FROM</span> users u
+<span class="kw">LEFT JOIN</span> orders o <span class="kw">ON</span> u.user_id = o.user_id;
+<span class="cm">-- 모든 사용자를 유지하고, 주문이 없는 사용자의 amount는 NULL</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🐍</span>
+        <span class="topic-name">Python에서 SQL 실행 (SQLite로 연습)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> sql_in_python.py</div>
+<pre><span class="kw">import</span> sqlite3
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 메모리 데이터베이스 생성 + 데이터 임포트 ----</span>
+conn = sqlite3.connect(<span class="st">":memory:"</span>)
+
+df = pd.DataFrame({
+    <span class="st">"name"</span>: [<span class="st">"철수"</span>,<span class="st">"영희"</span>,<span class="st">"민수"</span>],
+    <span class="st">"city"</span>: [<span class="st">"서울"</span>,<span class="st">"부산"</span>,<span class="st">"서울"</span>],
+    <span class="st">"score"</span>: [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>]
+})
+df.to_sql(<span class="st">"students"</span>, conn, index=<span class="kw">False</span>)
+
+<span class="cm"># ---- SQL로 쿼리, 결과가 바로 DataFrame으로 ----</span>
+result = pd.read_sql(<span class="st">"SELECT * FROM students WHERE score > 80"</span>, conn)
+<span class="fn">print</span>(result)
+
+<span class="cm"># ---- 그룹 통계 ----</span>
+result = pd.read_sql(<span class="st">"""
+    SELECT city, AVG(score) AS avg_score, COUNT(*) AS cnt
+    FROM students
+    GROUP BY city
+"""</span>, conn)
+<span class="fn">print</span>(result)
+
+conn.close()</pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 Pandas와 SQL의 대응 관계</h4>
+          <p>Pandas를 배운 후 SQL을 배우면 매우 빠릅니다. 개념이 일대일로 대응되기 때문입니다: <code>df[조건]</code> = WHERE, <code>df.groupby()</code> = GROUP BY, <code>pd.merge()</code> = JOIN, <code>df.sort_values()</code> = ORDER BY.</p>
+        </div>
+
+        <table class="vs-table" style="margin-top: 14px;">
+          <tr><th>작업</th><th>Pandas</th><th>SQL</th></tr>
+          <tr><td>필터링</td><td><code>df[df["score"] > 80]</code></td><td><code>WHERE score > 80</code></td></tr>
+          <tr><td>열 선택</td><td><code>df[["name","score"]]</code></td><td><code>SELECT name, score</code></td></tr>
+          <tr><td>정렬</td><td><code>df.sort_values("score")</code></td><td><code>ORDER BY score</code></td></tr>
+          <tr><td>그룹화</td><td><code>df.groupby("city").mean()</code></td><td><code>GROUP BY city</code></td></tr>
+          <tr><td>병합</td><td><code>pd.merge(a, b, on="id")</code></td><td><code>JOIN b ON a.id = b.id</code></td></tr>
+          <tr><td>중복 제거</td><td><code>df["city"].unique()</code></td><td><code>SELECT DISTINCT city</code></td></tr>
+          <tr><td>카운트</td><td><code>df["city"].value_counts()</code></td><td><code>COUNT(*) GROUP BY city</code></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 13-14 연습</h3>
+      <div class="practice-item">SQLite + Pandas로 학생 데이터베이스를 만들고 SELECT / WHERE / GROUP BY / JOIN 연습</div>
+      <div class="practice-item">SQL로 각 도시에서 성적이 가장 높은 학생 찾기</div>
+      <div class="practice-item">같은 문제를 Pandas와 SQL로 각각 구현하여 비교 이해</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 15-17 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d15" style="--dc: #f43f5e;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">15-17</span></div>
+      <div>
+        <div class="day-title">JSON 심화 처리 + 종합 프로젝트</div>
+        <div class="day-subtitle">모든 지식을 하나로 엮기 — AI 엔지니어의 실제 업무 시나리오 시뮬레이션</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📦</span>
+        <span class="topic-name">중첩 JSON 처리 (AI API 반환값의 표준)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">대규모 언어 모델 API의 반환값은 보통 여러 겹으로 중첩된 JSON입니다. "양파 껍질을 벗기듯" 데이터를 추출하는 것이 핵심 기술입니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> nested_json.py</div>
+<pre><span class="kw">import</span> json
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># AI API 반환값 시뮬레이션</span>
+api_response = {
+    <span class="st">"id"</span>: <span class="st">"chatcmpl-abc123"</span>,
+    <span class="st">"model"</span>: <span class="st">"gpt-4"</span>,
+    <span class="st">"choices"</span>: [
+        {
+            <span class="st">"index"</span>: <span class="nu">0</span>,
+            <span class="st">"message"</span>: {
+                <span class="st">"role"</span>: <span class="st">"assistant"</span>,
+                <span class="st">"content"</span>: <span class="st">"Python은 프로그래밍 언어입니다."</span>
+            },
+            <span class="st">"finish_reason"</span>: <span class="st">"stop"</span>
+        }
+    ],
+    <span class="st">"usage"</span>: {
+        <span class="st">"prompt_tokens"</span>: <span class="nu">10</span>,
+        <span class="st">"completion_tokens"</span>: <span class="nu">15</span>,
+        <span class="st">"total_tokens"</span>: <span class="nu">25</span>
+    }
+}
+
+<span class="cm"># ---- 단계별 추출 ----</span>
+content = api_response[<span class="st">"choices"</span>][<span class="nu">0</span>][<span class="st">"message"</span>][<span class="st">"content"</span>]
+tokens = api_response[<span class="st">"usage"</span>][<span class="st">"total_tokens"</span>]
+<span class="fn">print</span>(<span class="st">f"답변: </span><span class="var">{content}</span><span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"소비 token: </span><span class="var">{tokens}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 배치 API 결과 → DataFrame ----</span>
+results = [
+    {<span class="st">"question"</span>: <span class="st">"Q1"</span>, <span class="st">"answer"</span>: <span class="st">"A1"</span>, <span class="st">"tokens"</span>: <span class="nu">20</span>},
+    {<span class="st">"question"</span>: <span class="st">"Q2"</span>, <span class="st">"answer"</span>: <span class="st">"A2"</span>, <span class="st">"tokens"</span>: <span class="nu">35</span>},
+    {<span class="st">"question"</span>: <span class="st">"Q3"</span>, <span class="st">"answer"</span>: <span class="st">"A3"</span>, <span class="st">"tokens"</span>: <span class="nu">18</span>},
+]
+df = pd.DataFrame(results)
+<span class="fn">print</span>(<span class="st">f"총 token 소비: </span><span class="var">{df['tokens'].sum()}</span><span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"평균 token: </span><span class="var">{df['tokens'].mean():.1f}</span><span class="st">"</span>)
+
+<span class="cm"># ---- json_normalize: 중첩 JSON 자동 평탄화 ----</span>
+nested_data = [
+    {<span class="st">"name"</span>: <span class="st">"철수"</span>, <span class="st">"info"</span>: {<span class="st">"city"</span>: <span class="st">"서울"</span>, <span class="st">"age"</span>: <span class="nu">25</span>}},
+    {<span class="st">"name"</span>: <span class="st">"영희"</span>, <span class="st">"info"</span>: {<span class="st">"city"</span>: <span class="st">"부산"</span>, <span class="st">"age"</span>: <span class="nu">28</span>}},
+]
+df = pd.json_normalize(nested_data)
+<span class="fn">print</span>(df)
+<span class="cm">#   name info.city  info.age</span>
+<span class="cm"># 0  철수       서울        25</span>
+<span class="cm"># 1  영희       부산        28</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 pd.json_normalize()는 중첩 JSON 처리의 필수 도구</h4>
+          <ul>
+            <li>중첩된 필드를 자동으로 "평탄화"하여 일반 열로 변환</li>
+            <li>API 배치 반환 데이터 처리 시 많은 코드를 절약</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🏆</span>
+        <span class="topic-name">Phase 2 종합 프로젝트: AI 대화 로그 분석기</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">실제 시나리오 시뮬레이션: 당신은 AI 애플리케이션 개발자이며, 사용자와 AI의 대화 로그를 분석하여 보고서를 생성해야 합니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> project_chat_analyzer.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+<span class="cm"># ---- Step 1: 시뮬레이션 데이터 로드 ----</span>
+chat_logs = [
+    {<span class="st">"user_id"</span>:<span class="st">"u1"</span>, <span class="st">"time"</span>:<span class="st">"2026-03-28 10:00"</span>, <span class="st">"role"</span>:<span class="st">"user"</span>,
+     <span class="st">"content"</span>:<span class="st">"Python으로 CSV는 어떻게 읽나요?"</span>, <span class="st">"tokens"</span>:<span class="nu">8</span>},
+    {<span class="st">"user_id"</span>:<span class="st">"u1"</span>, <span class="st">"time"</span>:<span class="st">"2026-03-28 10:00"</span>, <span class="st">"role"</span>:<span class="st">"assistant"</span>,
+     <span class="st">"content"</span>:<span class="st">"pandas의 read_csv를 사용하세요..."</span>, <span class="st">"tokens"</span>:<span class="nu">120</span>},
+    {<span class="st">"user_id"</span>:<span class="st">"u2"</span>, <span class="st">"time"</span>:<span class="st">"2026-03-28 11:30"</span>, <span class="st">"role"</span>:<span class="st">"user"</span>,
+     <span class="st">"content"</span>:<span class="st">"크롤러 작성을 도와주세요"</span>, <span class="st">"tokens"</span>:<span class="nu">6</span>},
+    <span class="cm"># ... 더 많은 데이터</span>
+]
+
+df = pd.DataFrame(chat_logs)
+df[<span class="st">"time"</span>] = pd.to_datetime(df[<span class="st">"time"</span>])
+
+<span class="cm"># ---- Step 2: 데이터 정제 ----</span>
+df[<span class="st">"content"</span>] = df[<span class="st">"content"</span>].str.strip()
+df = df.dropna(subset=[<span class="st">"content"</span>])
+df[<span class="st">"hour"</span>] = df[<span class="st">"time"</span>].dt.hour
+
+<span class="cm"># ---- Step 3: 통계 분석 ----</span>
+<span class="cm"># 각 사용자의 대화 횟수</span>
+user_stats = df[df[<span class="st">"role"</span>]==<span class="st">"user"</span>].groupby(<span class="st">"user_id"</span>).agg(
+    대화횟수=(<span class="st">"content"</span>, <span class="st">"count"</span>),
+    총token=(<span class="st">"tokens"</span>, <span class="st">"sum"</span>)
+).reset_index()
+
+<span class="cm"># AI 응답의 token 통계</span>
+ai_stats = df[df[<span class="st">"role"</span>]==<span class="st">"assistant"</span>][<span class="st">"tokens"</span>].describe()
+
+<span class="cm"># 시간대별 활성도 통계</span>
+hourly = df.groupby(<span class="st">"hour"</span>).size()
+
+<span class="cm"># ---- Step 4: 보고서 내보내기 ----</span>
+report = {
+    <span class="st">"총 대화 수"</span>: <span class="fn">len</span>(df),
+    <span class="st">"고유 사용자 수"</span>: df[<span class="st">"user_id"</span>].nunique(),
+    <span class="st">"총 token 소비"</span>: <span class="fn">int</span>(df[<span class="st">"tokens"</span>].sum()),
+    <span class="st">"평균 응답 token"</span>: <span class="fn">round</span>(<span class="fn">float</span>(ai_stats[<span class="st">"mean"</span>]), <span class="nu">1</span>),
+    <span class="st">"생성 시간"</span>: datetime.now().strftime(<span class="st">"%Y-%m-%d %H:%M"</span>)
+}
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"chat_report.json"</span>, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    json.dump(report, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>)
+
+user_stats.to_csv(<span class="st">"user_stats.csv"</span>, index=<span class="kw">False</span>)
+<span class="fn">print</span>(<span class="st">"보고서 생성 완료!"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ 종합 프로젝트 확장 도전</h3>
+      <div class="practice-item">"인기 질문 Top 10" 통계 추가 (키워드 빈도 기반)</div>
+      <div class="practice-item">각 사용자의 평균 대화 길이와 token 소비를 계산하여 "고빈도 사용자" 찾기</div>
+      <div class="practice-item">날짜별 그룹화하여 매일 대화량의 변화 추세 그리기</div>
+      <div class="practice-item">모든 통계 지표를 포함한 완전한 CSV 보고서 생성</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CHECKPOINT -->
+  <!-- ======================================================================== -->
+  <div class="checkpoint">
+    <h3>🏁 Phase 2 통과 자가 점검 목록</h3>
+    <p>아래 항목을 모두 완료하면, Phase 3으로 진입할 준비가 된 것입니다:</p>
+    <ul class="check-list">
+      <li><span class="chk">□</span> <code>pd.read_csv()</code> / <code>read_excel()</code> / <code>read_json()</code>으로 다양한 형식의 데이터를 읽을 수 있다</li>
+      <li><span class="chk">□</span> 데이터를 받으면 빠르게 "3종 세트" 탐색을 할 수 있다 (구조, 결측값, 분포)</li>
+      <li><span class="chk">□</span> 조건 필터링, loc/iloc으로 데이터를 정밀하게 추출할 수 있다</li>
+      <li><span class="chk">□</span> 결측값(삭제/채우기)과 중복값을 처리할 수 있다</li>
+      <li><span class="chk">□</span> apply + lambda로 커스텀 변환을 할 수 있다</li>
+      <li><span class="chk">□</span> groupby로 그룹 집계 통계를 할 수 있다</li>
+      <li><span class="chk">□</span> merge와 concat으로 여러 테이블을 합칠 수 있다</li>
+      <li><span class="chk">□</span> 기본 SQL을 작성할 수 있다 (SELECT / WHERE / GROUP BY / JOIN)</li>
+      <li><span class="chk">□</span> 중첩 JSON을 파싱하여 API 반환 데이터를 추출할 수 있다</li>
+      <li><span class="chk">□</span> 종합 프로젝트 완료: AI 대화 로그 분석기</li>
+    </ul>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="resources" style="margin-top: 32px;">
+    <h3>📚 추천 학습 자료</h3>
+    <div class="res-item"><span class="res-type">공식 문서</span>Pandas 공식 튜토리얼 — pandas.pydata.org/docs (공식 참고 자료)</div>
+    <div class="res-item"><span class="res-type">무료 강좌</span>Kaggle Learn: Pandas — kaggle.com/learn/pandas (인터랙티브 연습)</div>
+    <div class="res-item"><span class="res-type">연습 데이터</span>Kaggle Datasets — kaggle.com/datasets (대량의 실제 데이터셋)</div>
+    <div class="res-item"><span class="res-type">SQL 연습</span>SQLBolt — sqlbolt.com (인터랙티브 SQL 튜토리얼, 무료)</div>
+    <div class="res-item"><span class="res-type">치트시트</span>Pandas Cheat Sheet — "pandas cheat sheet pdf"를 검색하여 인쇄해서 책상에 놓기</div>
+  </div>
+
+  <!-- FINAL -->
+  <div class="final-box">
+    <h2>Phase 2 완료 후 → Phase 3: 대규모 언어 모델 API와 Prompt 엔지니어링으로 진입</h2>
+    <p>데이터 처리의 핵심 능력을 갖추셨습니다! 다음으로 대규모 언어 모델 API를 본격적으로 다루게 되며, Phase 1과 Phase 2에서 배운 모든 기술이 API 호출, 반환값 처리, 데이터 파이프라인 구축에 활용됩니다.</p>
+  </div>
+
+</div>
+</body>
+</html>

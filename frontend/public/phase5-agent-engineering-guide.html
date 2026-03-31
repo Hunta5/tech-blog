@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 5 · Agent 框架与工程化 · 详细学习指南</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans SC',sans-serif;background:#06080f;color:#c9d1d9;line-height:1.75;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 25%,rgba(244,63,94,.07) 0%,transparent 50%),radial-gradient(ellipse at 85% 75%,rgba(168,85,247,.06) 0%,transparent 50%);pointer-events:none}
+  .page{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:48px 24px 80px}
+
+  .header{text-align:center;margin-bottom:48px}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;color:#f43f5e;background:rgba(244,63,94,.1);padding:4px 14px;border-radius:6px;margin-bottom:12px}
+  h1{font-size:2.2rem;font-weight:900;color:#f1f5f9;margin-bottom:6px}
+  .header p{color:#64748b;font-size:.9rem}
+  .meta-bar{display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap}
+  .meta-item{font-size:.8rem;color:#94a3b8;display:flex;align-items:center;gap:6px}
+  .meta-dot{width:8px;height:8px;border-radius:50%}
+
+  .why-box{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid rgba(244,63,94,.2);border-radius:14px;padding:24px 28px;margin-bottom:40px}
+  .why-box h2{font-size:1rem;color:#fb7185;margin-bottom:10px}
+  .why-box p{font-size:.88rem;color:#94a3b8;line-height:1.8}
+  .why-box p+p{margin-top:8px}
+
+  /* Agent Loop Diagram */
+  .agent-loop{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:24px 0;padding:20px 0}
+  .al-step{background:linear-gradient(135deg,#111827,#0c1018);border:1.5px solid var(--ac,#f43f5e);border-radius:14px;padding:12px 18px;text-align:center;min-width:110px;position:relative}
+  .al-step .al-icon{font-size:1.4rem;margin-bottom:2px}
+  .al-step .al-title{font-size:.8rem;font-weight:700;color:var(--ac,#f43f5e)}
+  .al-step .al-sub{font-size:.65rem;color:#64748b}
+  .al-arrow{color:#334155;font-size:1.3rem;margin:0 8px}
+  .al-loop-back{display:block;text-align:center;font-size:.7rem;color:#475569;margin-top:8px;letter-spacing:2px}
+
+  .toc{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid #1e293b;border-radius:14px;padding:24px 28px;margin-bottom:48px}
+  .toc h2{font-size:.85rem;color:#64748b;letter-spacing:3px;margin-bottom:14px;text-transform:uppercase}
+  .toc-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .toc-list a{color:#93c5fd;text-decoration:none;font-size:.88rem;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:8px;transition:all .2s}
+  .toc-list a:hover{background:rgba(59,130,246,.08);color:#60a5fa}
+  .toc-num{color:#475569;font-size:.75rem;font-weight:700;min-width:24px}
+
+  .day-section{margin-bottom:56px;scroll-margin-top:24px}
+  .day-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #1e293b}
+  .day-badge{flex-shrink:0;width:52px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(135deg,var(--dc),color-mix(in srgb,var(--dc) 60%,#000));color:#fff;font-weight:900}
+  .day-badge .d-label{font-size:.55rem;letter-spacing:1px;opacity:.8}
+  .day-badge .d-num{font-size:1.2rem;line-height:1}
+  .day-title{font-size:1.3rem;font-weight:700;color:#f1f5f9}
+  .day-subtitle{font-size:.82rem;color:#64748b;margin-top:2px}
+
+  .topic{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid #1e293b;border-radius:12px;margin-bottom:14px;overflow:hidden;transition:border-color .3s}
+  .topic:hover{border-color:color-mix(in srgb,var(--dc) 40%,transparent)}
+  .topic-head{padding:16px 20px;display:flex;align-items:center;gap:10px}
+  .topic-icon{font-size:1.2rem}
+  .topic-name{font-weight:700;font-size:.95rem;color:#e2e8f0;flex:1}
+  .topic-tag{font-size:.65rem;padding:2px 8px;border-radius:5px;font-weight:600}
+  .tag-must{background:rgba(239,68,68,.12);color:#f87171}
+  .tag-imp{background:rgba(251,191,36,.12);color:#fbbf24}
+  .tag-nice{background:rgba(148,163,184,.1);color:#94a3b8}
+  .topic-body{padding:0 20px 20px}
+  .explain{font-size:.85rem;color:#94a3b8;margin-bottom:14px;line-height:1.7}
+
+  .code-block{background:#0d1117;border:1px solid #21262d;border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .code-label{padding:6px 14px;font-size:.7rem;font-weight:600;color:#7c8496;background:#161b22;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+  .code-label .dot{width:6px;height:6px;border-radius:50%}
+  pre{padding:14px 18px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.7;color:#c9d1d9}
+  .cm{color:#8b949e}.kw{color:#ff7b72}.fn{color:#d2a8ff}.st{color:#a5d6ff}
+  .nu{color:#79c0ff}.bi{color:#ffa657}.op{color:#ff7b72}.var{color:#ffa657}
+
+  .key-points{background:rgba(59,130,246,.05);border-left:3px solid rgba(59,130,246,.3);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:12px}
+  .key-points h4{font-size:.78rem;color:#60a5fa;margin-bottom:6px;letter-spacing:1px}
+  .key-points li{font-size:.82rem;color:#94a3b8;margin-bottom:4px;margin-left:16px}
+
+  .practice{background:linear-gradient(135deg,rgba(52,211,153,.06),rgba(16,185,129,.02));border:1px solid rgba(52,211,153,.2);border-radius:12px;padding:18px 20px;margin-top:20px}
+  .practice h3{color:#34d399;font-size:.9rem;margin-bottom:10px}
+  .practice-item{font-size:.85rem;color:#94a3b8;margin-bottom:8px;padding-left:20px;position:relative}
+  .practice-item::before{content:'✦';position:absolute;left:0;color:#34d399;font-size:.7rem;top:2px}
+
+  .tip-box{background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:14px 18px;margin-top:14px}
+  .tip-box h4{color:#60a5fa;font-size:.82rem;margin-bottom:6px}
+  .tip-box p{font-size:.8rem;color:#94a3b8;line-height:1.7}
+  .warn-box{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:10px;padding:14px 18px;margin-top:14px}
+  .warn-box h4{color:#f87171;font-size:.82rem;margin-bottom:6px}
+  .warn-box p{font-size:.8rem;color:#94a3b8;line-height:1.7}
+
+  .vs-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem}
+  .vs-table th{background:#161b22;color:#8b949e;padding:8px 12px;text-align:left;font-weight:600;border-bottom:1px solid #21262d}
+  .vs-table td{padding:8px 12px;border-bottom:1px solid #161b22;color:#c9d1d9}
+  .vs-table tr:hover td{background:rgba(244,63,94,.04)}
+
+  .checkpoint{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(245,158,11,.03));border:1.5px solid rgba(251,191,36,.25);border-radius:14px;padding:22px 24px;margin-top:24px;text-align:center}
+  .checkpoint h3{color:#fbbf24;font-size:1rem;margin-bottom:8px}
+  .checkpoint p{font-size:.85rem;color:#94a3b8}
+  .check-list{list-style:none;text-align:left;margin-top:14px}
+  .check-list li{font-size:.85rem;padding:6px 0;color:#cbd5e1;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(251,191,36,.08)}
+  .check-list li:last-child{border:none}
+  .chk{color:#fbbf24;font-size:.9rem}
+
+  .resources{background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(139,92,246,.02));border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:18px 20px;margin-top:14px}
+  .resources h3{color:#a78bfa;font-size:.88rem;margin-bottom:10px}
+  .res-item{display:flex;align-items:flex-start;gap:10px;font-size:.83rem;color:#94a3b8;margin-bottom:8px}
+  .res-type{flex-shrink:0;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(168,85,247,.1);color:#c4b5fd}
+
+  .final-box{margin-top:56px;background:linear-gradient(135deg,rgba(244,63,94,.08),rgba(168,85,247,.06));border:1.5px solid rgba(244,63,94,.25);border-radius:16px;padding:28px;text-align:center}
+  .final-box h2{color:#fb7185;font-size:1.2rem;margin-bottom:8px}
+  .final-box p{color:#64748b;font-size:.88rem}
+  .final-box p+p{margin-top:6px}
+
+  @media(max-width:600px){.toc-list{grid-template-columns:1fr}h1{font-size:1.6rem}.page{padding:32px 14px 60px}.agent-loop{flex-direction:column;gap:8px}.al-arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">PHASE 05 · 详细版</div>
+    <h1>Agent 框架与工程化</h1>
+    <p>让 AI 自主完成复杂任务 + 把你的应用部署上线</p>
+    <div class="meta-bar">
+      <div class="meta-item"><div class="meta-dot" style="background:#f43f5e"></div>总时长：2~4 周</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#f59e0b"></div>每天投入：2~3 小时</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#10b981"></div>可边工作边学</div>
+    </div>
+  </div>
+
+  <div class="why-box">
+    <h2>Phase 5 让你从"能用"变成"好用"</h2>
+    <p>Phase 1-4 你学会了调 API、写 Prompt、做 RAG。但实际工作中，你还需要：让 AI 自己规划并完成多步任务（Agent）、快速搭建可演示的界面（Streamlit/Gradio）、把服务部署上线（FastAPI/Docker）、持续评测和优化 AI 的输出质量（Eval）。</p>
+    <p>这一阶段让你从"能写 demo"进化到"能交付产品"。完成后你就具备了独立承担 AI 项目的全栈能力。</p>
+  </div>
+
+  <!-- Agent Loop -->
+  <div class="agent-loop">
+    <div class="al-step" style="--ac:#3b82f6"><div class="al-icon">🤔</div><div class="al-title">思考 Think</div><div class="al-sub">理解任务，制定计划</div></div>
+    <div class="al-arrow">→</div>
+    <div class="al-step" style="--ac:#f59e0b"><div class="al-icon">🛠️</div><div class="al-title">行动 Act</div><div class="al-sub">调用工具，执行操作</div></div>
+    <div class="al-arrow">→</div>
+    <div class="al-step" style="--ac:#10b981"><div class="al-icon">👀</div><div class="al-title">观察 Observe</div><div class="al-sub">查看结果，判断状态</div></div>
+    <div class="al-arrow">→</div>
+    <div class="al-step" style="--ac:#f43f5e"><div class="al-icon">✅</div><div class="al-title">决策 Decide</div><div class="al-sub">继续 or 完成</div></div>
+  </div>
+  <p class="al-loop-back">↩ 未完成则循环回「思考」继续执行 — 这就是 Agent Loop</p>
+
+  <div class="toc">
+    <h2>📋 学习日程目录</h2>
+    <ul class="toc-list">
+      <li><a href="#d1"><span class="toc-num">Day 1-3</span>AI Agent 核心原理与手写实现</a></li>
+      <li><a href="#d4"><span class="toc-num">Day 4-6</span>LangChain Agent 实战</a></li>
+      <li><a href="#d7"><span class="toc-num">Day 7-9</span>Web 界面：Streamlit / Gradio</a></li>
+      <li><a href="#d10"><span class="toc-num">Day 10-12</span>API 服务：FastAPI 部署</a></li>
+      <li><a href="#d13"><span class="toc-num">Day 13-15</span>Eval 评测与持续优化</a></li>
+      <li><a href="#d16"><span class="toc-num">Day 16-18</span>Docker + Git + 工程实践</a></li>
+      <li><a href="#d19"><span class="toc-num">Day 19-24</span>毕业项目：全栈 AI Agent 应用</a></li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 1-3 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d1" style="--dc:#3b82f6">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">1-3</span></div>
+      <div>
+        <div class="day-title">AI Agent 核心原理与手写实现</div>
+        <div class="day-subtitle">先不用框架——从零理解 Agent 是怎么"自主思考"的</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🧠</span>
+        <span class="topic-name">Agent vs 普通 API 调用</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <table class="vs-table">
+          <tr><th></th><th>普通 API 调用</th><th>AI Agent</th></tr>
+          <tr><td>流程</td><td>你写死每一步</td><td>AI 自己决定执行什么</td></tr>
+          <tr><td>工具</td><td>你手动调用</td><td>AI 自动选择调用哪个工具</td></tr>
+          <tr><td>循环</td><td>调一次就完</td><td>循环执行直到任务完成</td></tr>
+          <tr><td>容错</td><td>你处理异常</td><td>AI 观察错误后自己调整策略</td></tr>
+          <tr><td>类比</td><td>遥控车</td><td>自动驾驶</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔧</span>
+        <span class="topic-name">从零手写一个 ReAct Agent</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">ReAct（Reasoning + Acting）是最经典的 Agent 模式。AI 先推理（Thought），再行动（Action），然后观察结果（Observation），循环执行直到完成。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> react_agent.py — 手写 ReAct Agent</div>
+<pre><span class="kw">import</span> json, re
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+client = OpenAI()
+
+<span class="cm"># ========== 1. 工具定义 ==========</span>
+<span class="kw">def</span> <span class="fn">search_web</span>(query):
+    <span class="st">"""模拟网络搜索"""</span>
+    fake_results = {
+        <span class="st">"Python"</span>: <span class="st">"Python 是一种高级编程语言，最新版本 3.12。"</span>,
+        <span class="st">"RAG"</span>: <span class="st">"RAG 是检索增强生成，2024-2025 年最热门的 AI 技术之一。"</span>,
+    }
+    <span class="kw">for</span> key, val <span class="kw">in</span> fake_results.items():
+        <span class="kw">if</span> key.lower() <span class="kw">in</span> query.lower():
+            <span class="kw">return</span> val
+    <span class="kw">return</span> <span class="st">f"未找到关于'{query}'的搜索结果"</span>
+
+<span class="kw">def</span> <span class="fn">calculator</span>(expression):
+    <span class="st">"""安全计算数学表达式"""</span>
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="fn">str</span>(<span class="fn">eval</span>(expression, {<span class="st">"__builtins__"</span>: {}}, {}))
+    <span class="kw">except</span>:
+        <span class="kw">return</span> <span class="st">"计算错误"</span>
+
+<span class="kw">def</span> <span class="fn">get_current_time</span>():
+    <span class="st">"""获取当前时间"""</span>
+    <span class="kw">return</span> datetime.now().strftime(<span class="st">"%Y-%m-%d %H:%M:%S"</span>)
+
+TOOLS = {
+    <span class="st">"search_web"</span>: {<span class="st">"func"</span>: search_web, <span class="st">"desc"</span>: <span class="st">"搜索网络信息，参数: query"</span>},
+    <span class="st">"calculator"</span>: {<span class="st">"func"</span>: calculator, <span class="st">"desc"</span>: <span class="st">"计算数学表达式，参数: expression"</span>},
+    <span class="st">"get_current_time"</span>: {<span class="st">"func"</span>: get_current_time, <span class="st">"desc"</span>: <span class="st">"获取当前时间，无参数"</span>},
+}
+
+<span class="cm"># ========== 2. Agent 系统 Prompt ==========</span>
+AGENT_PROMPT = <span class="st">"""你是一个智能助手，可以使用工具完成任务。
+
+可用工具：
+{tool_descriptions}
+
+工作流程：
+1. 分析用户需求
+2. 如果需要，调用工具获取信息
+3. 根据结果回答问题
+
+调用工具时，严格使用以下 JSON 格式（独占一行）：
+TOOL_CALL: {{"tool": "工具名", "args": {{"参数名": "参数值"}}}}
+
+如果不需要工具，直接回答。
+如果任务已完成，以 FINAL_ANSWER: 开头给出最终回答。"""</span>
+
+<span class="cm"># ========== 3. Agent 循环 ==========</span>
+<span class="kw">class</span> <span class="fn">SimpleAgent</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, tools, max_steps=<span class="nu">5</span>):
+        self.tools = tools
+        self.max_steps = max_steps
+
+        tool_desc = <span class="st">"\n"</span>.join(
+            [<span class="st">f"- {name}: {t['desc']}"</span> <span class="kw">for</span> name, t <span class="kw">in</span> tools.items()]
+        )
+        self.system_prompt = AGENT_PROMPT.format(tool_descriptions=tool_desc)
+
+    <span class="kw">def</span> <span class="fn">run</span>(self, task):
+        messages = [
+            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: self.system_prompt},
+            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: task}
+        ]
+
+        <span class="kw">for</span> step <span class="kw">in</span> <span class="fn">range</span>(self.max_steps):
+            <span class="fn">print</span>(<span class="st">f"\n--- Step </span><span class="var">{step + 1}</span><span class="st"> ---"</span>)
+
+            response = client.chat.completions.create(
+                model=<span class="st">"gpt-4o"</span>, messages=messages, temperature=<span class="nu">0.3</span>
+            )
+            reply = response.choices[<span class="nu">0</span>].message.content
+            <span class="fn">print</span>(<span class="st">f"AI: </span><span class="var">{reply}</span><span class="st">"</span>)
+            messages.append({<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: reply})
+
+            <span class="cm"># 检查最终答案</span>
+            <span class="kw">if</span> <span class="st">"FINAL_ANSWER:"</span> <span class="kw">in</span> reply:
+                <span class="kw">return</span> reply.split(<span class="st">"FINAL_ANSWER:"</span>)[<span class="nu">1</span>].strip()
+
+            <span class="cm"># 检查工具调用</span>
+            <span class="kw">if</span> <span class="st">"TOOL_CALL:"</span> <span class="kw">in</span> reply:
+                tool_json = reply.split(<span class="st">"TOOL_CALL:"</span>)[<span class="nu">1</span>].strip()
+                <span class="kw">try</span>:
+                    call = json.loads(tool_json)
+                    tool_name = call[<span class="st">"tool"</span>]
+                    tool_args = call.get(<span class="st">"args"</span>, {})
+
+                    <span class="fn">print</span>(<span class="st">f"🔧 调用工具: </span><span class="var">{tool_name}</span><span class="st">(</span><span class="var">{tool_args}</span><span class="st">)"</span>)
+                    result = self.tools[tool_name][<span class="st">"func"</span>](**tool_args)
+                    <span class="fn">print</span>(<span class="st">f"📋 结果: </span><span class="var">{result}</span><span class="st">"</span>)
+
+                    messages.append({
+                        <span class="st">"role"</span>: <span class="st">"user"</span>,
+                        <span class="st">"content"</span>: <span class="st">f"工具 {tool_name} 的执行结果：{result}"</span>
+                    })
+                <span class="kw">except</span> Exception <span class="kw">as</span> e:
+                    messages.append({
+                        <span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">f"工具调用失败：{e}"</span>
+                    })
+
+        <span class="kw">return</span> <span class="st">"达到最大步骤数，任务未完成"</span>
+
+<span class="cm"># ========== 使用 ==========</span>
+agent = SimpleAgent(TOOLS)
+answer = agent.run(<span class="st">"现在几点了？另外帮我算一下 1024 * 768 等于多少"</span>)
+<span class="fn">print</span>(<span class="st">f"\n最终答案: </span><span class="var">{answer}</span><span class="st">"</span>)</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 Agent 的核心就是一个 While 循环</h4>
+          <ul>
+            <li>① LLM 思考，决定下一步做什么</li>
+            <li>② 如果需要工具 → 调用工具 → 把结果喂回 LLM</li>
+            <li>③ 如果不需要工具 → 输出最终答案 → 退出循环</li>
+            <li>④ 设置 max_steps 防止无限循环</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 1-3 练习</h3>
+      <div class="practice-item">给 Agent 添加一个"读文件"工具，让它能读取本地 txt 文件回答问题</div>
+      <div class="practice-item">给 Agent 添加 RAG 工具：接入 Phase 4 的知识库检索功能</div>
+      <div class="practice-item">测试 Agent 对复杂任务的处理：需要调用 2-3 个工具才能完成的问题</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 4-6 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d4" style="--dc:#8b5cf6">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">4-6</span></div>
+      <div>
+        <div class="day-title">LangChain Agent 实战</div>
+        <div class="day-subtitle">用框架快速构建强大的 Agent——不用重复造轮子</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🦜</span>
+        <span class="topic-name">LangChain Agent 快速搭建</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL</div>
+<pre>pip install langchain langchain-openai langchain-community duckduckgo-search</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> langchain_agent.py</div>
+<pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+<span class="kw">from</span> langchain.agents <span class="kw">import</span> create_tool_calling_agent, AgentExecutor
+<span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
+<span class="kw">from</span> langchain_core.tools <span class="kw">import</span> tool
+
+<span class="cm"># ---- 1. 定义工具（用装饰器，超简单）----</span>
+@tool
+<span class="kw">def</span> <span class="fn">calculator</span>(expression: <span class="fn">str</span>) -> <span class="fn">str</span>:
+    <span class="st">"""计算数学表达式。输入一个数学表达式字符串，如 '2 + 3 * 4'"""</span>
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="fn">str</span>(<span class="fn">eval</span>(expression, {<span class="st">"__builtins__"</span>: {}}, {}))
+    <span class="kw">except</span>:
+        <span class="kw">return</span> <span class="st">"计算出错"</span>
+
+@tool
+<span class="kw">def</span> <span class="fn">get_word_count</span>(text: <span class="fn">str</span>) -> <span class="fn">str</span>:
+    <span class="st">"""统计文本的字数和字符数"""</span>
+    words = <span class="fn">len</span>(text.split())
+    chars = <span class="fn">len</span>(text)
+    <span class="kw">return</span> <span class="st">f"单词数: {words}, 字符数: {chars}"</span>
+
+tools = [calculator, get_word_count]
+
+<span class="cm"># ---- 2. 创建 Agent ----</span>
+llm = ChatOpenAI(model=<span class="st">"gpt-4o"</span>, temperature=<span class="nu">0.3</span>)
+prompt = ChatPromptTemplate.from_messages([
+    (<span class="st">"system"</span>, <span class="st">"你是一个乐于助人的 AI 助手，可以使用工具完成任务。"</span>),
+    (<span class="st">"human"</span>, <span class="st">"{input}"</span>),
+    (<span class="st">"placeholder"</span>, <span class="st">"{agent_scratchpad}"</span>),
+])
+
+agent = create_tool_calling_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools, verbose=<span class="kw">True</span>)
+
+<span class="cm"># ---- 3. 运行 ----</span>
+result = executor.invoke({<span class="st">"input"</span>: <span class="st">"计算 (125 * 37) + (89 * 43) 的结果"</span>})
+<span class="fn">print</span>(result[<span class="st">"output"</span>])</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔗</span>
+        <span class="topic-name">RAG + Agent 结合（最强组合）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">把 RAG 知识库检索封装成一个工具，Agent 就能自动判断"什么时候需要查知识库"。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> rag_agent.py</div>
+<pre>@tool
+<span class="kw">def</span> <span class="fn">search_knowledge_base</span>(query: <span class="fn">str</span>) -> <span class="fn">str</span>:
+    <span class="st">"""从企业知识库中搜索相关信息。当用户问产品、政策、流程相关问题时使用。"""</span>
+    <span class="cm"># 复用 Phase 4 的检索逻辑</span>
+    emb = get_embeddings([query])[<span class="nu">0</span>]
+    results = collection.query(query_embeddings=[emb], n_results=<span class="nu">3</span>)
+    <span class="kw">if</span> results[<span class="st">"documents"</span>][<span class="nu">0</span>]:
+        <span class="kw">return</span> <span class="st">"\n---\n"</span>.join(results[<span class="st">"documents"</span>][<span class="nu">0</span>])
+    <span class="kw">return</span> <span class="st">"知识库中未找到相关信息"</span>
+
+<span class="cm"># Agent 同时拥有：知识库搜索 + 计算器 + 其他工具</span>
+tools = [search_knowledge_base, calculator, get_word_count]
+<span class="cm"># AI 会自动判断：用户问产品问题 → 查知识库，问数学 → 用计算器</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 4-6 练习</h3>
+      <div class="practice-item">用 LangChain 搭建一个 Agent，至少包含 3 个工具（搜索、计算、知识库）</div>
+      <div class="practice-item">让 Agent 完成一个复杂任务："查一下 XXX 产品的价格，再算一下买 5 个需要多少钱"</div>
+      <div class="practice-item">开启 <code>verbose=True</code>，观察 Agent 的思考过程，理解每一步决策</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 7-9 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d7" style="--dc:#10b981">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">7-9</span></div>
+      <div>
+        <div class="day-title">Web 界面：Streamlit / Gradio</div>
+        <div class="day-subtitle">让你的 AI 应用有"脸"——10 分钟搭建可演示的 Web 界面</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🎨</span>
+        <span class="topic-name">Streamlit — Python 界最快的 Web 框架</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL</div>
+<pre>pip install streamlit</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> app.py — RAG 知识库问答界面</div>
+<pre><span class="kw">import</span> streamlit <span class="kw">as</span> st
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+st.set_page_config(page_title=<span class="st">"AI 知识库问答"</span>, page_icon=<span class="st">"🧠"</span>)
+st.title(<span class="st">"🧠 企业知识库问答系统"</span>)
+
+<span class="cm"># ---- 侧边栏：文件上传 ----</span>
+<span class="kw">with</span> st.sidebar:
+    st.header(<span class="st">"📁 文档管理"</span>)
+    uploaded = st.file_uploader(<span class="st">"上传文档"</span>, type=[<span class="st">"pdf"</span>, <span class="st">"txt"</span>], accept_multiple_files=<span class="kw">True</span>)
+    <span class="kw">if</span> uploaded:
+        st.success(<span class="st">f"已上传 {len(uploaded)} 个文件"</span>)
+        <span class="cm"># 这里调用入库逻辑...</span>
+
+<span class="cm"># ---- 聊天界面 ----</span>
+<span class="kw">if</span> <span class="st">"messages"</span> <span class="kw">not in</span> st.session_state:
+    st.session_state.messages = []
+
+<span class="cm"># 显示历史消息</span>
+<span class="kw">for</span> msg <span class="kw">in</span> st.session_state.messages:
+    <span class="kw">with</span> st.chat_message(msg[<span class="st">"role"</span>]):
+        st.markdown(msg[<span class="st">"content"</span>])
+
+<span class="cm"># 输入框</span>
+<span class="kw">if</span> question := st.chat_input(<span class="st">"输入你的问题..."</span>):
+    <span class="cm"># 显示用户消息</span>
+    st.session_state.messages.append({<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: question})
+    <span class="kw">with</span> st.chat_message(<span class="st">"user"</span>):
+        st.markdown(question)
+
+    <span class="cm"># 显示 AI 回答</span>
+    <span class="kw">with</span> st.chat_message(<span class="st">"assistant"</span>):
+        <span class="kw">with</span> st.spinner(<span class="st">"思考中..."</span>):
+            <span class="cm"># 调用你的 RAG 问答函数</span>
+            result = rag_query(question)  <span class="cm"># Phase 4 的函数</span>
+            st.markdown(result[<span class="st">"answer"</span>])
+            <span class="kw">if</span> result[<span class="st">"sources"</span>]:
+                st.caption(<span class="st">f"📎 来源: {', '.join(result['sources'])}"</span>)
+
+    st.session_state.messages.append({<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: result[<span class="st">"answer"</span>]})</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL — 启动</div>
+<pre>streamlit run app.py    <span class="cm"># 浏览器自动打开 http://localhost:8501</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🖼️</span>
+        <span class="topic-name">Gradio — 更适合 AI 演示的框架</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> gradio_app.py — 5 行搞定聊天界面</div>
+<pre><span class="kw">import</span> gradio <span class="kw">as</span> gr
+
+<span class="kw">def</span> <span class="fn">chat_fn</span>(message, history):
+    result = rag_query(message)
+    <span class="kw">return</span> result[<span class="st">"answer"</span>]
+
+demo = gr.ChatInterface(fn=chat_fn, title=<span class="st">"AI 知识库问答"</span>)
+demo.launch()   <span class="cm"># → http://localhost:7860</span></pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 Streamlit vs Gradio</h4>
+          <p><strong>Streamlit</strong> — 更灵活，可做完整 Web 应用（仪表盘、表单、多页面）<br>
+          <strong>Gradio</strong> — 更快速，几行代码就有聊天界面，还能一键分享公网链接<br>
+          <strong>建议</strong>：原型/演示用 Gradio，完整产品用 Streamlit</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 7-9 练习</h3>
+      <div class="practice-item">用 Streamlit 搭建一个 RAG 问答界面：带文件上传 + 聊天 + 来源显示</div>
+      <div class="practice-item">用 Gradio 搭建同样的功能，对比开发速度和效果</div>
+      <div class="practice-item">在界面中加入 token 消耗统计、对话导出功能</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 10-12 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d10" style="--dc:#f59e0b">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">10-12</span></div>
+      <div>
+        <div class="day-title">API 服务：FastAPI 部署</div>
+        <div class="day-subtitle">把你的 AI 功能包装成 API——让前端/其他系统调用</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">⚡</span>
+        <span class="topic-name">FastAPI 快速构建 AI API</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL</div>
+<pre>pip install fastapi uvicorn</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> api_server.py</div>
+<pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> typing <span class="kw">import</span> List
+
+app = FastAPI(title=<span class="st">"AI 知识库 API"</span>)
+
+<span class="cm"># ---- 请求/响应模型 ----</span>
+<span class="kw">class</span> <span class="fn">QueryRequest</span>(BaseModel):
+    question: <span class="fn">str</span>
+    top_k: <span class="fn">int</span> = <span class="nu">3</span>
+
+<span class="kw">class</span> <span class="fn">QueryResponse</span>(BaseModel):
+    answer: <span class="fn">str</span>
+    sources: List[<span class="fn">str</span>]
+    tokens: <span class="fn">int</span>
+
+<span class="cm"># ---- API 路由 ----</span>
+@app.post(<span class="st">"/ask"</span>, response_model=QueryResponse)
+<span class="kw">async def</span> <span class="fn">ask_question</span>(req: QueryRequest):
+    <span class="kw">try</span>:
+        result = rag_query(req.question, top_k=req.top_k)
+        <span class="kw">return</span> QueryResponse(
+            answer=result[<span class="st">"answer"</span>],
+            sources=result[<span class="st">"sources"</span>],
+            tokens=result.get(<span class="st">"tokens"</span>, <span class="nu">0</span>)
+        )
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="nu">500</span>, detail=<span class="fn">str</span>(e))
+
+@app.get(<span class="st">"/health"</span>)
+<span class="kw">async def</span> <span class="fn">health</span>():
+    <span class="kw">return</span> {<span class="st">"status"</span>: <span class="st">"ok"</span>}
+
+<span class="cm"># 启动: uvicorn api_server:app --reload</span>
+<span class="cm"># 自动文档: http://localhost:8000/docs</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 10-12 练习</h3>
+      <div class="practice-item">用 FastAPI 包装 RAG 问答，提供 <code>/ask</code> 和 <code>/upload</code> 两个接口</div>
+      <div class="practice-item">用 requests 或 curl 测试你的 API，确认能正常工作</div>
+      <div class="practice-item">访问 <code>/docs</code> 查看自动生成的 Swagger 文档</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 13-15 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d13" style="--dc:#ec4899">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">13-15</span></div>
+      <div>
+        <div class="day-title">Eval 评测与持续优化</div>
+        <div class="day-subtitle">"怎么知道 AI 回答得好不好？"——用数据说话</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📏</span>
+        <span class="topic-name">构建评测数据集</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> eval_dataset.py</div>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># ---- 手动构建评测集 ----</span>
+eval_data = [
+    {<span class="st">"question"</span>: <span class="st">"退货流程是什么？"</span>,
+     <span class="st">"expected_answer"</span>: <span class="st">"7天内可退，需提交退货申请"</span>,
+     <span class="st">"expected_source"</span>: <span class="st">"退换货政策.pdf"</span>},
+    {<span class="st">"question"</span>: <span class="st">"产品保修多久？"</span>,
+     <span class="st">"expected_answer"</span>: <span class="st">"标准保修1年"</span>,
+     <span class="st">"expected_source"</span>: <span class="st">"产品手册.pdf"</span>},
+    <span class="cm"># ... 至少 20-50 条</span>
+]
+eval_df = pd.DataFrame(eval_data)
+
+<span class="cm"># ---- 批量跑评测 ----</span>
+results = []
+<span class="kw">for</span> _, row <span class="kw">in</span> eval_df.iterrows():
+    result = rag_query(row[<span class="st">"question"</span>])
+    results.append({
+        <span class="st">"question"</span>: row[<span class="st">"question"</span>],
+        <span class="st">"expected"</span>: row[<span class="st">"expected_answer"</span>],
+        <span class="st">"actual"</span>: result[<span class="st">"answer"</span>],
+        <span class="st">"sources"</span>: result[<span class="st">"sources"</span>],
+        <span class="st">"source_hit"</span>: row[<span class="st">"expected_source"</span>] <span class="kw">in</span> result[<span class="st">"sources"</span>]
+    })
+
+results_df = pd.DataFrame(results)
+<span class="fn">print</span>(<span class="st">f"来源命中率: </span><span class="var">{results_df['source_hit'].mean():.1%}</span><span class="st">"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🤖</span>
+        <span class="topic-name">LLM-as-Judge（用 AI 评判 AI）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> llm_judge.py</div>
+<pre>JUDGE_PROMPT = <span class="st">"""你是一个 AI 回答质量评判官。请评估以下回答的质量。
+
+问题：{question}
+参考答案：{expected}
+实际回答：{actual}
+
+请从以下维度打分（1-5）：
+- 准确性：回答是否正确
+- 完整性：是否包含关键信息
+- 简洁性：是否简明扼要
+
+输出 JSON：{{"accuracy": X, "completeness": X, "conciseness": X, "total": X, "comment": "..."}}"""</span>
+
+<span class="kw">def</span> <span class="fn">judge_answer</span>(question, expected, actual):
+    resp = client.chat.completions.create(
+        model=<span class="st">"gpt-4o"</span>,
+        messages=[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: JUDGE_PROMPT.format(
+            question=question, expected=expected, actual=actual
+        )}],
+        response_format={<span class="st">"type"</span>: <span class="st">"json_object"</span>},
+        temperature=<span class="nu">0</span>
+    )
+    <span class="kw">return</span> json.loads(resp.choices[<span class="nu">0</span>].message.content)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 13-15 练习</h3>
+      <div class="practice-item">构建一个 30 条以上的评测数据集</div>
+      <div class="practice-item">用 LLM-as-Judge 批量评分，生成评测报告（平均分、最差 case）</div>
+      <div class="practice-item">根据评测结果优化 Prompt 或 chunk_size，再次评测，对比改进效果</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 16-18 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d16" style="--dc:#f97316">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">16-18</span></div>
+      <div>
+        <div class="day-title">Docker + Git + 工程实践</div>
+        <div class="day-subtitle">让你的项目"可部署、可协作、可复现"</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🐳</span>
+        <span class="topic-name">Docker 容器化</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> Dockerfile</div>
+<pre><span class="kw">FROM</span> python:3.12-slim
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> requirements.txt .
+<span class="kw">RUN</span> pip install --no-cache-dir -r requirements.txt
+<span class="kw">COPY</span> . .
+<span class="kw">EXPOSE</span> 8000
+<span class="kw">CMD</span> ["uvicorn", "api_server:app", "--host", "0.0.0.0", "--port", "8000"]</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL</div>
+<pre>docker build -t my-ai-app .           <span class="cm"># 构建镜像</span>
+docker run -p 8000:8000 my-ai-app     <span class="cm"># 运行容器</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📁</span>
+        <span class="topic-name">标准项目结构</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> 推荐目录结构</div>
+<pre>my-ai-project/
+├── app/
+│   ├── main.py            <span class="cm"># FastAPI 入口</span>
+│   ├── rag.py             <span class="cm"># RAG 核心逻辑</span>
+│   ├── agent.py           <span class="cm"># Agent 逻辑</span>
+│   ├── tools.py           <span class="cm"># 工具定义</span>
+│   └── prompts.py         <span class="cm"># Prompt 模板</span>
+├── data/
+│   └── docs/              <span class="cm"># 知识库文档</span>
+├── eval/
+│   ├── dataset.json       <span class="cm"># 评测数据</span>
+│   └── run_eval.py        <span class="cm"># 评测脚本</span>
+├── streamlit_app.py       <span class="cm"># Web 界面</span>
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── .env                   <span class="cm"># API Key（不提交到 Git）</span>
+├── .gitignore
+└── README.md</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 16-18 练习</h3>
+      <div class="practice-item">用标准结构重构你的项目，把代码按模块拆分</div>
+      <div class="practice-item">写 Dockerfile，确认能用 Docker 启动服务</div>
+      <div class="practice-item">初始化 Git 仓库，写好 .gitignore（排除 .env、__pycache__、chroma_db/）</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 19-24 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d19" style="--dc:#f43f5e">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">19-24</span></div>
+      <div>
+        <div class="day-title">毕业项目：全栈 AI Agent 应用</div>
+        <div class="day-subtitle">你的作品集核心——一个完整的、可演示的 AI 产品</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🏆</span>
+        <span class="topic-name">项目需求：AI 研究助手</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">构建一个 AI 研究助手，能上传文档建知识库、联网搜索、做数据分析，并生成结构化报告。这个项目用到了 Phase 1-5 的所有技能。</p>
+        <div class="key-points">
+          <h4>📌 功能清单</h4>
+          <ul>
+            <li><strong>文档管理</strong> — 上传 PDF/Word/TXT，自动切分、向量化、入库</li>
+            <li><strong>智能问答</strong> — RAG 检索 + 大模型生成，带来源引用</li>
+            <li><strong>Agent 能力</strong> — 自动决定何时查知识库、何时搜网络、何时做计算</li>
+            <li><strong>报告生成</strong> — 输入主题，Agent 自动搜集信息并生成结构化报告</li>
+            <li><strong>Web 界面</strong> — Streamlit 聊天界面 + 文件上传 + 报告下载</li>
+            <li><strong>API 服务</strong> — FastAPI 后端，支持外部系统接入</li>
+            <li><strong>评测体系</strong> — 评测数据集 + 自动化评测脚本</li>
+          </ul>
+        </div>
+
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> 项目核心架构 — research_agent.py</div>
+<pre><span class="kw">class</span> <span class="fn">ResearchAgent</span>:
+    <span class="st">"""AI 研究助手 — 集成 RAG + Agent + 报告生成"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.kb = KnowledgeBaseQA()       <span class="cm"># Phase 4 的知识库</span>
+        self.tools = self._init_tools()    <span class="cm"># Agent 工具集</span>
+        self.cost_tracker = CostTracker()  <span class="cm"># Phase 3 的成本追踪</span>
+
+    <span class="kw">def</span> <span class="fn">_init_tools</span>(self):
+        <span class="kw">return</span> {
+            <span class="st">"search_kb"</span>: self.kb.ask,           <span class="cm"># 知识库检索</span>
+            <span class="st">"web_search"</span>: web_search,           <span class="cm"># 网络搜索</span>
+            <span class="st">"calculator"</span>: calculator,            <span class="cm"># 计算器</span>
+            <span class="st">"generate_report"</span>: self.gen_report, <span class="cm"># 报告生成</span>
+        }
+
+    <span class="kw">def</span> <span class="fn">chat</span>(self, user_input):
+        <span class="st">"""Agent 驱动的聊天"""</span>
+        <span class="cm"># Agent 循环：思考 → 行动 → 观察 → 决策</span>
+        ...
+
+    <span class="kw">def</span> <span class="fn">gen_report</span>(self, topic):
+        <span class="st">"""自动生成研究报告"""</span>
+        <span class="cm"># 1. 从知识库搜索相关信息</span>
+        <span class="cm"># 2. 从网络搜索补充信息</span>
+        <span class="cm"># 3. 让 LLM 整合成结构化报告</span>
+        <span class="cm"># 4. 返回 Markdown 格式报告</span>
+        ...
+
+    <span class="kw">def</span> <span class="fn">upload_docs</span>(self, files):
+        <span class="st">"""批量上传文档"""</span>
+        <span class="kw">for</span> f <span class="kw">in</span> files:
+            self.kb.add_document(f)
+
+    <span class="kw">def</span> <span class="fn">get_stats</span>(self):
+        <span class="st">"""系统统计信息"""</span>
+        <span class="kw">return</span> {
+            <span class="st">"kb_chunks"</span>: self.kb.stats()[<span class="st">"total_chunks"</span>],
+            <span class="st">"total_cost"</span>: self.cost_tracker.total_cost,
+            <span class="st">"total_calls"</span>: self.cost_tracker.call_count,
+        }</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ 毕业项目里程碑</h3>
+      <div class="practice-item"><strong>Day 19-20</strong> — 搭建项目骨架、RAG 核心功能、Agent 工具集</div>
+      <div class="practice-item"><strong>Day 21-22</strong> — Streamlit Web 界面（聊天 + 文件上传 + 报告生成）</div>
+      <div class="practice-item"><strong>Day 23</strong> — FastAPI 后端 + Docker 容器化</div>
+      <div class="practice-item"><strong>Day 24</strong> — 评测体系 + 优化 + README + 推到 GitHub</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CHECKPOINT -->
+  <!-- ======================================================================== -->
+  <div class="checkpoint">
+    <h3>🏁 Phase 5 通关自测清单</h3>
+    <p>完成以下所有项目，你就具备了独立交付 AI 项目的全栈能力：</p>
+    <ul class="check-list">
+      <li><span class="chk">□</span> 理解 Agent 的 Think → Act → Observe 循环，能手写一个简易 Agent</li>
+      <li><span class="chk">□</span> 能用 LangChain 搭建多工具 Agent（RAG + 搜索 + 计算）</li>
+      <li><span class="chk">□</span> 能用 Streamlit 或 Gradio 搭建 Web 聊天界面</li>
+      <li><span class="chk">□</span> 能用 FastAPI 把 AI 功能包装成 REST API</li>
+      <li><span class="chk">□</span> 能构建评测数据集，用 LLM-as-Judge 评估质量</li>
+      <li><span class="chk">□</span> 能用 Docker 容器化项目</li>
+      <li><span class="chk">□</span> 掌握标准项目结构和 Git 工作流</li>
+      <li><span class="chk">□</span> 完成毕业项目：全栈 AI Agent 应用</li>
+    </ul>
+  </div>
+
+  <div class="resources" style="margin-top:32px">
+    <h3>📚 推荐学习资源</h3>
+    <div class="res-item"><span class="res-type">官方文档</span>LangChain Agents — python.langchain.com/docs/modules/agents</div>
+    <div class="res-item"><span class="res-type">官方文档</span>Streamlit Docs — docs.streamlit.io</div>
+    <div class="res-item"><span class="res-type">官方文档</span>FastAPI Docs — fastapi.tiangolo.com（有中文版）</div>
+    <div class="res-item"><span class="res-type">免费课程</span>Functions, Tools and Agents with LangChain — DeepLearning.AI</div>
+    <div class="res-item"><span class="res-type">实战教程</span>Docker 入门 — docker-curriculum.com</div>
+    <div class="res-item"><span class="res-type">书籍</span>Building LLM Apps — O'Reilly（2025 新书，覆盖全栈 AI 开发）</div>
+  </div>
+
+  <div class="final-box">
+    <h2>🎓 全部 5 个 Phase 完成！</h2>
+    <p>从零基础的小白到能独立交付 AI 项目的全栈工程师，你走完了完整的学习路径。</p>
+    <p style="margin-top:12px"><strong>Python → 数据处理 → 大模型 API → RAG → Agent + 工程化</strong></p>
+    <p style="margin-top:12px">你现在具备的能力：AI 应用开发工程师 / LLM 工程师 / AI 全栈工程师。把你的毕业项目推到 GitHub，写进简历，开始你的 AI 职业生涯吧！</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -4,12 +4,12 @@ import { useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 
-export default function Phase1Page() {
+export default function Phase5Page() {
     const { lang } = useLanguage()
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const [iframeHeight, setIframeHeight] = useState(3000)
 
-    const src = lang === 'ko' ? '/phase1-python-guide-ko.html' : '/phase1-python-guide.html'
+    const src = lang === 'ko' ? '/phase5-agent-engineering-guide-ko.html' : '/phase5-agent-engineering-guide.html'
 
     const handleLoad = useCallback(() => {
         const iframe = iframeRef.current
@@ -35,7 +35,7 @@ export default function Phase1Page() {
             </nav>
             <div className="rounded-xl overflow-hidden border border-gray-700 bg-gray-900">
                 <iframe ref={iframeRef} key={lang} src={src} className="w-full border-0"
-                    style={{ height: `${iframeHeight}px` }} scrolling="no" onLoad={handleLoad} title="Phase 1" />
+                    style={{ height: `${iframeHeight}px` }} scrolling="no" onLoad={handleLoad} title="Phase 5" />
             </div>
         </div>
     )

@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 4 · RAG 检索增强生成 · 详细学习指南</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans SC',sans-serif;background:#06080f;color:#c9d1d9;line-height:1.75;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(16,185,129,.07) 0%,transparent 50%),radial-gradient(ellipse at 80% 70%,rgba(59,130,246,.06) 0%,transparent 50%);pointer-events:none}
+  .page{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:48px 24px 80px}
+
+  .header{text-align:center;margin-bottom:48px}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:3px;color:#10b981;background:rgba(16,185,129,.1);padding:4px 14px;border-radius:6px;margin-bottom:12px}
+  h1{font-size:2.2rem;font-weight:900;color:#f1f5f9;margin-bottom:6px}
+  .header p{color:#64748b;font-size:.9rem}
+  .meta-bar{display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap}
+  .meta-item{font-size:.8rem;color:#94a3b8;display:flex;align-items:center;gap:6px}
+  .meta-dot{width:8px;height:8px;border-radius:50%}
+
+  .why-box{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:24px 28px;margin-bottom:40px}
+  .why-box h2{font-size:1rem;color:#34d399;margin-bottom:10px}
+  .why-box p{font-size:.88rem;color:#94a3b8;line-height:1.8}
+  .why-box p+p{margin-top:8px}
+
+  /* Flow diagram */
+  .flow{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:20px 0 10px;padding:16px 0}
+  .flow-step{background:linear-gradient(135deg,#111827,#0c1018);border:1.5px solid var(--fc,#3b82f6);border-radius:12px;padding:10px 16px;text-align:center;min-width:100px}
+  .flow-step .fs-icon{font-size:1.3rem;margin-bottom:2px}
+  .flow-step .fs-title{font-size:.78rem;font-weight:700;color:var(--fc,#3b82f6)}
+  .flow-step .fs-sub{font-size:.65rem;color:#64748b}
+  .flow-arrow{color:#334155;font-size:1.2rem;margin:0 6px}
+
+  .toc{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid #1e293b;border-radius:14px;padding:24px 28px;margin-bottom:48px}
+  .toc h2{font-size:.85rem;color:#64748b;letter-spacing:3px;margin-bottom:14px;text-transform:uppercase}
+  .toc-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .toc-list a{color:#93c5fd;text-decoration:none;font-size:.88rem;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:8px;transition:all .2s}
+  .toc-list a:hover{background:rgba(59,130,246,.08);color:#60a5fa}
+  .toc-num{color:#475569;font-size:.75rem;font-weight:700;min-width:24px}
+
+  .day-section{margin-bottom:56px;scroll-margin-top:24px}
+  .day-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #1e293b}
+  .day-badge{flex-shrink:0;width:52px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(135deg,var(--dc),color-mix(in srgb,var(--dc) 60%,#000));color:#fff;font-weight:900}
+  .day-badge .d-label{font-size:.55rem;letter-spacing:1px;opacity:.8}
+  .day-badge .d-num{font-size:1.3rem;line-height:1}
+  .day-title{font-size:1.3rem;font-weight:700;color:#f1f5f9}
+  .day-subtitle{font-size:.82rem;color:#64748b;margin-top:2px}
+
+  .topic{background:linear-gradient(160deg,#111827,#0c1018);border:1px solid #1e293b;border-radius:12px;margin-bottom:14px;overflow:hidden;transition:border-color .3s}
+  .topic:hover{border-color:color-mix(in srgb,var(--dc) 40%,transparent)}
+  .topic-head{padding:16px 20px;display:flex;align-items:center;gap:10px}
+  .topic-icon{font-size:1.2rem}
+  .topic-name{font-weight:700;font-size:.95rem;color:#e2e8f0;flex:1}
+  .topic-tag{font-size:.65rem;padding:2px 8px;border-radius:5px;font-weight:600}
+  .tag-must{background:rgba(239,68,68,.12);color:#f87171}
+  .tag-imp{background:rgba(251,191,36,.12);color:#fbbf24}
+  .tag-nice{background:rgba(148,163,184,.1);color:#94a3b8}
+  .topic-body{padding:0 20px 20px}
+  .explain{font-size:.85rem;color:#94a3b8;margin-bottom:14px;line-height:1.7}
+
+  .code-block{background:#0d1117;border:1px solid #21262d;border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .code-label{padding:6px 14px;font-size:.7rem;font-weight:600;color:#7c8496;background:#161b22;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+  .code-label .dot{width:6px;height:6px;border-radius:50%}
+  pre{padding:14px 18px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;color:#c9d1d9}
+  .cm{color:#8b949e}.kw{color:#ff7b72}.fn{color:#d2a8ff}.st{color:#a5d6ff}
+  .nu{color:#79c0ff}.bi{color:#ffa657}.op{color:#ff7b72}.var{color:#ffa657}
+
+  .key-points{background:rgba(59,130,246,.05);border-left:3px solid rgba(59,130,246,.3);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:12px}
+  .key-points h4{font-size:.78rem;color:#60a5fa;margin-bottom:6px;letter-spacing:1px}
+  .key-points li{font-size:.82rem;color:#94a3b8;margin-bottom:4px;margin-left:16px}
+
+  .practice{background:linear-gradient(135deg,rgba(52,211,153,.06),rgba(16,185,129,.02));border:1px solid rgba(52,211,153,.2);border-radius:12px;padding:18px 20px;margin-top:20px}
+  .practice h3{color:#34d399;font-size:.9rem;margin-bottom:10px}
+  .practice-item{font-size:.85rem;color:#94a3b8;margin-bottom:8px;padding-left:20px;position:relative}
+  .practice-item::before{content:'✦';position:absolute;left:0;color:#34d399;font-size:.7rem;top:2px}
+
+  .tip-box{background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:14px 18px;margin-top:14px}
+  .tip-box h4{color:#60a5fa;font-size:.82rem;margin-bottom:6px}
+  .tip-box p{font-size:.8rem;color:#94a3b8;line-height:1.7}
+  .warn-box{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:10px;padding:14px 18px;margin-top:14px}
+  .warn-box h4{color:#f87171;font-size:.82rem;margin-bottom:6px}
+  .warn-box p{font-size:.8rem;color:#94a3b8;line-height:1.7}
+
+  .vs-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem}
+  .vs-table th{background:#161b22;color:#8b949e;padding:8px 12px;text-align:left;font-weight:600;border-bottom:1px solid #21262d}
+  .vs-table td{padding:8px 12px;border-bottom:1px solid #161b22;color:#c9d1d9}
+  .vs-table tr:hover td{background:rgba(16,185,129,.04)}
+
+  .checkpoint{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(245,158,11,.03));border:1.5px solid rgba(251,191,36,.25);border-radius:14px;padding:22px 24px;margin-top:24px;text-align:center}
+  .checkpoint h3{color:#fbbf24;font-size:1rem;margin-bottom:8px}
+  .checkpoint p{font-size:.85rem;color:#94a3b8}
+  .check-list{list-style:none;text-align:left;margin-top:14px}
+  .check-list li{font-size:.85rem;padding:6px 0;color:#cbd5e1;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(251,191,36,.08)}
+  .check-list li:last-child{border:none}
+  .chk{color:#fbbf24;font-size:.9rem}
+
+  .resources{background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(139,92,246,.02));border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:18px 20px;margin-top:14px}
+  .resources h3{color:#a78bfa;font-size:.88rem;margin-bottom:10px}
+  .res-item{display:flex;align-items:flex-start;gap:10px;font-size:.83rem;color:#94a3b8;margin-bottom:8px}
+  .res-type{flex-shrink:0;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(168,85,247,.1);color:#c4b5fd}
+
+  .final-box{margin-top:56px;background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(52,211,153,.04));border:1.5px solid rgba(16,185,129,.25);border-radius:16px;padding:28px;text-align:center}
+  .final-box h2{color:#34d399;font-size:1.2rem;margin-bottom:8px}
+  .final-box p{color:#64748b;font-size:.88rem}
+
+  @media(max-width:600px){.toc-list{grid-template-columns:1fr}h1{font-size:1.6rem}.page{padding:32px 14px 60px}.flow{flex-direction:column;gap:8px}.flow-arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">PHASE 04 · 详细版</div>
+    <h1>RAG 检索增强生成</h1>
+    <p>让大模型读懂你的私有数据——企业 AI 应用的核心能力</p>
+    <div class="meta-bar">
+      <div class="meta-item"><div class="meta-dot" style="background:#10b981;"></div>总时长：2~3 周</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#f59e0b;"></div>每天投入：2~3 小时</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#ef4444;"></div>前置要求：Phase 1-3 完成</div>
+    </div>
+  </div>
+
+  <div class="why-box">
+    <h2>为什么 RAG 是企业最刚需的技术？</h2>
+    <p>大模型很聪明，但它不知道你公司的产品手册、内部文档、客户数据。RAG 解决的就是这个问题——让大模型在回答时"参考"你的私有数据，既不用重新训练模型，又能给出准确、有依据的回答。</p>
+    <p>据统计，当前 80% 的企业 AI 项目都涉及 RAG。学会 RAG，你就能解决"让 AI 读懂公司文档"这个最高频的需求。</p>
+  </div>
+
+  <!-- RAG Flow Diagram -->
+  <div class="flow">
+    <div class="flow-step" style="--fc:#3b82f6"><div class="fs-icon">📄</div><div class="fs-title">文档</div><div class="fs-sub">PDF/Word/网页</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="--fc:#8b5cf6"><div class="fs-icon">✂️</div><div class="fs-title">切分</div><div class="fs-sub">Chunking</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="--fc:#ec4899"><div class="fs-icon">🔢</div><div class="fs-title">向量化</div><div class="fs-sub">Embedding</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="--fc:#f59e0b"><div class="fs-icon">🗄️</div><div class="fs-title">存储</div><div class="fs-sub">向量数据库</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="--fc:#10b981"><div class="fs-icon">🔍</div><div class="fs-title">检索</div><div class="fs-sub">相似度搜索</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="--fc:#ef4444"><div class="fs-icon">🧠</div><div class="fs-title">生成</div><div class="fs-sub">LLM 回答</div></div>
+  </div>
+  <p style="text-align:center;font-size:.75rem;color:#475569;margin-bottom:40px">↑ RAG 完整流程：文档 → 切分 → 向量化 → 存储 → 检索 → 生成</p>
+
+  <div class="toc">
+    <h2>📋 学习日程目录</h2>
+    <ul class="toc-list">
+      <li><a href="#d1"><span class="toc-num">Day 1-2</span>RAG 原理 + Embedding 向量化</a></li>
+      <li><a href="#d3"><span class="toc-num">Day 3-4</span>文档加载与切分策略</a></li>
+      <li><a href="#d5"><span class="toc-num">Day 5-7</span>向量数据库实战</a></li>
+      <li><a href="#d8"><span class="toc-num">Day 8-9</span>检索 + 生成 全链路串联</a></li>
+      <li><a href="#d10"><span class="toc-num">Day 10-11</span>RAG 质量优化</a></li>
+      <li><a href="#d12"><span class="toc-num">Day 12-13</span>LangChain / LlamaIndex 框架</a></li>
+      <li><a href="#d14"><span class="toc-num">Day 14-17</span>综合项目：企业知识库问答系统</a></li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 1-2 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d1" style="--dc:#3b82f6">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">1-2</span></div>
+      <div>
+        <div class="day-title">RAG 原理 + Embedding 向量化</div>
+        <div class="day-subtitle">理解"为什么文字可以变成数字"——RAG 的理论根基</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">💡</span>
+        <span class="topic-name">什么是 Embedding？</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">Embedding 就是把文字变成一串数字（向量）。意思相近的文字，向量也相近。这样计算机就能"理解"语义了——不是靠关键词匹配，而是靠意思相似度。</p>
+        <table class="vs-table">
+          <tr><th>文本</th><th>向量（简化示意）</th><th>说明</th></tr>
+          <tr><td>"我喜欢猫"</td><td>[0.82, -0.15, 0.43, ...]</td><td rowspan="2">意思相近 → 向量接近</td></tr>
+          <tr><td>"我爱小猫咪"</td><td>[0.80, -0.12, 0.45, ...]</td></tr>
+          <tr><td>"今天股票涨了"</td><td>[-0.31, 0.67, -0.22, ...]</td><td>意思不同 → 向量远离</td></tr>
+        </table>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> TERMINAL — 安装依赖</div>
+<pre>pip install openai chromadb tiktoken langchain langchain-openai
+pip install pypdf python-docx unstructured</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔢</span>
+        <span class="topic-name">调用 Embedding API</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> embedding_basics.py</div>
+<pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+client = OpenAI()
+
+<span class="cm"># ---- 单条文本向量化 ----</span>
+response = client.embeddings.create(
+    model=<span class="st">"text-embedding-3-small"</span>,   <span class="cm"># 推荐，便宜又好用</span>
+    input=<span class="st">"Python 是一种编程语言"</span>
+)
+vector = response.data[<span class="nu">0</span>].embedding
+<span class="fn">print</span>(<span class="st">f"向量维度: </span><span class="var">{len(vector)}</span><span class="st">"</span>)      <span class="cm"># 1536</span>
+<span class="fn">print</span>(<span class="st">f"前5个值: </span><span class="var">{vector[:5]}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 批量向量化 ----</span>
+texts = [
+    <span class="st">"Python 是一种编程语言"</span>,
+    <span class="st">"Java 也是编程语言"</span>,
+    <span class="st">"今天天气真好"</span>,
+]
+response = client.embeddings.create(
+    model=<span class="st">"text-embedding-3-small"</span>,
+    input=texts
+)
+vectors = [d.embedding <span class="kw">for</span> d <span class="kw">in</span> response.data]
+
+<span class="cm"># ---- 计算相似度 ----</span>
+<span class="kw">def</span> <span class="fn">cosine_similarity</span>(a, b):
+    a, b = np.array(a), np.array(b)
+    <span class="kw">return</span> np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+<span class="fn">print</span>(<span class="st">f"Python vs Java: </span><span class="var">{cosine_similarity(vectors[0], vectors[1]):.4f}</span><span class="st">"</span>)
+<span class="cm"># → 0.89（很相似！都是编程语言）</span>
+
+<span class="fn">print</span>(<span class="st">f"Python vs 天气: </span><span class="var">{cosine_similarity(vectors[0], vectors[2]):.4f}</span><span class="st">"</span>)
+<span class="cm"># → 0.21（不相似，话题完全不同）</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 Embedding 模型选择</h4>
+          <ul>
+            <li><code>text-embedding-3-small</code> — OpenAI 推荐，便宜（$0.02/1M tokens），效果好</li>
+            <li><code>text-embedding-3-large</code> — 更高精度，贵一倍</li>
+            <li><code>BAAI/bge-large-zh</code> — 开源中文 Embedding，可本地运行，免费</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 1-2 练习</h3>
+      <div class="practice-item">对 10 句话做 Embedding，计算两两之间的相似度矩阵</div>
+      <div class="practice-item">用相似度实现"语义搜索"：给一个查询句，从 10 句话中找出最相关的 3 句</div>
+      <div class="practice-item">对比"关键词搜索"和"语义搜索"的差异（如搜索"价格"能否匹配到"多少钱"）</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 3-4 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d3" style="--dc:#8b5cf6">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">3-4</span></div>
+      <div>
+        <div class="day-title">文档加载与切分策略</div>
+        <div class="day-subtitle">RAG 的第一步——把文档变成"可搜索"的知识碎片</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📄</span>
+        <span class="topic-name">文档加载（支持多种格式）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> document_loading.py</div>
+<pre><span class="cm"># ---- 读取 TXT ----</span>
+<span class="kw">def</span> <span class="fn">load_txt</span>(path):
+    <span class="kw">with</span> <span class="fn">open</span>(path, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+        <span class="kw">return</span> f.read()
+
+<span class="cm"># ---- 读取 PDF ----</span>
+<span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader
+
+<span class="kw">def</span> <span class="fn">load_pdf</span>(path):
+    reader = PdfReader(path)
+    text = <span class="st">""</span>
+    <span class="kw">for</span> page <span class="kw">in</span> reader.pages:
+        text += page.extract_text() + <span class="st">"\n"</span>
+    <span class="kw">return</span> text
+
+<span class="cm"># ---- 读取 Word ----</span>
+<span class="kw">from</span> docx <span class="kw">import</span> Document
+
+<span class="kw">def</span> <span class="fn">load_docx</span>(path):
+    doc = Document(path)
+    <span class="kw">return</span> <span class="st">"\n"</span>.join([p.text <span class="kw">for</span> p <span class="kw">in</span> doc.paragraphs])
+
+<span class="cm"># ---- 统一加载接口 ----</span>
+<span class="kw">def</span> <span class="fn">load_document</span>(path):
+    <span class="kw">if</span> path.endswith(<span class="st">".pdf"</span>):
+        <span class="kw">return</span> load_pdf(path)
+    <span class="kw">elif</span> path.endswith(<span class="st">".docx"</span>):
+        <span class="kw">return</span> load_docx(path)
+    <span class="kw">elif</span> path.endswith(<span class="st">".txt"</span>) <span class="kw">or</span> path.endswith(<span class="st">".md"</span>):
+        <span class="kw">return</span> load_txt(path)
+    <span class="kw">else</span>:
+        <span class="kw">raise</span> ValueError(<span class="st">f"不支持的文件格式: </span><span class="var">{path}</span><span class="st">"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">✂️</span>
+        <span class="topic-name">文本切分（Chunking）— RAG 最关键的步骤</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">一篇长文档不能整体做 Embedding（太长了），必须切成小块（chunk）。切分策略直接决定 RAG 的检索质量——切太大找不准，切太小丢上下文。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> chunking.py</div>
+<pre><span class="cm"># ==== 方法 1: 固定长度 + 重叠（最常用）====</span>
+<span class="kw">def</span> <span class="fn">chunk_by_size</span>(text, chunk_size=<span class="nu">500</span>, overlap=<span class="nu">100</span>):
+    <span class="st">"""按字符数切分，相邻块有重叠"""</span>
+    chunks = []
+    start = <span class="nu">0</span>
+    <span class="kw">while</span> start < <span class="fn">len</span>(text):
+        end = start + chunk_size
+        chunk = text[start:end]
+        chunks.append(chunk)
+        start = end - overlap   <span class="cm"># 重叠部分保持上下文连贯</span>
+    <span class="kw">return</span> chunks
+
+<span class="cm"># ==== 方法 2: 按段落切分 ====</span>
+<span class="kw">def</span> <span class="fn">chunk_by_paragraph</span>(text, max_size=<span class="nu">800</span>):
+    <span class="st">"""按段落切分，短段落合并，长段落拆分"""</span>
+    paragraphs = text.split(<span class="st">"\n\n"</span>)
+    chunks = []
+    current = <span class="st">""</span>
+    <span class="kw">for</span> para <span class="kw">in</span> paragraphs:
+        <span class="kw">if</span> <span class="fn">len</span>(current) + <span class="fn">len</span>(para) < max_size:
+            current += para + <span class="st">"\n\n"</span>
+        <span class="kw">else</span>:
+            <span class="kw">if</span> current:
+                chunks.append(current.strip())
+            current = para + <span class="st">"\n\n"</span>
+    <span class="kw">if</span> current.strip():
+        chunks.append(current.strip())
+    <span class="kw">return</span> chunks
+
+<span class="cm"># ==== 方法 3: 使用 LangChain 的 Splitter（推荐）====</span>
+<span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> RecursiveCharacterTextSplitter
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=<span class="nu">500</span>,        <span class="cm"># 每块最大字符数</span>
+    chunk_overlap=<span class="nu">100</span>,     <span class="cm"># 重叠字符数</span>
+    separators=[<span class="st">"\n\n"</span>, <span class="st">"\n"</span>, <span class="st">"。"</span>, <span class="st">"！"</span>, <span class="st">"？"</span>, <span class="st">"，"</span>, <span class="st">" "</span>]
+    <span class="cm"># 优先按段落分，其次按句子，最后按字符</span>
+)
+
+text = load_document(<span class="st">"product_manual.pdf"</span>)
+chunks = splitter.split_text(text)
+<span class="fn">print</span>(<span class="st">f"共切分为 </span><span class="var">{len(chunks)}</span><span class="st"> 个块"</span>)
+<span class="fn">print</span>(<span class="st">f"平均长度: </span><span class="var">{sum(len(c) for c in chunks) / len(chunks):.0f}</span><span class="st"> 字符"</span>)</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 切分经验法则</h4>
+          <ul>
+            <li><strong>chunk_size 500-1000</strong> 字符通常效果最好</li>
+            <li><strong>overlap 10%-20%</strong> 保持跨块的上下文连贯性</li>
+            <li>中文按句号切比按空格切效果好</li>
+            <li>表格数据建议每行为一个 chunk，加上表头作为上下文</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🏷️</span>
+        <span class="topic-name">添加元数据（Metadata）</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">每个 chunk 不只有文本内容，还应该带上"来自哪个文件、第几页、什么类别"等信息。回答时可以引用溯源。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> metadata.py</div>
+<pre><span class="kw">def</span> <span class="fn">create_documents</span>(file_path, chunks):
+    <span class="st">"""为每个 chunk 添加元数据"""</span>
+    documents = []
+    <span class="kw">for</span> i, chunk <span class="kw">in</span> <span class="fn">enumerate</span>(chunks):
+        doc = {
+            <span class="st">"id"</span>: <span class="st">f"</span><span class="var">{file_path}</span><span class="st">_chunk_</span><span class="var">{i}</span><span class="st">"</span>,
+            <span class="st">"text"</span>: chunk,
+            <span class="st">"metadata"</span>: {
+                <span class="st">"source"</span>: file_path,
+                <span class="st">"chunk_index"</span>: i,
+                <span class="st">"total_chunks"</span>: <span class="fn">len</span>(chunks),
+                <span class="st">"char_count"</span>: <span class="fn">len</span>(chunk),
+            }
+        }
+        documents.append(doc)
+    <span class="kw">return</span> documents</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 3-4 练习</h3>
+      <div class="practice-item">加载一个 PDF 文件，分别用固定长度和 RecursiveCharacterTextSplitter 切分，对比结果</div>
+      <div class="practice-item">调整 chunk_size（200 / 500 / 1000），观察切出来的块数量和内容质量</div>
+      <div class="practice-item">为每个 chunk 添加元数据（文件名、块序号），打印前 3 个 chunk 检查</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 5-7 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d5" style="--dc:#f59e0b">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">5-7</span></div>
+      <div>
+        <div class="day-title">向量数据库实战</div>
+        <div class="day-subtitle">把向量存起来、搜出来——RAG 的"大脑记忆体"</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🗄️</span>
+        <span class="topic-name">向量数据库选型</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <table class="vs-table">
+          <tr><th>数据库</th><th>特点</th><th>推荐场景</th></tr>
+          <tr><td><strong>Chroma</strong></td><td>Python 原生，零配置，本地运行</td><td>学习入门、原型开发（推荐先学这个）</td></tr>
+          <tr><td>FAISS</td><td>Meta 开源，极快，纯内存</td><td>大规模离线检索</td></tr>
+          <tr><td>Milvus</td><td>分布式，高性能，功能完整</td><td>生产环境、百万级数据</td></tr>
+          <tr><td>Pinecone</td><td>全托管云服务，免运维</td><td>不想自建基础设施</td></tr>
+          <tr><td>Weaviate</td><td>支持混合搜索，GraphQL API</td><td>需要关键词+语义混合搜索</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">💎</span>
+        <span class="topic-name">ChromaDB 完整实战</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> chroma_rag.py — 完整的存储 + 检索流程</div>
+<pre><span class="kw">import</span> chromadb
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+client = OpenAI()
+
+<span class="cm"># ========== 1. 创建/连接向量数据库 ==========</span>
+chroma_client = chromadb.PersistentClient(path=<span class="st">"./my_vectordb"</span>)
+collection = chroma_client.get_or_create_collection(
+    name=<span class="st">"knowledge_base"</span>,
+    metadata={<span class="st">"description"</span>: <span class="st">"企业知识库"</span>}
+)
+
+<span class="cm"># ========== 2. 向量化函数 ==========</span>
+<span class="kw">def</span> <span class="fn">get_embeddings</span>(texts):
+    response = client.embeddings.create(
+        model=<span class="st">"text-embedding-3-small"</span>,
+        input=texts
+    )
+    <span class="kw">return</span> [d.embedding <span class="kw">for</span> d <span class="kw">in</span> response.data]
+
+<span class="cm"># ========== 3. 存入文档 ==========</span>
+documents = [
+    <span class="st">"Python 是一种解释型、面向对象的高级编程语言。"</span>,
+    <span class="st">"Pandas 是 Python 中最流行的数据处理库。"</span>,
+    <span class="st">"RAG 是检索增强生成的缩写，用于让 AI 访问外部知识。"</span>,
+    <span class="st">"向量数据库存储文本的数学表示，支持语义搜索。"</span>,
+    <span class="st">"ChromaDB 是一个轻量级的开源向量数据库。"</span>,
+]
+ids = [<span class="st">f"doc_</span><span class="var">{i}</span><span class="st">"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(documents))]
+metadatas = [{<span class="st">"source"</span>: <span class="st">"tutorial"</span>, <span class="st">"index"</span>: i} <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(documents))]
+
+embeddings = get_embeddings(documents)
+
+collection.add(
+    ids=ids,
+    documents=documents,
+    embeddings=embeddings,
+    metadatas=metadatas
+)
+<span class="fn">print</span>(<span class="st">f"已存入 </span><span class="var">{collection.count()}</span><span class="st"> 条文档"</span>)
+
+<span class="cm"># ========== 4. 语义检索 ==========</span>
+<span class="kw">def</span> <span class="fn">search</span>(query, top_k=<span class="nu">3</span>):
+    query_embedding = get_embeddings([query])[<span class="nu">0</span>]
+    results = collection.query(
+        query_embeddings=[query_embedding],
+        n_results=top_k,
+        include=[<span class="st">"documents"</span>, <span class="st">"metadatas"</span>, <span class="st">"distances"</span>]
+    )
+    <span class="kw">return</span> results
+
+<span class="cm"># 测试检索</span>
+results = search(<span class="st">"如何处理数据？"</span>)
+<span class="kw">for</span> i, doc <span class="kw">in</span> <span class="fn">enumerate</span>(results[<span class="st">"documents"</span>][<span class="nu">0</span>]):
+    dist = results[<span class="st">"distances"</span>][<span class="nu">0</span>][i]
+    <span class="fn">print</span>(<span class="st">f"[相似度: </span><span class="var">{1-dist:.3f}</span><span class="st">] </span><span class="var">{doc}</span><span class="st">"</span>)
+<span class="cm"># → [相似度: 0.856] Pandas 是 Python 中最流行的数据处理库。</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📁</span>
+        <span class="topic-name">完整的文档入库管线</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> indexing_pipeline.py — 文件 → 切分 → 向量化 → 存储</div>
+<pre><span class="kw">import</span> os, glob
+
+<span class="kw">def</span> <span class="fn">index_documents</span>(folder_path, collection, chunk_size=<span class="nu">500</span>, overlap=<span class="nu">100</span>):
+    <span class="st">"""将文件夹中所有文档建立索引"""</span>
+    <span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> RecursiveCharacterTextSplitter
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size, chunk_overlap=overlap,
+        separators=[<span class="st">"\n\n"</span>, <span class="st">"\n"</span>, <span class="st">"。"</span>, <span class="st">"！"</span>, <span class="st">"？"</span>, <span class="st">" "</span>]
+    )
+
+    all_chunks, all_ids, all_metas = [], [], []
+    doc_count = <span class="nu">0</span>
+
+    <span class="kw">for</span> filepath <span class="kw">in</span> glob.glob(os.path.join(folder_path, <span class="st">"*"</span>)):
+        <span class="kw">try</span>:
+            text = load_document(filepath)
+            chunks = splitter.split_text(text)
+            filename = os.path.basename(filepath)
+
+            <span class="kw">for</span> i, chunk <span class="kw">in</span> <span class="fn">enumerate</span>(chunks):
+                all_chunks.append(chunk)
+                all_ids.append(<span class="st">f"</span><span class="var">{filename}</span><span class="st">_</span><span class="var">{i}</span><span class="st">"</span>)
+                all_metas.append({
+                    <span class="st">"source"</span>: filename,
+                    <span class="st">"chunk_index"</span>: i
+                })
+
+            doc_count += <span class="nu">1</span>
+            <span class="fn">print</span>(<span class="st">f"✅ </span><span class="var">{filename}</span><span class="st">: </span><span class="var">{len(chunks)}</span><span class="st"> 个块"</span>)
+        <span class="kw">except</span> Exception <span class="kw">as</span> e:
+            <span class="fn">print</span>(<span class="st">f"❌ </span><span class="var">{filepath}</span><span class="st">: </span><span class="var">{e}</span><span class="st">"</span>)
+
+    <span class="cm"># 批量向量化并存入</span>
+    <span class="kw">if</span> all_chunks:
+        embeddings = get_embeddings(all_chunks)
+        collection.add(
+            ids=all_ids,
+            documents=all_chunks,
+            embeddings=embeddings,
+            metadatas=all_metas
+        )
+
+    <span class="fn">print</span>(<span class="st">f"\n完成！共处理 </span><span class="var">{doc_count}</span><span class="st"> 个文件，</span><span class="var">{len(all_chunks)}</span><span class="st"> 个块"</span>)
+
+<span class="cm"># 使用</span>
+index_documents(<span class="st">"./docs"</span>, collection)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 5-7 练习</h3>
+      <div class="practice-item">创建一个 ChromaDB 数据库，手动存入 10 条知识，测试语义搜索</div>
+      <div class="practice-item">准备 3 个 PDF 文件，用入库管线批量处理，验证检索效果</div>
+      <div class="practice-item">尝试用不同的 chunk_size（200 vs 500 vs 1000）索引同一文档，对比检索质量</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 8-9 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d8" style="--dc:#10b981">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">8-9</span></div>
+      <div>
+        <div class="day-title">检索 + 生成 全链路串联</div>
+        <div class="day-subtitle">把检索到的知识"喂"给大模型——RAG 的核心闭环</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔗</span>
+        <span class="topic-name">RAG 完整流程实现</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> rag_pipeline.py — 完整的 RAG 问答</div>
+<pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+<span class="kw">import</span> chromadb
+
+client = OpenAI()
+chroma = chromadb.PersistentClient(path=<span class="st">"./my_vectordb"</span>)
+collection = chroma.get_collection(<span class="st">"knowledge_base"</span>)
+
+RAG_PROMPT = <span class="st">"""你是一个智能问答助手。请根据以下参考资料回答用户的问题。
+
+规则：
+- 只根据参考资料回答，不要编造信息
+- 如果参考资料中没有相关信息，请说"根据现有资料，我无法回答这个问题"
+- 在回答末尾标注信息来源
+
+参考资料：
+---
+{context}
+---
+
+用户问题：{question}"""</span>
+
+<span class="kw">def</span> <span class="fn">rag_query</span>(question, top_k=<span class="nu">3</span>):
+    <span class="st">"""完整的 RAG 问答流程"""</span>
+
+    <span class="cm"># Step 1: 检索相关文档</span>
+    query_emb = get_embeddings([question])[<span class="nu">0</span>]
+    results = collection.query(
+        query_embeddings=[query_emb],
+        n_results=top_k,
+        include=[<span class="st">"documents"</span>, <span class="st">"metadatas"</span>, <span class="st">"distances"</span>]
+    )
+
+    <span class="cm"># Step 2: 拼装上下文</span>
+    context_parts = []
+    sources = []
+    <span class="kw">for</span> i, doc <span class="kw">in</span> <span class="fn">enumerate</span>(results[<span class="st">"documents"</span>][<span class="nu">0</span>]):
+        source = results[<span class="st">"metadatas"</span>][<span class="nu">0</span>][i].get(<span class="st">"source"</span>, <span class="st">"未知"</span>)
+        context_parts.append(<span class="st">f"[来源: </span><span class="var">{source}</span><span class="st">]\n</span><span class="var">{doc}</span><span class="st">"</span>)
+        sources.append(source)
+
+    context = <span class="st">"\n\n"</span>.join(context_parts)
+
+    <span class="cm"># Step 3: 调用大模型生成回答</span>
+    prompt = RAG_PROMPT.format(context=context, question=question)
+    response = client.chat.completions.create(
+        model=<span class="st">"gpt-4o"</span>,
+        messages=[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt}],
+        temperature=<span class="nu">0.3</span>    <span class="cm"># RAG 场景建议低温度，更忠实</span>
+    )
+    answer = response.choices[<span class="nu">0</span>].message.content
+
+    <span class="kw">return</span> {
+        <span class="st">"answer"</span>: answer,
+        <span class="st">"sources"</span>: <span class="fn">list</span>(<span class="fn">set</span>(sources)),
+        <span class="st">"context_used"</span>: context_parts
+    }
+
+<span class="cm"># ---- 使用 ----</span>
+result = rag_query(<span class="st">"什么是 RAG？"</span>)
+<span class="fn">print</span>(<span class="st">f"回答: </span><span class="var">{result['answer']}</span><span class="st">"</span>)
+<span class="fn">print</span>(<span class="st">f"来源: </span><span class="var">{result['sources']}</span><span class="st">"</span>)</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 RAG 的三个关键参数</h4>
+          <ul>
+            <li><strong>top_k</strong> — 检索几条结果（通常 3-5 条，太多会干扰模型）</li>
+            <li><strong>temperature</strong> — RAG 场景用 0-0.3，避免 AI "发挥创造力"编造信息</li>
+            <li><strong>Prompt 模板</strong> — 明确告诉 AI "只根据资料回答"，是防止幻觉的关键</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 8-9 练习</h3>
+      <div class="practice-item">实现完整 RAG：上传 3 个文档 → 建索引 → 提问 → 获得带来源引用的回答</div>
+      <div class="practice-item">写一个命令行 RAG 问答工具：循环输入问题，输出答案和来源</div>
+      <div class="practice-item">对比有无 RAG 的回答质量：同一个问题，直接问 AI vs 给了参考资料后问 AI</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 10-11 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d10" style="--dc:#ec4899">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">10-11</span></div>
+      <div>
+        <div class="day-title">RAG 质量优化</div>
+        <div class="day-subtitle">从"能用"到"好用"——解决 RAG 最常见的坑</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🎯</span>
+        <span class="topic-name">问题 1：检索不准（最常见）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> retrieval_optimization.py</div>
+<pre><span class="cm"># ==== 优化 1: Query 改写 ====</span>
+<span class="cm"># 用户问题口语化，先让 AI 改写成更适合检索的形式</span>
+<span class="kw">def</span> <span class="fn">rewrite_query</span>(original_query):
+    response = client.chat.completions.create(
+        model=<span class="st">"gpt-4o-mini"</span>,
+        messages=[{
+            <span class="st">"role"</span>: <span class="st">"user"</span>,
+            <span class="st">"content"</span>: <span class="st">f"""将以下用户问题改写为更适合知识库检索的形式。
+输出 3 个不同角度的检索查询，每行一个。
+
+用户问题：{original_query}"""</span>
+        }],
+        temperature=<span class="nu">0.3</span>
+    )
+    queries = response.choices[<span class="nu">0</span>].message.content.strip().split(<span class="st">"\n"</span>)
+    <span class="kw">return</span> [q.strip() <span class="kw">for</span> q <span class="kw">in</span> queries <span class="kw">if</span> q.strip()]
+
+<span class="cm"># 例: "这东西怎么退" → ["退货流程", "退换货政策", "如何申请退货"]</span>
+
+<span class="cm"># ==== 优化 2: 混合搜索 ====</span>
+<span class="cm"># 同时用语义搜索 + 关键词搜索，取并集</span>
+<span class="kw">def</span> <span class="fn">hybrid_search</span>(query, collection, top_k=<span class="nu">5</span>):
+    <span class="cm"># 语义搜索</span>
+    emb = get_embeddings([query])[<span class="nu">0</span>]
+    semantic_results = collection.query(
+        query_embeddings=[emb], n_results=top_k
+    )
+
+    <span class="cm"># 关键词搜索（Chroma 支持 where_document 过滤）</span>
+    keyword_results = collection.query(
+        query_texts=[query], n_results=top_k  <span class="cm"># 内置关键词匹配</span>
+    )
+
+    <span class="cm"># 合并去重</span>
+    seen = <span class="fn">set</span>()
+    combined = []
+    <span class="kw">for</span> source <span class="kw">in</span> [semantic_results, keyword_results]:
+        <span class="kw">for</span> doc, doc_id <span class="kw">in</span> <span class="fn">zip</span>(source[<span class="st">"documents"</span>][<span class="nu">0</span>], source[<span class="st">"ids"</span>][<span class="nu">0</span>]):
+            <span class="kw">if</span> doc_id <span class="kw">not in</span> seen:
+                seen.add(doc_id)
+                combined.append(doc)
+    <span class="kw">return</span> combined[:top_k]
+
+<span class="cm"># ==== 优化 3: Rerank 重排序 ====</span>
+<span class="cm"># 检索出 10 条，让 AI 挑出最相关的 3 条</span>
+<span class="kw">def</span> <span class="fn">rerank</span>(query, documents, top_k=<span class="nu">3</span>):
+    doc_list = <span class="st">"\n"</span>.join([<span class="st">f"[</span><span class="var">{i}</span><span class="st">] </span><span class="var">{d[:200]}</span><span class="st">"</span> <span class="kw">for</span> i, d <span class="kw">in</span> <span class="fn">enumerate</span>(documents)])
+    resp = client.chat.completions.create(
+        model=<span class="st">"gpt-4o-mini"</span>,
+        messages=[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">f"""以下文档中，哪些与问题最相关？
+返回最相关的 {top_k} 个文档编号，用逗号分隔。
+
+问题：{query}
+
+文档列表：
+{doc_list}"""</span>}],
+        temperature=<span class="nu">0</span>
+    )
+    indices = [<span class="fn">int</span>(x.strip()) <span class="kw">for</span> x <span class="kw">in</span> resp.choices[<span class="nu">0</span>].message.content.split(<span class="st">","</span>)]
+    <span class="kw">return</span> [documents[i] <span class="kw">for</span> i <span class="kw">in</span> indices <span class="kw">if</span> i < <span class="fn">len</span>(documents)]</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">👻</span>
+        <span class="topic-name">问题 2：AI 幻觉（编造信息）</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> anti_hallucination.py</div>
+<pre><span class="cm"># 防幻觉 Prompt 模板</span>
+ANTI_HALLUCINATION_PROMPT = <span class="st">"""根据以下参考资料回答问题。
+
+重要规则：
+1. 只使用参考资料中的信息回答
+2. 如果资料中没有答案，明确说"资料中未提及"
+3. 直接引用原文关键句，用「」标注
+4. 给出置信度（高/中/低）
+
+参考资料：
+{context}
+
+问题：{question}
+
+请按以下格式输出：
+回答：...
+引用：「原文句子」
+置信度：高/中/低
+来源：文件名"""</span>
+
+<span class="cm"># 相似度阈值过滤——太不相关的结果直接丢弃</span>
+<span class="kw">def</span> <span class="fn">filtered_search</span>(query, collection, top_k=<span class="nu">5</span>, threshold=<span class="nu">0.3</span>):
+    emb = get_embeddings([query])[<span class="nu">0</span>]
+    results = collection.query(
+        query_embeddings=[emb], n_results=top_k,
+        include=[<span class="st">"documents"</span>, <span class="st">"distances"</span>, <span class="st">"metadatas"</span>]
+    )
+    <span class="cm"># 只保留距离小于阈值的结果</span>
+    filtered = []
+    <span class="kw">for</span> doc, dist, meta <span class="kw">in</span> <span class="fn">zip</span>(
+        results[<span class="st">"documents"</span>][<span class="nu">0</span>],
+        results[<span class="st">"distances"</span>][<span class="nu">0</span>],
+        results[<span class="st">"metadatas"</span>][<span class="nu">0</span>]
+    ):
+        <span class="kw">if</span> dist < threshold:
+            filtered.append({<span class="st">"doc"</span>: doc, <span class="st">"distance"</span>: dist, <span class="st">"meta"</span>: meta})
+    <span class="kw">return</span> filtered</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 10-11 练习</h3>
+      <div class="practice-item">实现 Query 改写：用户输入口语化问题，自动生成 3 个检索 query</div>
+      <div class="practice-item">加入相似度阈值过滤：距离 > 0.5 的结果不使用，直接说"未找到相关信息"</div>
+      <div class="practice-item">实现 Rerank：先检索 10 条，再用 AI 挑出最相关的 3 条，对比前后效果</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 12-13 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d12" style="--dc:#06b6d4">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">12-13</span></div>
+      <div>
+        <div class="day-title">LangChain / LlamaIndex 框架</div>
+        <div class="day-subtitle">用框架加速开发——不用从零造轮子</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🦜</span>
+        <span class="topic-name">LangChain 快速搭建 RAG</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">LangChain 是目前最流行的 LLM 应用框架，把文档加载、切分、向量化、检索、生成全部封装好了。前面手写的代码，用 LangChain 几行就搞定。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> langchain_rag.py</div>
+<pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> OpenAIEmbeddings, ChatOpenAI
+<span class="kw">from</span> langchain_community.vectorstores <span class="kw">import</span> Chroma
+<span class="kw">from</span> langchain_community.document_loaders <span class="kw">import</span> PyPDFLoader, DirectoryLoader
+<span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> RecursiveCharacterTextSplitter
+<span class="kw">from</span> langchain.chains <span class="kw">import</span> RetrievalQA
+
+<span class="cm"># ---- 1. 加载文档 ----</span>
+loader = DirectoryLoader(<span class="st">"./docs"</span>, glob=<span class="st">"**/*.pdf"</span>, loader_cls=PyPDFLoader)
+documents = loader.load()
+<span class="fn">print</span>(<span class="st">f"加载了 </span><span class="var">{len(documents)}</span><span class="st"> 页文档"</span>)
+
+<span class="cm"># ---- 2. 切分 ----</span>
+splitter = RecursiveCharacterTextSplitter(chunk_size=<span class="nu">500</span>, chunk_overlap=<span class="nu">100</span>)
+chunks = splitter.split_documents(documents)
+<span class="fn">print</span>(<span class="st">f"切分为 </span><span class="var">{len(chunks)}</span><span class="st"> 个块"</span>)
+
+<span class="cm"># ---- 3. 向量化 + 存储（一行搞定！）----</span>
+embeddings = OpenAIEmbeddings(model=<span class="st">"text-embedding-3-small"</span>)
+vectordb = Chroma.from_documents(chunks, embeddings, persist_directory=<span class="st">"./chroma_db"</span>)
+
+<span class="cm"># ---- 4. 创建 RAG 问答链 ----</span>
+llm = ChatOpenAI(model=<span class="st">"gpt-4o"</span>, temperature=<span class="nu">0.3</span>)
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    retriever=vectordb.as_retriever(search_kwargs={<span class="st">"k"</span>: <span class="nu">3</span>}),
+    return_source_documents=<span class="kw">True</span>
+)
+
+<span class="cm"># ---- 5. 提问 ----</span>
+result = qa_chain.invoke({<span class="st">"query"</span>: <span class="st">"什么是 RAG？"</span>})
+<span class="fn">print</span>(<span class="st">f"回答: </span><span class="var">{result['result']}</span><span class="st">"</span>)
+<span class="kw">for</span> doc <span class="kw">in</span> result[<span class="st">"source_documents"</span>]:
+    <span class="fn">print</span>(<span class="st">f"  来源: </span><span class="var">{doc.metadata['source']}</span><span class="st"> (page </span><span class="var">{doc.metadata.get('page', '?')}</span><span class="st">)"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🦙</span>
+        <span class="topic-name">LlamaIndex 快速搭建 RAG</span>
+        <span class="topic-tag tag-imp">重要</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">LlamaIndex 更专注于 RAG 场景，代码更简洁，特别适合"文档问答"类应用。</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> llamaindex_rag.py</div>
+<pre><span class="kw">from</span> llama_index.core <span class="kw">import</span> VectorStoreIndex, SimpleDirectoryReader
+
+<span class="cm"># ---- 就这三行！----</span>
+documents = SimpleDirectoryReader(<span class="st">"./docs"</span>).load_data()
+index = VectorStoreIndex.from_documents(documents)
+query_engine = index.as_query_engine()
+
+<span class="cm"># ---- 提问 ----</span>
+response = query_engine.query(<span class="st">"什么是 RAG？"</span>)
+<span class="fn">print</span>(response)</pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 LangChain vs LlamaIndex 怎么选？</h4>
+          <p><strong>LangChain</strong> — 更通用，适合构建复杂的多步骤 AI 应用（Agent、链式调用）<br>
+          <strong>LlamaIndex</strong> — 更专注 RAG，代码最简洁，适合快速做文档问答原型<br>
+          <strong>建议：</strong>两个都学，LlamaIndex 做原型验证，LangChain 做生产系统</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 12-13 练习</h3>
+      <div class="practice-item">用 LangChain 搭建 RAG：加载文档 → 切分 → 向量化 → 问答，全流程 20 行代码内</div>
+      <div class="practice-item">用 LlamaIndex 搭建同样的 RAG，对比代码量和使用体验</div>
+      <div class="practice-item">在 LangChain 中自定义 Prompt 模板，加入防幻觉规则和来源引用</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 14-17 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d14" style="--dc:#f43f5e">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">14-17</span></div>
+      <div>
+        <div class="day-title">综合项目：企业知识库问答系统</div>
+        <div class="day-subtitle">你的简历核心项目——完整的 RAG 系统，从文档上传到智能问答</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🏆</span>
+        <span class="topic-name">项目架构与完整代码</span>
+        <span class="topic-tag tag-must">必做</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171"></div><div class="dot" style="background:#fbbf24"></div><div class="dot" style="background:#34d399"></div> knowledge_base_qa.py — 企业知识库问答系统</div>
+<pre><span class="kw">import</span> os, json, glob
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+<span class="kw">import</span> chromadb
+<span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> RecursiveCharacterTextSplitter
+<span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+client = OpenAI()
+
+<span class="kw">class</span> <span class="fn">KnowledgeBaseQA</span>:
+    <span class="st">"""企业知识库问答系统"""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, db_path=<span class="st">"./knowledge_db"</span>):
+        self.chroma = chromadb.PersistentClient(path=db_path)
+        self.collection = self.chroma.get_or_create_collection(<span class="st">"enterprise_kb"</span>)
+        self.splitter = RecursiveCharacterTextSplitter(
+            chunk_size=<span class="nu">500</span>, chunk_overlap=<span class="nu">100</span>,
+            separators=[<span class="st">"\n\n"</span>, <span class="st">"\n"</span>, <span class="st">"。"</span>, <span class="st">"！"</span>, <span class="st">"？"</span>, <span class="st">" "</span>]
+        )
+        self.chat_history = []
+
+    <span class="cm"># ========== 文档管理 ==========</span>
+    <span class="kw">def</span> <span class="fn">add_document</span>(self, file_path):
+        <span class="st">"""添加单个文档到知识库"""</span>
+        text = self._load_file(file_path)
+        chunks = self.splitter.split_text(text)
+        filename = os.path.basename(file_path)
+
+        ids = [<span class="st">f"</span><span class="var">{filename}</span><span class="st">_</span><span class="var">{i}</span><span class="st">"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(chunks))]
+        metas = [{<span class="st">"source"</span>: filename, <span class="st">"chunk_idx"</span>: i} <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(chunks))]
+        embs = self._embed(chunks)
+
+        self.collection.add(ids=ids, documents=chunks,
+                           embeddings=embs, metadatas=metas)
+        <span class="fn">print</span>(<span class="st">f"✅ </span><span class="var">{filename}</span><span class="st">: </span><span class="var">{len(chunks)}</span><span class="st"> 块已入库"</span>)
+
+    <span class="kw">def</span> <span class="fn">add_folder</span>(self, folder_path):
+        <span class="st">"""批量添加文件夹中的文档"""</span>
+        <span class="kw">for</span> f <span class="kw">in</span> glob.glob(os.path.join(folder_path, <span class="st">"*"</span>)):
+            <span class="kw">try</span>:
+                self.add_document(f)
+            <span class="kw">except</span> Exception <span class="kw">as</span> e:
+                <span class="fn">print</span>(<span class="st">f"❌ </span><span class="var">{f}</span><span class="st">: </span><span class="var">{e}</span><span class="st">"</span>)
+
+    <span class="cm"># ========== 智能问答 ==========</span>
+    <span class="kw">def</span> <span class="fn">ask</span>(self, question, top_k=<span class="nu">3</span>):
+        <span class="st">"""RAG 问答"""</span>
+        <span class="cm"># 1. 检索</span>
+        emb = self._embed([question])[<span class="nu">0</span>]
+        results = self.collection.query(
+            query_embeddings=[emb], n_results=top_k,
+            include=[<span class="st">"documents"</span>, <span class="st">"metadatas"</span>, <span class="st">"distances"</span>]
+        )
+
+        <span class="cm"># 2. 过滤低质量结果</span>
+        context_parts, sources = [], []
+        <span class="kw">for</span> doc, dist, meta <span class="kw">in</span> <span class="fn">zip</span>(
+            results[<span class="st">"documents"</span>][<span class="nu">0</span>],
+            results[<span class="st">"distances"</span>][<span class="nu">0</span>],
+            results[<span class="st">"metadatas"</span>][<span class="nu">0</span>]
+        ):
+            <span class="kw">if</span> dist < <span class="nu">0.5</span>:
+                context_parts.append(doc)
+                sources.append(meta[<span class="st">"source"</span>])
+
+        <span class="kw">if not</span> context_parts:
+            <span class="kw">return</span> {<span class="st">"answer"</span>: <span class="st">"抱歉，知识库中未找到相关信息。"</span>, <span class="st">"sources"</span>: []}
+
+        <span class="cm"># 3. 生成回答</span>
+        context = <span class="st">"\n---\n"</span>.join(context_parts)
+        prompt = <span class="st">f"""根据以下参考资料回答问题。只基于资料回答，无法回答请说明。
+
+参考资料：
+{context}
+
+问题：{question}"""</span>
+
+        response = client.chat.completions.create(
+            model=<span class="st">"gpt-4o"</span>,
+            messages=[
+                {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">"你是企业知识库助手，基于提供的资料准确回答。"</span>},
+                {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt}
+            ],
+            temperature=<span class="nu">0.2</span>
+        )
+
+        <span class="kw">return</span> {
+            <span class="st">"answer"</span>: response.choices[<span class="nu">0</span>].message.content,
+            <span class="st">"sources"</span>: <span class="fn">list</span>(<span class="fn">set</span>(sources)),
+            <span class="st">"tokens"</span>: response.usage.total_tokens
+        }
+
+    <span class="kw">def</span> <span class="fn">stats</span>(self):
+        <span class="st">"""查看知识库统计"""</span>
+        <span class="kw">return</span> {<span class="st">"total_chunks"</span>: self.collection.count()}
+
+    <span class="cm"># ========== 内部方法 ==========</span>
+    <span class="kw">def</span> <span class="fn">_embed</span>(self, texts):
+        resp = client.embeddings.create(
+            model=<span class="st">"text-embedding-3-small"</span>, input=texts)
+        <span class="kw">return</span> [d.embedding <span class="kw">for</span> d <span class="kw">in</span> resp.data]
+
+    <span class="kw">def</span> <span class="fn">_load_file</span>(self, path):
+        <span class="kw">if</span> path.endswith(<span class="st">".pdf"</span>):
+            reader = PdfReader(path)
+            <span class="kw">return</span> <span class="st">"\n"</span>.join(p.extract_text() <span class="kw">for</span> p <span class="kw">in</span> reader.pages)
+        <span class="kw">else</span>:
+            <span class="kw">with</span> <span class="fn">open</span>(path, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+                <span class="kw">return</span> f.read()
+
+<span class="cm"># ========== 主程序 ==========</span>
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    kb = KnowledgeBaseQA()
+
+    <span class="cm"># 添加文档</span>
+    kb.add_folder(<span class="st">"./docs"</span>)
+    <span class="fn">print</span>(<span class="st">f"\n知识库状态: </span><span class="var">{kb.stats()}</span><span class="st">"</span>)
+
+    <span class="cm"># 交互式问答</span>
+    <span class="fn">print</span>(<span class="st">"\n企业知识库问答系统已启动！输入 quit 退出。\n"</span>)
+    <span class="kw">while</span> <span class="kw">True</span>:
+        q = <span class="fn">input</span>(<span class="st">"📌 你的问题: "</span>)
+        <span class="kw">if</span> q.lower() == <span class="st">"quit"</span>: <span class="kw">break</span>
+        result = kb.ask(q)
+        <span class="fn">print</span>(<span class="st">f"\n💬 回答: </span><span class="var">{result['answer']}</span><span class="st">"</span>)
+        <span class="fn">print</span>(<span class="st">f"📎 来源: </span><span class="var">{', '.join(result['sources'])}</span><span class="st">"</span>)
+        <span class="fn">print</span>(<span class="st">f"💰 Token: </span><span class="var">{result.get('tokens', '?')}</span><span class="st">\n"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ 项目扩展挑战</h3>
+      <div class="practice-item">添加 Query 改写和 Rerank 优化模块，提升检索精度</div>
+      <div class="practice-item">支持多轮对话：用户追问时自动结合上下文</div>
+      <div class="practice-item">用 Streamlit 或 Gradio 做一个 Web 界面（上传文件 + 问答框）</div>
+      <div class="practice-item">记录所有问答日志，用 Pandas 分析常见问题 Top 10 和 token 消耗</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CHECKPOINT -->
+  <!-- ======================================================================== -->
+  <div class="checkpoint">
+    <h3>🏁 Phase 4 通关自测清单</h3>
+    <p>完成以下所有项目，你就具备了 AI 应用开发岗位的核心竞争力：</p>
+    <ul class="check-list">
+      <li><span class="chk">□</span> 理解 Embedding 原理，能调用 API 将文本向量化</li>
+      <li><span class="chk">□</span> 能计算向量间的余弦相似度，实现语义搜索</li>
+      <li><span class="chk">□</span> 能加载 PDF/TXT/Word 等文档，并合理切分</li>
+      <li><span class="chk">□</span> 掌握 chunk_size 和 overlap 的调优经验</li>
+      <li><span class="chk">□</span> 能用 ChromaDB 存储和检索向量</li>
+      <li><span class="chk">□</span> 能串联完整 RAG 流程：文档 → 切分 → 向量化 → 检索 → 生成</li>
+      <li><span class="chk">□</span> 掌握 RAG 优化技巧（Query 改写、混合搜索、Rerank、防幻觉）</li>
+      <li><span class="chk">□</span> 能用 LangChain 或 LlamaIndex 快速搭建 RAG 应用</li>
+      <li><span class="chk">□</span> 完成综合项目：企业知识库问答系统</li>
+    </ul>
+  </div>
+
+  <div class="resources" style="margin-top:32px">
+    <h3>📚 推荐学习资源</h3>
+    <div class="res-item"><span class="res-type">官方文档</span>LangChain Docs — python.langchain.com（最全面的 RAG 教程）</div>
+    <div class="res-item"><span class="res-type">官方文档</span>LlamaIndex Docs — docs.llamaindex.ai（RAG 专精框架）</div>
+    <div class="res-item"><span class="res-type">官方文档</span>ChromaDB Docs — docs.trychroma.com（向量数据库入门首选）</div>
+    <div class="res-item"><span class="res-type">免费课程</span>Building Systems with ChatGPT — DeepLearning.AI（含 RAG 章节）</div>
+    <div class="res-item"><span class="res-type">实战教程</span>RAG From Scratch — YouTube (LangChain)（从零实现 RAG 的系列）</div>
+  </div>
+
+  <div class="final-box">
+    <h2>🎉 恭喜！Phase 1-4 全部完成！</h2>
+    <p>你已经掌握了 Python → 数据处理 → 大模型 API → RAG 的完整技能链。现在你具备了 AI 应用开发工程师 / LLM 工程师的核心能力，可以开始投递简历了！Phase 5（Agent 框架与工程化）可以边工作边学。</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 · Python 프로그래밍 입문 · 상세 학습 가이드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    background: #06080f;
+    color: #c9d1d9;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 48px; }
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 3px; color: #3b82f6; background: rgba(59,130,246,0.1); padding: 4px 14px; border-radius: 6px; margin-bottom: 12px; }
+  h1 { font-size: 2.2rem; font-weight: 900; color: #f1f5f9; margin-bottom: 6px; }
+  .header p { color: #64748b; font-size: 0.9rem; }
+  .meta-bar {
+    display: flex; justify-content: center; gap: 24px; margin-top: 16px; flex-wrap: wrap;
+  }
+  .meta-item {
+    font-size: 0.8rem; color: #94a3b8;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .meta-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Table of Contents */
+  .toc {
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+  .toc h2 { font-size: 0.85rem; color: #64748b; letter-spacing: 3px; margin-bottom: 14px; text-transform: uppercase; }
+  .toc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toc-list a {
+    color: #93c5fd; text-decoration: none; font-size: 0.88rem; padding: 6px 12px;
+    border-radius: 8px; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+  }
+  .toc-list a:hover { background: rgba(59,130,246,0.08); color: #60a5fa; }
+  .toc-num { color: #475569; font-size: 0.75rem; font-weight: 700; min-width: 24px; }
+
+  /* Day Section */
+  .day-section { margin-bottom: 56px; scroll-margin-top: 24px; }
+
+  .day-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #1e293b;
+  }
+  .day-badge {
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--dc), color-mix(in srgb, var(--dc) 60%, #000));
+    color: #fff; font-weight: 900;
+  }
+  .day-badge .d-label { font-size: 0.55rem; letter-spacing: 1px; opacity: 0.8; }
+  .day-badge .d-num { font-size: 1.3rem; line-height: 1; }
+  .day-title { font-size: 1.3rem; font-weight: 700; color: #f1f5f9; }
+  .day-subtitle { font-size: 0.82rem; color: #64748b; margin-top: 2px; }
+
+  /* Topic Block */
+  .topic {
+    background: linear-gradient(160deg, #111827, #0c1018);
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .topic:hover { border-color: color-mix(in srgb, var(--dc) 40%, transparent); }
+
+  .topic-head {
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .topic-icon { font-size: 1.2rem; }
+  .topic-name { font-weight: 700; font-size: 0.95rem; color: #e2e8f0; flex: 1; }
+  .topic-tag {
+    font-size: 0.65rem; padding: 2px 8px; border-radius: 5px; font-weight: 600;
+  }
+  .tag-must { background: rgba(239,68,68,0.12); color: #f87171; }
+  .tag-imp  { background: rgba(251,191,36,0.12); color: #fbbf24; }
+  .tag-nice { background: rgba(148,163,184,0.1); color: #94a3b8; }
+
+  .topic-body { padding: 0 20px 20px; }
+
+  .explain {
+    font-size: 0.85rem; color: #94a3b8; margin-bottom: 14px; line-height: 1.7;
+  }
+
+  /* Code Block */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .code-label {
+    padding: 6px 14px;
+    font-size: 0.7rem; font-weight: 600;
+    color: #7c8496; background: #161b22;
+    letter-spacing: 1px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-label .dot { width: 6px; height: 6px; border-radius: 50%; }
+  pre {
+    padding: 14px 18px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #c9d1d9;
+  }
+  .cm { color: #8b949e; }
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .st { color: #a5d6ff; }
+  .nu { color: #79c0ff; }
+  .bi { color: #ffa657; }
+  .op { color: #ff7b72; }
+  .var { color: #ffa657; }
+
+  /* Key Points */
+  .key-points {
+    background: rgba(59,130,246,0.05);
+    border-left: 3px solid rgba(59,130,246,0.3);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+  }
+  .key-points h4 { font-size: 0.78rem; color: #60a5fa; margin-bottom: 6px; letter-spacing: 1px; }
+  .key-points li {
+    font-size: 0.82rem; color: #94a3b8; margin-bottom: 4px; margin-left: 16px;
+  }
+
+  /* Practice Box */
+  .practice {
+    background: linear-gradient(135deg, rgba(52,211,153,0.06), rgba(16,185,129,0.02));
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 20px;
+  }
+  .practice h3 { color: #34d399; font-size: 0.9rem; margin-bottom: 10px; }
+  .practice-item {
+    font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;
+    padding-left: 20px; position: relative;
+  }
+  .practice-item::before {
+    content: '✦'; position: absolute; left: 0; color: #34d399; font-size: 0.7rem; top: 2px;
+  }
+
+  /* Resources */
+  .resources {
+    background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(139,92,246,0.02));
+    border: 1px solid rgba(168,85,247,0.2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 14px;
+  }
+  .resources h3 { color: #a78bfa; font-size: 0.88rem; margin-bottom: 10px; }
+  .res-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.83rem; color: #94a3b8; margin-bottom: 8px;
+  }
+  .res-type {
+    flex-shrink: 0; font-size: 0.65rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    background: rgba(168,85,247,0.1); color: #c4b5fd;
+  }
+
+  /* Checkpoint */
+  .checkpoint {
+    background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.03));
+    border: 1.5px solid rgba(251,191,36,0.25);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-top: 24px;
+    text-align: center;
+  }
+  .checkpoint h3 { color: #fbbf24; font-size: 1rem; margin-bottom: 8px; }
+  .checkpoint p { font-size: 0.85rem; color: #94a3b8; }
+  .check-list { list-style: none; text-align: left; margin-top: 14px; }
+  .check-list li {
+    font-size: 0.85rem; padding: 6px 0; color: #cbd5e1;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(251,191,36,0.08);
+  }
+  .check-list li:last-child { border: none; }
+  .chk { color: #fbbf24; font-size: 0.9rem; }
+
+  /* Warn / Tip */
+  .warn-box {
+    background: rgba(239,68,68,0.05);
+    border: 1px solid rgba(239,68,68,0.15);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+  }
+  .warn-box h4 { color: #f87171; font-size: 0.82rem; margin-bottom: 6px; }
+  .warn-box p { font-size: 0.8rem; color: #94a3b8; }
+
+  .tip-box {
+    background: rgba(59,130,246,0.05);
+    border: 1px solid rgba(59,130,246,0.15);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+  }
+  .tip-box h4 { color: #60a5fa; font-size: 0.82rem; margin-bottom: 6px; }
+  .tip-box p { font-size: 0.8rem; color: #94a3b8; }
+
+  /* Final */
+  .final-box {
+    margin-top: 56px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.05));
+    border: 1.5px solid rgba(59,130,246,0.25);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+  }
+  .final-box h2 { color: #93c5fd; font-size: 1.2rem; margin-bottom: 8px; }
+  .final-box p { color: #64748b; font-size: 0.88rem; }
+
+  @media (max-width: 600px) {
+    .toc-list { grid-template-columns: 1fr; }
+    h1 { font-size: 1.6rem; }
+    .page { padding: 32px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== HEADER ===== -->
+  <div class="header">
+    <div class="badge">PHASE 01 · 상세판</div>
+    <h1>Python 프로그래밍 입문</h1>
+    <p>처음부터 시작하여 매일 무엇을 배우고, 어떻게 배우고, 무엇을 연습할지 모두 안내합니다</p>
+    <div class="meta-bar">
+      <div class="meta-item"><div class="meta-dot" style="background:#3b82f6;"></div>총 기간: 2~3주</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#f59e0b;"></div>매일 투자: 2~3시간</div>
+      <div class="meta-item"><div class="meta-dot" style="background:#10b981;"></div>사전 요구사항: 제로 베이스</div>
+    </div>
+  </div>
+
+  <!-- ===== TOC ===== -->
+  <div class="toc">
+    <h2>📋 학습 일정 목차</h2>
+    <ul class="toc-list">
+      <li><a href="#d1"><span class="toc-num">Day 1-2</span>환경 구축 + 첫 번째 프로그램</a></li>
+      <li><a href="#d3"><span class="toc-num">Day 3-4</span>변수와 데이터 타입</a></li>
+      <li><a href="#d5"><span class="toc-num">Day 5-6</span>조건 판단과 반복문</a></li>
+      <li><a href="#d7"><span class="toc-num">Day 7-8</span>리스트와 딕셔너리</a></li>
+      <li><a href="#d9"><span class="toc-num">Day 9-10</span>함수</a></li>
+      <li><a href="#d11"><span class="toc-num">Day 11-12</span>파일 작업과 모듈</a></li>
+      <li><a href="#d13"><span class="toc-num">Day 13-14</span>실용 서드파티 라이브러리</a></li>
+      <li><a href="#d15"><span class="toc-num">Day 15-17</span>디버깅 + 종합 프로젝트</a></li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 1-2 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d1" style="--dc: #3b82f6;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">1-2</span></div>
+      <div>
+        <div class="day-title">환경 구축 + 첫 번째 프로그램</div>
+        <div class="day-subtitle">도구부터 먼저 준비합시다</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">⬇️</span>
+        <span class="topic-name">Python 설치</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain"><strong>python.org</strong>에서 최신 Python 3.12+를 다운로드하고, 설치 시 반드시 <strong>"Add Python to PATH"</strong>를 체크하세요(Windows). Mac 사용자는 Homebrew 사용을 권장합니다: <code>brew install python</code>.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> TERMINAL — 설치 확인</div>
+<pre><span class="cm"># 터미널 / 명령줄을 열고 입력:</span>
+python --version     <span class="cm"># Python 3.12.x가 표시되어야 함</span>
+pip --version        <span class="cm"># pip 24.x.x가 표시되어야 함</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📝</span>
+        <span class="topic-name">편집기 선택</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain"><strong>VS Code</strong>(무료, 풍부한 플러그인)를 추천합니다. 설치 후 <strong>Python 확장</strong>(Microsoft 제작)을 설치하면 코드 하이라이팅, 자동 완성, 원클릭 실행을 사용할 수 있습니다.</p>
+        <div class="tip-box">
+          <h4>💡 초보자 팁</h4>
+          <p>편집기 선택에 고민하지 마세요. VS Code가 현재 업계에서 가장 주류인 선택입니다. 일단 사용해 보세요.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">👋</span>
+        <span class="topic-name">첫 번째 Python 프로그램</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain"><code>hello.py</code>라는 파일을 만들고 아래 코드를 작성한 다음, 터미널에서 <code>python hello.py</code>를 실행하세요</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> hello.py</div>
+<pre><span class="cm"># 나의 첫 번째 Python 프로그램</span>
+<span class="fn">print</span>(<span class="st">"Hello, World!"</span>)
+<span class="fn">print</span>(<span class="st">"안녕하세요, 세계!"</span>)
+
+<span class="cm"># 간단한 계산을 해봅시다</span>
+<span class="fn">print</span>(<span class="nu">1</span> + <span class="nu">1</span>)          <span class="cm"># 출력: 2</span>
+<span class="fn">print</span>(<span class="nu">10</span> * <span class="nu">3</span>)         <span class="cm"># 출력: 30</span>
+<span class="fn">print</span>(<span class="st">"AI"</span> * <span class="nu">3</span>)      <span class="cm"># 출력: AIAIAI</span>
+
+<span class="cm"># 사용자 입력 받기</span>
+name = <span class="fn">input</span>(<span class="st">"이름이 뭐예요? "</span>)
+<span class="fn">print</span>(<span class="st">f"안녕하세요, </span><span class="var">{name}</span><span class="st">! Python 학습을 환영합니다"</span>)</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 기억할 것</h4>
+          <ul>
+            <li><code>print()</code> — 화면에 내용을 출력</li>
+            <li><code>input()</code> — 사용자의 키보드 입력을 받음</li>
+            <li><code>f"...{변수}..."</code> — f-string 포맷팅, 변수를 문자열에 삽입</li>
+            <li><code># 주석</code> — #으로 시작하는 것은 주석이며, 실행되지 않음</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 1-2 연습</h3>
+      <div class="practice-item">프로그램 작성: 사용자의 이름과 나이를 묻고 "XX님 안녕하세요, 내년이면 XX살이시네요!"를 출력</div>
+      <div class="practice-item">간단한 계산기 작성: 두 숫자를 입력받아 덧셈, 뺄셈, 곱셈, 나눗셈 결과를 출력</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 3-4 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d3" style="--dc: #6366f1;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">3-4</span></div>
+      <div>
+        <div class="day-title">변수와 데이터 타입</div>
+        <div class="day-subtitle">Python의 "빌딩 블록" — 모든 데이터의 기본 형태</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📦</span>
+        <span class="topic-name">변수: 데이터에 이름 붙이기</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">변수는 데이터를 가리키는 이름입니다. Python은 타입을 선언할 필요 없이 바로 값을 할당하면 됩니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> variables.py</div>
+<pre><span class="cm"># ---- 기본 할당 ----</span>
+age = <span class="nu">25</span>                   <span class="cm"># 정수 int</span>
+price = <span class="nu">9.99</span>               <span class="cm"># 부동소수점 float</span>
+name = <span class="st">"철수"</span>              <span class="cm"># 문자열 str</span>
+is_student = <span class="kw">True</span>          <span class="cm"># 불리언 bool</span>
+
+<span class="cm"># ---- 타입 확인 ----</span>
+<span class="fn">print</span>(<span class="fn">type</span>(age))           <span class="cm"># &lt;class 'int'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(name))          <span class="cm"># &lt;class 'str'&gt;</span>
+
+<span class="cm"># ---- 타입 변환 ----</span>
+age_str = <span class="st">"25"</span>             <span class="cm"># 이것은 문자열 "25"</span>
+age_num = <span class="fn">int</span>(age_str)     <span class="cm"># 숫자 25로 변환</span>
+price_str = <span class="fn">str</span>(price)     <span class="cm"># 숫자를 문자열 "9.99"로 변환</span>
+
+<span class="cm"># ---- 명명 규칙 ----</span>
+user_name = <span class="st">"좋음"</span>           <span class="cm"># ✅ 밑줄로 연결(권장)</span>
+userName = <span class="st">"비권장"</span>         <span class="cm"># ❌ 카멜 케이스(Python에서는 잘 사용하지 않음)</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔤</span>
+        <span class="topic-name">문자열 작업 (중요!)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">AI 개발에서 많은 시간을 텍스트 처리에 사용하므로, 문자열 작업은 가장 자주 쓰이는 기술 중 하나입니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> strings.py</div>
+<pre>text = <span class="st">"Hello, Python World!"</span>
+
+<span class="cm"># ---- 기본 작업 ----</span>
+<span class="fn">print</span>(<span class="fn">len</span>(text))             <span class="cm"># 길이: 21</span>
+<span class="fn">print</span>(text.lower())          <span class="cm"># 전부 소문자: hello, python world!</span>
+<span class="fn">print</span>(text.upper())          <span class="cm"># 전부 대문자: HELLO, PYTHON WORLD!</span>
+<span class="fn">print</span>(text.replace(<span class="st">"World"</span>, <span class="st">"AI"</span>))  <span class="cm"># 치환: Hello, Python AI!</span>
+
+<span class="cm"># ---- 슬라이싱 (매우 자주 사용) ----</span>
+<span class="fn">print</span>(text[<span class="nu">0</span>])               <span class="cm"># 첫 번째 문자: H</span>
+<span class="fn">print</span>(text[<span class="nu">7</span>:<span class="nu">13</span>])            <span class="cm"># 추출: Python</span>
+<span class="fn">print</span>(text[<span class="op">-</span><span class="nu">6</span>:])             <span class="cm"># 뒤에서 6개: orld!</span>
+
+<span class="cm"># ---- 분할과 결합 ----</span>
+words = text.split(<span class="st">","</span>)      <span class="cm"># 쉼표로 분할: ['Hello', ' Python World!']</span>
+joined = <span class="st">" | "</span>.join([<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>])  <span class="cm"># 결합: a | b | c</span>
+
+<span class="cm"># ---- 검색과 판단 ----</span>
+<span class="fn">print</span>(<span class="st">"Python"</span> <span class="kw">in</span> text)     <span class="cm"># True (포함 여부)</span>
+<span class="fn">print</span>(text.startswith(<span class="st">"Hello"</span>))  <span class="cm"># True</span>
+<span class="fn">print</span>(text.find(<span class="st">"Python"</span>))   <span class="cm"># 7 (위치 반환)</span>
+
+<span class="cm"># ---- f-string 포맷팅 (가장 권장) ----</span>
+name = <span class="st">"철수"</span>
+score = <span class="nu">95.6</span>
+<span class="fn">print</span>(<span class="st">f"</span><span class="var">{name}</span><span class="st">의 성적은 </span><span class="var">{score:.1f}</span><span class="st">점입니다"</span>)  <span class="cm"># 철수의 성적은 95.6점입니다</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 AI 개발에서 가장 자주 쓰는 문자열 작업</h4>
+          <ul>
+            <li><code>.strip()</code> — 앞뒤 공백/줄바꿈 제거 (데이터 정리 필수)</li>
+            <li><code>.split()</code> — 구분자로 문자열 분할</li>
+            <li><code>"".join()</code> — 리스트를 문자열로 다시 결합</li>
+            <li><code>f"..."</code> — 포맷 출력 (prompt 조합 시 매일 사용)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔢</span>
+        <span class="topic-name">숫자와 연산</span>
+        <span class="topic-tag tag-imp">중요</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> numbers.py</div>
+<pre><span class="cm"># ---- 기본 연산 ----</span>
+<span class="fn">print</span>(<span class="nu">10</span> + <span class="nu">3</span>)     <span class="cm"># 덧셈: 13</span>
+<span class="fn">print</span>(<span class="nu">10</span> - <span class="nu">3</span>)     <span class="cm"># 뺄셈: 7</span>
+<span class="fn">print</span>(<span class="nu">10</span> * <span class="nu">3</span>)     <span class="cm"># 곱셈: 30</span>
+<span class="fn">print</span>(<span class="nu">10</span> / <span class="nu">3</span>)     <span class="cm"># 나눗셈: 3.3333 (결과는 부동소수점)</span>
+<span class="fn">print</span>(<span class="nu">10</span> // <span class="nu">3</span>)    <span class="cm"># 정수 나눗셈: 3</span>
+<span class="fn">print</span>(<span class="nu">10</span> % <span class="nu">3</span>)     <span class="cm"># 나머지: 1</span>
+<span class="fn">print</span>(<span class="nu">2</span> ** <span class="nu">10</span>)    <span class="cm"># 거듭제곱: 1024</span>
+
+<span class="cm"># ---- 자주 쓰는 내장 함수 ----</span>
+<span class="fn">print</span>(<span class="fn">abs</span>(<span class="op">-</span><span class="nu">5</span>))     <span class="cm"># 절대값: 5</span>
+<span class="fn">print</span>(<span class="fn">round</span>(<span class="nu">3.7</span>))  <span class="cm"># 반올림: 4</span>
+<span class="fn">print</span>(<span class="fn">max</span>(<span class="nu">1</span>,<span class="nu">5</span>,<span class="nu">3</span>))  <span class="cm"># 최대값: 5</span>
+<span class="fn">print</span>(<span class="fn">min</span>(<span class="nu">1</span>,<span class="nu">5</span>,<span class="nu">3</span>))  <span class="cm"># 최소값: 1</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 3-4 연습</h3>
+      <div class="practice-item">프로그램 작성: 영어 문장을 입력받아 단어 수와 문자 수를 출력</div>
+      <div class="practice-item">온도 변환기 작성: 섭씨를 입력받아 화씨를 출력 (공식: F = C × 9/5 + 32)</div>
+      <div class="practice-item">f-string으로 자기소개를 작성하세요. 이름, 나이, 직업을 포함</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 5-6 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d5" style="--dc: #f59e0b;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">5-6</span></div>
+      <div>
+        <div class="day-title">조건 판단과 반복문</div>
+        <div class="day-subtitle">프로그램에 "로직"을 부여 — 판단하고, 반복하기</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔀</span>
+        <span class="topic-name">if / elif / else 조건 판단</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> conditions.py</div>
+<pre>score = <span class="nu">85</span>
+
+<span class="cm"># ---- 기본 판단 ----</span>
+<span class="kw">if</span> score >= <span class="nu">90</span>:
+    <span class="fn">print</span>(<span class="st">"우수"</span>)
+<span class="kw">elif</span> score >= <span class="nu">60</span>:
+    <span class="fn">print</span>(<span class="st">"합격"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"불합격"</span>)
+
+<span class="cm"># ---- 비교 연산자 ----</span>
+<span class="cm"># ==  같음     !=  다름</span>
+<span class="cm"># >   크다     <   작다</span>
+<span class="cm"># >=  크거나 같다  <=  작거나 같다</span>
+
+<span class="cm"># ---- 논리 연산자 ----</span>
+age = <span class="nu">20</span>
+has_id = <span class="kw">True</span>
+
+<span class="kw">if</span> age >= <span class="nu">18</span> <span class="kw">and</span> has_id:
+    <span class="fn">print</span>(<span class="st">"입장 가능"</span>)
+
+<span class="kw">if</span> age < <span class="nu">12</span> <span class="kw">or</span> age > <span class="nu">65</span>:
+    <span class="fn">print</span>(<span class="st">"할인 적용"</span>)
+
+<span class="kw">if</span> <span class="kw">not</span> has_id:
+    <span class="fn">print</span>(<span class="st">"신분증을 제시해 주세요"</span>)
+
+<span class="cm"># ---- 문자열 내용 판단 (AI 개발에서 자주 사용) ----</span>
+user_input = <span class="st">"안녕하세요"</span>
+<span class="kw">if</span> <span class="st">"안녕"</span> <span class="kw">in</span> user_input:
+    <span class="fn">print</span>(<span class="st">"인사말 감지됨"</span>)</pre>
+        </div>
+        <div class="warn-box">
+          <h4>⚠️ 자주 하는 실수</h4>
+          <p>Python은 <strong>들여쓰기</strong>(4칸 공백)로 코드 블록을 구분합니다. 중괄호 {}가 아닙니다. 들여쓰기가 맞지 않으면 <code>IndentationError</code>가 발생하며, 이것이 초보자가 가장 자주 겪는 에러입니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔁</span>
+        <span class="topic-name">for 반복문</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> for_loop.py</div>
+<pre><span class="cm"># ---- 리스트 순회 ----</span>
+fruits = [<span class="st">"사과"</span>, <span class="st">"바나나"</span>, <span class="st">"귤"</span>]
+<span class="kw">for</span> fruit <span class="kw">in</span> fruits:
+    <span class="fn">print</span>(<span class="st">f"저는 </span><span class="var">{fruit}</span><span class="st">를 좋아합니다"</span>)
+
+<span class="cm"># ---- range()로 숫자 시퀀스 생성 ----</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">5</span>):           <span class="cm"># 0, 1, 2, 3, 4</span>
+    <span class="fn">print</span>(i)
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, <span class="nu">11</span>):      <span class="cm"># 1부터 10까지</span>
+    <span class="fn">print</span>(i)
+
+<span class="cm"># ---- 인덱스와 함께 순회 (enumerate) ----</span>
+<span class="kw">for</span> index, fruit <span class="kw">in</span> <span class="fn">enumerate</span>(fruits):
+    <span class="fn">print</span>(<span class="st">f"</span><span class="var">{index}</span><span class="st">: </span><span class="var">{fruit}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 문자열 순회 ----</span>
+<span class="kw">for</span> char <span class="kw">in</span> <span class="st">"Python"</span>:
+    <span class="fn">print</span>(char, end=<span class="st">" "</span>)     <span class="cm"># P y t h o n</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔄</span>
+        <span class="topic-name">while 반복문 + break / continue</span>
+        <span class="topic-tag tag-imp">중요</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> while_loop.py</div>
+<pre><span class="cm"># ---- 기본 while ----</span>
+count = <span class="nu">0</span>
+<span class="kw">while</span> count < <span class="nu">5</span>:
+    <span class="fn">print</span>(<span class="st">f"</span><span class="var">{count + 1}</span><span class="st">번째"</span>)
+    count += <span class="nu">1</span>
+
+<span class="cm"># ---- break: 즉시 반복문 탈출 ----</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    cmd = <span class="fn">input</span>(<span class="st">"명령을 입력하세요 (quit으로 종료): "</span>)
+    <span class="kw">if</span> cmd == <span class="st">"quit"</span>:
+        <span class="kw">break</span>
+    <span class="fn">print</span>(<span class="st">f"입력하신 내용: </span><span class="var">{cmd}</span><span class="st">"</span>)
+
+<span class="cm"># ---- continue: 현재 반복 건너뛰기 ----</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">10</span>):
+    <span class="kw">if</span> i % <span class="nu">2</span> == <span class="nu">0</span>:       <span class="cm"># 짝수 건너뛰기</span>
+        <span class="kw">continue</span>
+    <span class="fn">print</span>(i)              <span class="cm"># 출력: 1, 3, 5, 7, 9</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 5-6 연습</h3>
+      <div class="practice-item">숫자 맞추기 게임: 프로그램이 1-100 사이의 랜덤 숫자를 생성하고, 사용자가 반복적으로 추측하며 "크다/작다" 힌트를 주고 맞출 때까지 계속</div>
+      <div class="practice-item">구구단: 이중 for 반복문으로 출력</div>
+      <div class="practice-item">FizzBuzz: 1부터 50까지, 3의 배수는 Fizz, 5의 배수는 Buzz, 3과 5의 공배수는 FizzBuzz 출력</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 7-8 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d7" style="--dc: #10b981;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">7-8</span></div>
+      <div>
+        <div class="day-title">리스트와 딕셔너리</div>
+        <div class="day-subtitle">가장 중요한 두 가지 데이터 구조, AI 개발에서 모든 코드에 사용됩니다</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📋</span>
+        <span class="topic-name">리스트 (List)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">리스트는 순서가 있는 데이터 모음으로, <code>[]</code>로 표현하며 어떤 타입의 데이터든 넣을 수 있습니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> lists.py</div>
+<pre><span class="cm"># ---- 리스트 생성 ----</span>
+nums = [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>]
+names = [<span class="st">"철수"</span>, <span class="st">"영희"</span>, <span class="st">"민수"</span>]
+mixed = [<span class="nu">1</span>, <span class="st">"hello"</span>, <span class="kw">True</span>, <span class="nu">3.14</span>]   <span class="cm"># 여러 타입 혼합 가능</span>
+
+<span class="cm"># ---- 추가, 삭제, 수정, 조회 ----</span>
+names.append(<span class="st">"지훈"</span>)          <span class="cm"># 끝에 추가</span>
+names.insert(<span class="nu">0</span>, <span class="st">"수진"</span>)       <span class="cm"># 지정 위치에 삽입</span>
+names.remove(<span class="st">"영희"</span>)          <span class="cm"># 지정 요소 삭제</span>
+last = names.pop()            <span class="cm"># 마지막 요소를 삭제하고 반환</span>
+names[<span class="nu">0</span>] = <span class="st">"대왕"</span>            <span class="cm"># 요소 수정</span>
+
+<span class="cm"># ---- 슬라이싱 (문자열과 동일) ----</span>
+<span class="fn">print</span>(nums[<span class="nu">1</span>:<span class="nu">3</span>])              <span class="cm"># [2, 3]</span>
+<span class="fn">print</span>(nums[<span class="op">-</span><span class="nu">2</span>:])              <span class="cm"># [4, 5]</span>
+
+<span class="cm"># ---- 자주 쓰는 작업 ----</span>
+<span class="fn">print</span>(<span class="fn">len</span>(nums))              <span class="cm"># 길이: 5</span>
+<span class="fn">print</span>(<span class="fn">sorted</span>(nums, reverse=<span class="kw">True</span>))  <span class="cm"># 내림차순 정렬</span>
+<span class="fn">print</span>(<span class="nu">3</span> <span class="kw">in</span> nums)              <span class="cm"># True (포함 여부)</span>
+
+<span class="cm"># ---- 리스트 컴프리헨션 (매우 자주 사용!) ----</span>
+squares = [x**<span class="nu">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">10</span>)]
+<span class="cm"># [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span>
+
+even = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">20</span>) <span class="kw">if</span> x % <span class="nu">2</span> == <span class="nu">0</span>]
+<span class="cm"># [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🗂️</span>
+        <span class="topic-name">딕셔너리 (Dict) — AI 개발의 핵심 데이터 구조</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">딕셔너리는 키-값 쌍의 모음으로, <code>{}</code>로 표현합니다. API가 반환하는 JSON 데이터는 본질적으로 딕셔너리이므로, 반드시 능숙하게 다룰 수 있어야 합니다!</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> dicts.py</div>
+<pre><span class="cm"># ---- 딕셔너리 생성 ----</span>
+person = {
+    <span class="st">"name"</span>: <span class="st">"철수"</span>,
+    <span class="st">"age"</span>: <span class="nu">25</span>,
+    <span class="st">"skills"</span>: [<span class="st">"Python"</span>, <span class="st">"SQL"</span>],
+    <span class="st">"is_student"</span>: <span class="kw">False</span>
+}
+
+<span class="cm"># ---- 접근과 수정 ----</span>
+<span class="fn">print</span>(person[<span class="st">"name"</span>])           <span class="cm"># 철수</span>
+<span class="fn">print</span>(person.get(<span class="st">"age"</span>))       <span class="cm"># 25 (권장, 키가 없으면 None 반환)</span>
+<span class="fn">print</span>(person.get(<span class="st">"email"</span>, <span class="st">"없음"</span>)) <span class="cm"># "없음" (키가 없으면 기본값 반환)</span>
+
+person[<span class="st">"age"</span>] = <span class="nu">26</span>            <span class="cm"># 수정</span>
+person[<span class="st">"email"</span>] = <span class="st">"a@b.com"</span>  <span class="cm"># 추가</span>
+<span class="kw">del</span> person[<span class="st">"is_student"</span>]       <span class="cm"># 삭제</span>
+
+<span class="cm"># ---- 딕셔너리 순회 ----</span>
+<span class="kw">for</span> key, value <span class="kw">in</span> person.items():
+    <span class="fn">print</span>(<span class="st">f"</span><span class="var">{key}</span><span class="st">: </span><span class="var">{value}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 중첩 딕셔너리 (API 반환값 시뮬레이션) ----</span>
+api_response = {
+    <span class="st">"status"</span>: <span class="st">"success"</span>,
+    <span class="st">"data"</span>: {
+        <span class="st">"message"</span>: <span class="st">"안녕하세요, 세계"</span>,
+        <span class="st">"tokens"</span>: <span class="nu">15</span>
+    }
+}
+<span class="cm"># 중첩된 값 추출</span>
+msg = api_response[<span class="st">"data"</span>][<span class="st">"message"</span>]
+<span class="fn">print</span>(msg)  <span class="cm"># 안녕하세요, 세계</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 딕셔너리가 왜 이렇게 중요할까?</h4>
+          <ul>
+            <li>대규모 언어 모델 API의 요청과 반환값은 전부 JSON 형식 = Python 딕셔너리</li>
+            <li>설정 파일, Prompt 템플릿 관리에 모두 딕셔너리 사용</li>
+            <li>이후 배울 Pandas의 각 행 데이터도 본질적으로 키-값 쌍</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 7-8 연습</h3>
+      <div class="practice-item">연락처 딕셔너리 만들기: "연락처 추가, 연락처 검색, 연락처 삭제, 전체 표시" 기능 지원</div>
+      <div class="practice-item">텍스트에서 각 단어의 출현 횟수를 세어 딕셔너리에 저장하고 빈도순으로 정렬</div>
+      <div class="practice-item">API 반환값 시뮬레이션: 중첩 딕셔너리를 만들고 다층 접근으로 값 추출 연습</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 9-10 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d9" style="--dc: #ec4899;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">9-10</span></div>
+      <div>
+        <div class="day-title">함수</div>
+        <div class="day-subtitle">반복되는 코드를 "도구"로 패키징 — 유지보수 가능한 코드 작성의 핵심</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔧</span>
+        <span class="topic-name">함수 정의와 호출</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> functions.py</div>
+<pre><span class="cm"># ---- 기본 함수 ----</span>
+<span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="st">"""누군가에게 인사하기"""</span>
+    <span class="kw">return</span> <span class="st">f"안녕하세요, </span><span class="var">{name}</span><span class="st">!"</span>
+
+result = greet(<span class="st">"철수"</span>)
+<span class="fn">print</span>(result)   <span class="cm"># 안녕하세요, 철수!</span>
+
+<span class="cm"># ---- 기본 매개변수 ----</span>
+<span class="kw">def</span> <span class="fn">call_api</span>(prompt, model=<span class="st">"gpt-4"</span>, temperature=<span class="nu">0.7</span>):
+    <span class="fn">print</span>(<span class="st">f"모델: </span><span class="var">{model}</span><span class="st">, 온도: </span><span class="var">{temperature}</span><span class="st">"</span>)
+    <span class="fn">print</span>(<span class="st">f"프롬프트: </span><span class="var">{prompt}</span><span class="st">"</span>)
+
+call_api(<span class="st">"안녕하세요"</span>)                          <span class="cm"># 기본 매개변수 사용</span>
+call_api(<span class="st">"안녕하세요"</span>, model=<span class="st">"claude"</span>)           <span class="cm"># 모델만 변경</span>
+call_api(<span class="st">"안녕하세요"</span>, temperature=<span class="nu">0.2</span>)          <span class="cm"># 온도만 변경</span>
+
+<span class="cm"># ---- 여러 값 반환 ----</span>
+<span class="kw">def</span> <span class="fn">analyze_text</span>(text):
+    word_count = <span class="fn">len</span>(text.split())
+    char_count = <span class="fn">len</span>(text)
+    <span class="kw">return</span> word_count, char_count
+
+words, chars = analyze_text(<span class="st">"Hello World Python"</span>)
+<span class="fn">print</span>(<span class="st">f"단어 수: </span><span class="var">{words}</span><span class="st">, 문자 수: </span><span class="var">{chars}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 딕셔너리 반환 (AI 개발에서 흔한 패턴) ----</span>
+<span class="kw">def</span> <span class="fn">process_response</span>(raw_text):
+    <span class="kw">return</span> {
+        <span class="st">"content"</span>: raw_text.strip(),
+        <span class="st">"length"</span>: <span class="fn">len</span>(raw_text),
+        <span class="st">"is_empty"</span>: <span class="fn">len</span>(raw_text.strip()) == <span class="nu">0</span>
+    }</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">⚡</span>
+        <span class="topic-name">Lambda와 자주 쓰는 내장 함수</span>
+        <span class="topic-tag tag-imp">중요</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> lambda_builtins.py</div>
+<pre><span class="cm"># ---- lambda: 한 줄로 만드는 간단한 함수 ----</span>
+double = <span class="kw">lambda</span> x: x * <span class="nu">2</span>
+<span class="fn">print</span>(double(<span class="nu">5</span>))     <span class="cm"># 10</span>
+
+<span class="cm"># ---- 정렬 시 규칙 지정 (매우 자주 사용) ----</span>
+students = [
+    {<span class="st">"name"</span>: <span class="st">"철수"</span>, <span class="st">"score"</span>: <span class="nu">85</span>},
+    {<span class="st">"name"</span>: <span class="st">"영희"</span>, <span class="st">"score"</span>: <span class="nu">92</span>},
+    {<span class="st">"name"</span>: <span class="st">"민수"</span>, <span class="st">"score"</span>: <span class="nu">78</span>},
+]
+<span class="cm"># 점수 높은 순으로 정렬</span>
+ranked = <span class="fn">sorted</span>(students, key=<span class="kw">lambda</span> s: s[<span class="st">"score"</span>], reverse=<span class="kw">True</span>)
+
+<span class="cm"># ---- map / filter ----</span>
+nums = [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>]
+doubled = <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x * <span class="nu">2</span>, nums))    <span class="cm"># [2, 4, 6, 8, 10]</span>
+evens = <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x % <span class="nu">2</span> == <span class="nu">0</span>, nums)) <span class="cm"># [2, 4]</span>
+
+<span class="cm"># 하지만 리스트 컴프리헨션이 더 권장됩니다 (더 Pythonic)</span>
+doubled = [x * <span class="nu">2</span> <span class="kw">for</span> x <span class="kw">in</span> nums]
+evens = [x <span class="kw">for</span> x <span class="kw">in</span> nums <span class="kw">if</span> x % <span class="nu">2</span> == <span class="nu">0</span>]</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 9-10 연습</h3>
+      <div class="practice-item"><code>build_prompt(role, question)</code> 함수 작성: 완전한 AI 프롬프트 템플릿 생성</div>
+      <div class="practice-item">학생 리스트(딕셔너리 리스트)를 받아 평균 점수와 최고 점수 학생 이름을 반환하는 함수 작성</div>
+      <div class="practice-item">"간이 비밀번호 강도 검사기" 함수 작성: 길이, 대소문자 포함 여부, 숫자 포함 여부 체크</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 11-12 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d11" style="--dc: #8b5cf6;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">11-12</span></div>
+      <div>
+        <div class="day-title">파일 작업과 모듈</div>
+        <div class="day-subtitle">파일 읽기/쓰기 + 코드 구조화 — "스크립트 작성"에서 "프로젝트 개발"로</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📄</span>
+        <span class="topic-name">파일 읽기/쓰기</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> file_io.py</div>
+<pre><span class="cm"># ---- 파일 쓰기 ----</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.txt"</span>, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    f.write(<span class="st">"첫 번째 줄 내용\n"</span>)
+    f.write(<span class="st">"두 번째 줄 내용\n"</span>)
+
+<span class="cm"># ---- 파일 읽기 ----</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.txt"</span>, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    content = f.read()          <span class="cm"># 전체 내용 읽기</span>
+    <span class="fn">print</span>(content)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.txt"</span>, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    lines = f.readlines()       <span class="cm"># 줄별로 읽기, 리스트 반환</span>
+    <span class="kw">for</span> line <span class="kw">in</span> lines:
+        <span class="fn">print</span>(line.strip())     <span class="cm"># strip()으로 줄바꿈 제거</span>
+
+<span class="cm"># ---- 내용 추가 ----</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.txt"</span>, <span class="st">"a"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    f.write(<span class="st">"추가된 세 번째 줄\n"</span>)</pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 with 문의 의미</h4>
+          <ul>
+            <li><code>with open()</code>은 코드 블록이 끝나면 자동으로 파일을 닫아줍니다. 수동으로 close()할 필요 없음</li>
+            <li>항상 <code>encoding="utf-8"</code>을 추가하여 한글 깨짐 방지</li>
+            <li><code>"w"</code> = 쓰기(덮어쓰기), <code>"r"</code> = 읽기, <code>"a"</code> = 추가</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📦</span>
+        <span class="topic-name">모듈, 패키지와 pip</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> modules.py</div>
+<pre><span class="cm"># ---- 표준 라이브러리 임포트 ----</span>
+<span class="kw">import</span> os
+<span class="kw">import</span> random
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="cm"># os 모듈: 파일 경로 작업</span>
+<span class="fn">print</span>(os.getcwd())              <span class="cm"># 현재 작업 디렉토리</span>
+<span class="fn">print</span>(os.path.exists(<span class="st">"output.txt"</span>))  <span class="cm"># 파일 존재 여부</span>
+
+<span class="cm"># pathlib (더 현대적인 경로 처리 방법)</span>
+p = Path(<span class="st">"data"</span>) / <span class="st">"output.txt"</span>  <span class="cm"># 자동으로 경로 구분자 처리</span>
+
+<span class="cm"># random 모듈</span>
+<span class="fn">print</span>(random.randint(<span class="nu">1</span>, <span class="nu">100</span>))  <span class="cm"># 랜덤 정수</span>
+<span class="fn">print</span>(random.choice([<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>]))  <span class="cm"># 랜덤 선택</span>
+
+<span class="cm"># datetime 모듈</span>
+now = datetime.now()
+<span class="fn">print</span>(now.strftime(<span class="st">"%Y-%m-%d %H:%M"</span>))  <span class="cm"># 2026-03-30 14:30</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> TERMINAL — pip으로 서드파티 패키지 설치</div>
+<pre><span class="cm"># 서드파티 패키지 설치</span>
+pip install requests         <span class="cm"># HTTP 요청 라이브러리</span>
+pip install pandas           <span class="cm"># 데이터 처리 라이브러리</span>
+pip install python-dotenv    <span class="cm"># 환경 변수 관리</span>
+
+<span class="cm"># 설치된 패키지 확인</span>
+pip list
+
+<span class="cm"># 가상 환경 만들기 (프로젝트마다 하나씩 권장)</span>
+python -m venv myenv         <span class="cm"># 생성</span>
+source myenv/bin/activate    <span class="cm"># 활성화 (Mac/Linux)</span>
+myenv\Scripts\activate       <span class="cm"># 활성화 (Windows)</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 11-12 연습</h3>
+      <div class="practice-item">일기 프로그램 작성: 실행할 때마다 diary.txt에 당일 날짜와 내용을 추가</div>
+      <div class="practice-item">파일 일괄 처리: 폴더 내 모든 .txt 파일을 읽어 각 파일의 줄 수를 통계</div>
+      <div class="practice-item">새 가상 환경에 requests 라이브러리를 설치하고 정상적으로 import되는지 확인</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 13-14 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d13" style="--dc: #f97316;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">13-14</span></div>
+      <div>
+        <div class="day-title">실용 서드파티 라이브러리</div>
+        <div class="day-subtitle">이 세 가지 라이브러리를 배우면 API 호출 + 데이터 처리가 가능합니다</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🌐</span>
+        <span class="topic-name">requests — HTTP 요청 (API 호출 필수)</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> use_requests.py</div>
+<pre><span class="kw">import</span> requests
+
+<span class="cm"># ---- GET 요청 (데이터 가져오기) ----</span>
+response = requests.get(<span class="st">"https://api.github.com/users/octocat"</span>)
+<span class="fn">print</span>(response.status_code)    <span class="cm"># 200 = 성공</span>
+
+data = response.json()          <span class="cm"># JSON → Python 딕셔너리</span>
+<span class="fn">print</span>(data[<span class="st">"name"</span>])             <span class="cm"># The Octocat</span>
+<span class="fn">print</span>(data[<span class="st">"public_repos"</span>])    <span class="cm"># 8</span>
+
+<span class="cm"># ---- POST 요청 (데이터 보내기, AI API 호출에 사용) ----</span>
+url = <span class="st">"https://api.example.com/chat"</span>
+headers = {
+    <span class="st">"Authorization"</span>: <span class="st">"Bearer YOUR_API_KEY"</span>,
+    <span class="st">"Content-Type"</span>: <span class="st">"application/json"</span>
+}
+payload = {
+    <span class="st">"model"</span>: <span class="st">"gpt-4"</span>,
+    <span class="st">"messages"</span>: [
+        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"안녕하세요"</span>}
+    ]
+}
+response = requests.post(url, headers=headers, json=payload)
+result = response.json()
+
+<span class="cm"># ---- 에러 처리 ----</span>
+<span class="kw">if</span> response.status_code == <span class="nu">200</span>:
+    <span class="fn">print</span>(<span class="st">"성공!"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">f"에러 발생: </span><span class="var">{response.status_code}</span><span class="st">"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">📊</span>
+        <span class="topic-name">json — 데이터 교환 형식</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> use_json.py</div>
+<pre><span class="kw">import</span> json
+
+<span class="cm"># ---- 딕셔너리 → JSON 문자열 ----</span>
+data = {<span class="st">"name"</span>: <span class="st">"철수"</span>, <span class="st">"scores"</span>: [<span class="nu">85</span>, <span class="nu">92</span>, <span class="nu">78</span>]}
+json_str = json.dumps(data, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>)
+<span class="fn">print</span>(json_str)
+
+<span class="cm"># ---- JSON 문자열 → 딕셔너리 ----</span>
+parsed = json.loads(json_str)
+<span class="fn">print</span>(parsed[<span class="st">"name"</span>])         <span class="cm"># 철수</span>
+
+<span class="cm"># ---- JSON 파일 읽기/쓰기 ----</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"config.json"</span>, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    json.dump(data, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"config.json"</span>, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    loaded = json.load(f)
+    <span class="fn">print</span>(loaded)</pre>
+        </div>
+        <div class="tip-box">
+          <h4>💡 json과 dict의 관계</h4>
+          <p>JSON은 텍스트 형식이고, Python 딕셔너리는 메모리 내 데이터 구조입니다. <code>json.dumps()</code>는 딕셔너리를 텍스트로 변환하고, <code>json.loads()</code>는 텍스트를 딕셔너리로 되돌립니다. API 통신은 이것들에 전적으로 의존합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🔑</span>
+        <span class="topic-name">dotenv — API Key 관리 (보안 최우선)</span>
+        <span class="topic-tag tag-imp">중요</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> .env 파일 (GitHub에 업로드하지 마세요!)</div>
+<pre>OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
+MODEL_NAME=gpt-4</pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> use_dotenv.py</div>
+<pre><span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()  <span class="cm"># .env 파일 로드</span>
+
+api_key = os.getenv(<span class="st">"OPENAI_API_KEY"</span>)
+model = os.getenv(<span class="st">"MODEL_NAME"</span>, <span class="st">"gpt-3.5-turbo"</span>)  <span class="cm"># 기본값 설정 가능</span>
+<span class="fn">print</span>(<span class="st">f"사용 모델: </span><span class="var">{model}</span><span class="st">"</span>)</pre>
+        </div>
+        <div class="warn-box">
+          <h4>⚠️ 보안 경고</h4>
+          <p>절대로 API Key를 코드에 직접 작성하지 마세요! .env 파일로 관리하고, .gitignore에서 .env를 제외하세요. 이것은 업무에서의 철칙입니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ Day 13-14 연습</h3>
+      <div class="practice-item">requests로 공개 API(날씨 API, GitHub API 등) 호출하여 결과를 JSON 파일로 저장</div>
+      <div class="practice-item">설정 관리 도구 작성: JSON 설정 파일을 읽고 수정 및 저장 지원</div>
+      <div class="practice-item">.env 파일에 API Key를 저장하고 dotenv로 읽어 요청에서 사용</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- DAY 15-17 -->
+  <!-- ======================================================================== -->
+  <div class="day-section" id="d15" style="--dc: #06b6d4;">
+    <div class="day-header">
+      <div class="day-badge"><span class="d-label">DAY</span><span class="d-num">15-17</span></div>
+      <div>
+        <div class="day-title">디버깅 능력 + 종합 프로젝트</div>
+        <div class="day-subtitle">"코드를 작성할 수 있는 것"에서 "문제를 해결할 수 있는 것"으로 진화</div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🐛</span>
+        <span class="topic-name">에러 메시지 읽는 법</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">디버깅을 못하면 영원히 다른 사람에게 의존하게 됩니다. 에러 메시지를 읽는 법을 배우는 것이 독립적인 개발의 분수령입니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> 자주 나오는 에러 타입</div>
+<pre><span class="cm"># ❌ SyntaxError — 문법 오류</span>
+<span class="cm"># 에러가 가리키는 줄 번호를 확인하세요. 보통 콜론, 괄호, 따옴표가 빠져 있음</span>
+<span class="kw">if</span> x == <span class="nu">1</span>     <span class="cm"># 콜론 : 빠짐</span>
+
+<span class="cm"># ❌ NameError — 변수명이 존재하지 않음</span>
+<span class="fn">print</span>(username)  <span class="cm"># username을 정의한 적 없음</span>
+
+<span class="cm"># ❌ TypeError — 타입 불일치</span>
+<span class="st">"age: "</span> + <span class="nu">25</span>    <span class="cm"># 문자열과 숫자를 직접 결합할 수 없음, str(25)로 변환 필요</span>
+
+<span class="cm"># ❌ KeyError — 딕셔너리에서 해당 key를 찾을 수 없음</span>
+data = {<span class="st">"name"</span>: <span class="st">"철수"</span>}
+data[<span class="st">"age"</span>]     <span class="cm"># data.get("age")를 사용하는 것이 더 안전함</span>
+
+<span class="cm"># ❌ IndexError — 리스트 인덱스 범위 초과</span>
+lst = [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>]
+lst[<span class="nu">5</span>]           <span class="cm"># 인덱스 0, 1, 2만 존재</span>
+
+<span class="cm"># ❌ FileNotFoundError — 파일을 찾을 수 없음</span>
+<span class="fn">open</span>(<span class="st">"없는파일.txt"</span>)  <span class="cm"># 경로와 파일명 확인</span></pre>
+        </div>
+        <div class="key-points">
+          <h4>📌 디버깅 3단계 방법</h4>
+          <ul>
+            <li><strong>1단계:</strong> 에러 메시지의 마지막 줄을 보세요 — 에러 타입과 원인을 알려줍니다</li>
+            <li><strong>2단계:</strong> 에러 메시지의 줄 번호를 확인하세요 — 에러가 발생한 위치를 파악</li>
+            <li><strong>3단계:</strong> 에러 메시지를 ChatGPT / Claude에 복사하세요 — AI가 직접 찾는 것보다 10배 빠르게 설명해 줍니다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🛡️</span>
+        <span class="topic-name">try / except 예외 처리</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> error_handling.py</div>
+<pre><span class="cm"># ---- 기본 예외 처리 ----</span>
+<span class="kw">try</span>:
+    num = <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"숫자를 입력하세요: "</span>))
+    result = <span class="nu">100</span> / num
+    <span class="fn">print</span>(<span class="st">f"결과: </span><span class="var">{result}</span><span class="st">"</span>)
+<span class="kw">except</span> ValueError:
+    <span class="fn">print</span>(<span class="st">"유효한 숫자를 입력해 주세요!"</span>)
+<span class="kw">except</span> ZeroDivisionError:
+    <span class="fn">print</span>(<span class="st">"0으로 나눌 수 없습니다!"</span>)
+<span class="kw">except</span> Exception <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="st">f"알 수 없는 에러 발생: </span><span class="var">{e}</span><span class="st">"</span>)
+
+<span class="cm"># ---- 실제 응용: 안전한 API 호출 ----</span>
+<span class="kw">import</span> requests
+
+<span class="kw">def</span> <span class="fn">safe_api_call</span>(url):
+    <span class="kw">try</span>:
+        response = requests.get(url, timeout=<span class="nu">10</span>)
+        response.raise_for_status()  <span class="cm"># 200이 아니면 예외 발생</span>
+        <span class="kw">return</span> response.json()
+    <span class="kw">except</span> requests.Timeout:
+        <span class="fn">print</span>(<span class="st">"요청 시간 초과"</span>)
+    <span class="kw">except</span> requests.RequestException <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="st">f"요청 실패: </span><span class="var">{e}</span><span class="st">"</span>)
+    <span class="kw">return</span> <span class="kw">None</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic">
+      <div class="topic-head">
+        <span class="topic-icon">🏆</span>
+        <span class="topic-name">Phase 1 종합 프로젝트: CSV 데이터 처리기</span>
+        <span class="topic-tag tag-must">필수</span>
+      </div>
+      <div class="topic-body">
+        <p class="explain">앞에서 배운 모든 지식을 하나로 엮어 완전한 작은 도구를 만듭니다. 이것이 Phase 1의 "졸업 작품"입니다.</p>
+        <div class="code-block">
+          <div class="code-label"><div class="dot" style="background:#f87171;"></div><div class="dot" style="background:#fbbf24;"></div><div class="dot" style="background:#34d399;"></div> project.py — CSV 데이터 처리기</div>
+<pre><span class="kw">import</span> json
+<span class="kw">import</span> os
+
+<span class="kw">def</span> <span class="fn">read_csv</span>(filepath):
+    <span class="st">"""CSV 파일을 읽어 딕셔너리 리스트로 반환"""</span>
+    <span class="kw">try</span>:
+        <span class="kw">with</span> <span class="fn">open</span>(filepath, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+            lines = f.readlines()
+        headers = lines[<span class="nu">0</span>].strip().split(<span class="st">","</span>)
+        data = []
+        <span class="kw">for</span> line <span class="kw">in</span> lines[<span class="nu">1</span>:]:
+            values = line.strip().split(<span class="st">","</span>)
+            row = <span class="fn">dict</span>(<span class="fn">zip</span>(headers, values))
+            data.append(row)
+        <span class="kw">return</span> data
+    <span class="kw">except</span> FileNotFoundError:
+        <span class="fn">print</span>(<span class="st">f"파일이 존재하지 않습니다: </span><span class="var">{filepath}</span><span class="st">"</span>)
+        <span class="kw">return</span> []
+
+<span class="kw">def</span> <span class="fn">filter_data</span>(data, column, value):
+    <span class="st">"""조건에 따라 데이터 필터링"""</span>
+    <span class="kw">return</span> [row <span class="kw">for</span> row <span class="kw">in</span> data <span class="kw">if</span> row.get(column) == value]
+
+<span class="kw">def</span> <span class="fn">summarize</span>(data, column):
+    <span class="st">"""숫자 열의 합계와 평균값 계산"""</span>
+    values = [<span class="fn">float</span>(row[column]) <span class="kw">for</span> row <span class="kw">in</span> data <span class="kw">if</span> column <span class="kw">in</span> row]
+    <span class="kw">return</span> {
+        <span class="st">"count"</span>: <span class="fn">len</span>(values),
+        <span class="st">"sum"</span>: <span class="fn">sum</span>(values),
+        <span class="st">"average"</span>: <span class="fn">sum</span>(values) / <span class="fn">len</span>(values) <span class="kw">if</span> values <span class="kw">else</span> <span class="nu">0</span>
+    }
+
+<span class="kw">def</span> <span class="fn">save_result</span>(data, filepath):
+    <span class="st">"""결과를 JSON으로 저장"""</span>
+    <span class="kw">with</span> <span class="fn">open</span>(filepath, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+        json.dump(data, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>)
+    <span class="fn">print</span>(<span class="st">f"결과가 </span><span class="var">{filepath}</span><span class="st">에 저장되었습니다"</span>)
+
+<span class="cm"># ---- 메인 로직 ----</span>
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    data = read_csv(<span class="st">"students.csv"</span>)
+    <span class="fn">print</span>(<span class="st">f"총 </span><span class="var">{<span class="fn">len</span>(data)}</span><span class="st">건의 데이터를 읽었습니다"</span>)
+
+    <span class="cm"># 필터링</span>
+    class_a = filter_data(data, <span class="st">"class"</span>, <span class="st">"A"</span>)
+    <span class="fn">print</span>(<span class="st">f"A반 학생: </span><span class="var">{<span class="fn">len</span>(class_a)}</span><span class="st">명"</span>)
+
+    <span class="cm"># 통계</span>
+    stats = summarize(data, <span class="st">"score"</span>)
+    <span class="fn">print</span>(<span class="st">f"평균 점수: </span><span class="var">{stats['average']:.1f}</span><span class="st">"</span>)
+
+    <span class="cm"># 저장</span>
+    save_result(stats, <span class="st">"result.json"</span>)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <h3>🏋️ 종합 프로젝트 확장 도전</h3>
+      <div class="practice-item">CSV 처리기에 "정렬" 기능 추가: 특정 열 기준으로 오름차순/내림차순 정렬</div>
+      <div class="practice-item">명령줄 인터랙션 추가: 사용자가 실행할 작업을 선택 (필터링/통계/저장)</div>
+      <div class="practice-item">에러 처리 추가: 빈 파일, 데이터 누락, 타입 에러 등 경계 케이스 처리</div>
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- CHECKPOINT -->
+  <!-- ======================================================================== -->
+  <div class="checkpoint">
+    <h3>🏁 Phase 1 통과 자가 점검 목록</h3>
+    <p>아래 항목을 모두 완료할 수 있다면, Phase 2로 진입할 준비가 된 것입니다:</p>
+    <ul class="check-list">
+      <li><span class="chk">□</span> .py 파일을 독립적으로 생성하고, 터미널에서 실행하여 출력을 확인할 수 있다</li>
+      <li><span class="chk">□</span> 변수, 문자열, 숫자로 기본 계산과 텍스트 처리를 완료할 수 있다</li>
+      <li><span class="chk">□</span> if/for/while로 숫자 맞추기 또는 FizzBuzz를 구현할 수 있다</li>
+      <li><span class="chk">□</span> 리스트를 능숙하게 조작할 수 있다 (추가/삭제/수정/조회, 슬라이싱, 리스트 컴프리헨션)</li>
+      <li><span class="chk">□</span> 딕셔너리를 능숙하게 조작할 수 있다 (중첩 접근, 순회, .get() 안전 접근)</li>
+      <li><span class="chk">□</span> 함수를 정의하고 매개변수, 기본값, 반환값을 사용할 수 있다</li>
+      <li><span class="chk">□</span> 파일 읽기/쓰기(txt/json)가 가능하며, with open() 사용법을 이해한다</li>
+      <li><span class="chk">□</span> pip으로 패키지를 설치하고, requests로 GET/POST 요청을 보낼 수 있다</li>
+      <li><span class="chk">□</span> 에러를 만나도 당황하지 않는다 — Traceback을 이해하고 해결 방법을 찾을 수 있다</li>
+      <li><span class="chk">□</span> 종합 프로젝트 완료: CSV 데이터 처리기</li>
+    </ul>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- RESOURCES -->
+  <!-- ======================================================================== -->
+  <div class="resources" style="margin-top: 32px;">
+    <h3>📚 추천 학습 자료</h3>
+    <div class="res-item"><span class="res-type">무료 강좌</span>점프 투 파이썬 — wikidocs.net (한국어, 초보자 친화적)</div>
+    <div class="res-item"><span class="res-type">무료 강좌</span>파이썬 코딩 도장 — dojang.io (한국어, 설명이 자세함)</div>
+    <div class="res-item"><span class="res-type">영상</span>Python for Beginners — YouTube (Mosh) / 유튜브에서 "파이썬 기초" 검색</div>
+    <div class="res-item"><span class="res-type">연습</span>LeetCode 쉬운 문제 (매일 1문제, 논리적 사고력 훈련)</div>
+    <div class="res-item"><span class="res-type">AI 도우미</span>문제가 생기면 ChatGPT / Claude에게 직접 물어보세요. 에러 메시지를 붙여넣고 설명을 요청하세요</div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- FINAL -->
+  <!-- ======================================================================== -->
+  <div class="final-box">
+    <h2>Phase 1 완료 후 → Phase 2: Pandas 데이터 처리로 진입</h2>
+    <p>Python 기초를 마스터하신 것을 축하합니다! 다음으로 Pandas를 배우면, 앞서 배운 리스트, 딕셔너리, 파일 작업이 모두 활용됩니다.</p>
+  </div>
+
+</div>
+</body>
+</html>
