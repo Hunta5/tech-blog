@@ -46,6 +46,12 @@ export const sidebarConfig: SidebarItem[] = [
                     { titleKey: 'PDF Reader', href: '/tools/pdf' },
                 ],
             },
+            {
+                titleKey: 'sidebar.tool.react',
+                children: [
+                    { titleKey: 'Tailwind CheatSheet', href: '/tools/react/tailwind' },
+                ],
+            },
         ],
     },
     {

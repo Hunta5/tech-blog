@@ -21,7 +21,8 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); cards=d.get\\(''''data'''',{}\\).get\\(''''cards'''',[]\\); items=cards[0].get\\(''''content'''',[]\\) if cards else []; [print\\(f{i+1}. {x.get\\(''''word'''',''''''''\\)} - {x.get\\(''''desc'''',''''''''\\)[:30]}\\) for i,x in enumerate\\(items[:5]\\)]\")",
       "Bash(python3 -c \":*)",
       "Bash(python3 -c ':*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npx tsc *)"
     ]
   }
 }
